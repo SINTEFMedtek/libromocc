@@ -15,11 +15,16 @@ class Client : public QObject
 public:
     explicit Client(QObject *parent = nullptr);
 
-    void setAddress(QString ip_address, int port);
-    bool requestConnect();
+    bool requestConnect(QString ip_address, int port);
     bool isConnected();
 
     bool sendPackage(QByteArray package);
+
+    struct ConnectionInfo
+    {
+        QString host;
+        int port;
+    };
 
 signals:
     void packageReceived(QByteArray package);
@@ -29,11 +34,10 @@ private slots:
     void displayError(QAbstractSocket::SocketError socketError);
 
 private:
-    QString mHost;
-    int mPort;
+    ConnectionInfo mConnectionInfo;
     int mCurrentTimestamp;
 
-    QTcpSocket *mSocket;
+    QTcpSocket* mSocket;
 };
 
 

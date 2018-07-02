@@ -8,18 +8,11 @@
 #include "Client.h"
 
 
-Client::Client(QObject *parent)
-        : QObject(parent)
+Client::Client(QObject *parent) : QObject(parent)
         , mSocket(new QTcpSocket(this))
 {
     connect(mSocket, &QIODevice::readyRead, this, &Client::readPackage);
     connect(mSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), this, &Client::displayError);
-}
-
-void Client::setAddress(QString ip_address, int port)
-{
-    mHost = ip_address;
-    mPort = port;
 }
 
 bool Client::isConnected()
@@ -27,11 +20,14 @@ bool Client::isConnected()
     return mSocket->waitForConnected();
 }
 
-bool Client::requestConnect()
+bool Client::requestConnect(QString host, int port)
 {
+    mConnectionInfo.host = host;
+    mConnectionInfo.port = port;
+
     qInfo() << "Trying to connect...";
     mSocket->abort();
-    mSocket->connectToHost(mHost, mPort);
+    mSocket->connectToHost(host, port);
 
     if(isConnected())
     {
@@ -43,9 +39,6 @@ bool Client::requestConnect()
 
 void Client::readPackage()
 {
-    int timeDiff = QDateTime::currentMSecsSinceEpoch()-mCurrentTimestamp;
-
-    qDebug() << "Bytes available:" << mSocket->bytesAvailable() << timeDiff;
     mCurrentTimestamp = QDateTime::currentMSecsSinceEpoch();
 
     QByteArray buffer;
