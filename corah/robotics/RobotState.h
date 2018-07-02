@@ -1,15 +1,9 @@
-#ifndef CXUR5STATE_H
-#define CXUR5STATE_H
+#ifndef ROBOTSTATE_H
+#define ROBOTSTATE_H
 
-#include "org_custusx_robot_ur5_Export.h"
-#include "cxVector3D.h"
-#include "cxTransform3D.h"
-#include <vector>
+#include <Eigen/Dense>
 
-namespace cx
-{
-typedef boost::shared_ptr<struct Ur5State> Ur5StatePtr;
-typedef std::vector<struct Ur5MovementInfo> MovementQueue;
+typedef std::vector<struct RobotMovementInfo> MovementQueue;
 
 /**
  * Struct that holds UR5 robot information.
@@ -21,32 +15,32 @@ typedef std::vector<struct Ur5MovementInfo> MovementQueue;
  */
 
 
-struct Ur5State
+struct RobotState
 {
-    Ur5State(bool updated = false);
-    ~Ur5State();
+    RobotState(bool updated = false);
+    ~RobotState();
 
-    Vector3D cartAxis,cartAngles;
+    Eigen::Vector3d cartAxis,cartAngles;
 
     Eigen::RowVectorXd jointConfiguration;
     Eigen::RowVectorXd jointVelocity;
     Eigen::RowVectorXd operationalVelocity;
 
     Eigen::MatrixXd jacobian;
-    Transform3D bMee;
+    Eigen::Affine3d bMee;
 
     double timeSinceStart;
 
     bool updated;
 };
 
-struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
+struct RobotMovementInfo
 {
-    Ur5MovementInfo();
-    ~Ur5MovementInfo();
+    RobotMovementInfo();
+    ~RobotMovementInfo();
 
-    Transform3D target_xMe;
-    Transform3D motionReference; // prMx
+    Eigen::Affine3d target_xMe;
+    Eigen::Affine3d motionReference; // prMx
 
     double acceleration;
     double velocity;
@@ -70,9 +64,4 @@ struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
     Eigen::RowVectorXd targetJointVelocity;
 };
 
-
-
-
-} // cx
-
-#endif // CXUR5STATE_H
+#endif // ROBOTSTATE_H

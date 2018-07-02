@@ -1,10 +1,7 @@
-#include "cxUr5State.h"
+#include "RobotState.h"
 
 
-namespace cx
-{
-
-Ur5State::Ur5State(bool updt)
+RobotState::RobotState(bool updt)
 {
     updated = updt;
 
@@ -18,29 +15,26 @@ Ur5State::Ur5State(bool updt)
     timeSinceStart = 0;
 }
 
-Ur5State::~Ur5State()
+RobotState::~RobotState()
 {
 }
 
 //===============================================
 
-Ur5MovementInfo::~Ur5MovementInfo()
+RobotMovementInfo::~RobotMovementInfo()
 {
 
 }
 
-Ur5MovementInfo::Ur5MovementInfo():
+RobotMovementInfo::RobotMovementInfo():
     acceleration(0),
     velocity(0),
     time(0),
     radius(0),
-    motionReference(Transform3D::Identity())
+    motionReference(Eigen::Affine3d::Identity())
 {   
     typeOfMovement = undefinedMove;
 
     targetJointVelocity = Eigen::RowVectorXd(6);
     targetJointVelocity << 0,0,0,0,0,0;
 }
-
-
-} // cx
