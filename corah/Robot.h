@@ -7,8 +7,8 @@
 
 #include <QObject>
 
-#include <communication/Client.h>
-
+#include "robotics/RobotState.h"
+#include "communication/CommunicationInterface.h"
 
 class Robot : public QObject
 {
@@ -18,9 +18,20 @@ public:
     Robot();
     ~Robot();
 
+    void setup(Manipulator manipulator, QString ip_address, int port);
+    bool initialize();
+
+    RobotState getCurrentState();
+
+    void move(Eigen::RowVectorXd jointConfiguration, double acc, double vel, double t=0, double rad=0);
+
+
 private:
-    //CommunicationInterface mCommunicationInterface;
-    //
+    void updateCurrentState(RobotState state);
+
+    CommunicationInterface mCommunicationInterface;
+    RobotState mCurrentState;
+
 };
 
 
