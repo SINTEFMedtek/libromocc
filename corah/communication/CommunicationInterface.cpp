@@ -4,9 +4,13 @@
 
 #include "CommunicationInterface.h"
 
+#include "manipulators/ur5/Ur5MessageEncoder.h"
+#include "manipulators/ur5/Ur5MessageDecoder.h"
+
+
 CommunicationInterface::CommunicationInterface()
 {
-
+    connect(&mClient,&Client::packageReceived,this,&CommunicationInterface::decodePackage);
 }
 
 CommunicationInterface::~CommunicationInterface()
@@ -14,10 +18,9 @@ CommunicationInterface::~CommunicationInterface()
 
 }
 
-bool CommunicationInterface::connectToRobot(QString host, int port)
+bool CommunicationInterface::connectToRobot()
 {
-    mClient.setAddress(host, port);
-    mClient.requestConnect();
+    return mClient.requestConnect(mHost, mPort);
 }
 
 bool CommunicationInterface::sendMessage(QString message)
@@ -28,4 +31,32 @@ bool CommunicationInterface::sendMessage(QString message)
     buffer = buffer.append(message);
 
     return mClient.sendPackage(buffer);
+}
+
+void CommunicationInterface::config_connection(QString host, int port)
+{
+    mHost = host;
+    mPort = port;
+}
+
+void CommunicationInterface::set_communication_protocol(Manipulator manipulator)
+{
+    if(manipulator==UR5)
+    {
+        mEncoder = new Ur5MessageEncoder();
+        mDecoder = new Ur5MessageDecoder();
+    }
+}
+
+void CommunicationInterface::decodePackage(QByteArray package)
+{
+    RobotState state;
+    state = mDecoder->analyzeRawPacket(package);
+
+    emit(stateChanged(state));
+}
+
+void CommunicationInterface::moveJoints(Eigen::RowVectorXd jointConfiguration, double acc, double vel, double t, double rad)
+{
+    sendMessage(mEncoder->moveJoints(jointConfiguration, acc, vel, t, rad));
 }
