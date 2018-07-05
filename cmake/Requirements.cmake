@@ -49,6 +49,7 @@ endif()
 
 ## External depedencies
 include(cmake/ExternalEigen.cmake)
+include(cmake/ExternalOrocos.cmake)
 
 # Make sure project can find external includes and libaries
 link_directories(${CORAH_EXTERNAL_INSTALL_DIR}/lib/)
