@@ -1,40 +1,45 @@
 #include "RobotState.h"
 
+#include "manipulators/ur5/Ur5KDLDefinition.h"
 
-RobotState::RobotState(bool updt)
+RobotState::RobotState() :
+mFKSolver(mKDLChain)
 {
-    updated = updt;
-
-    jointConfiguration = Eigen::RowVectorXd(6);
-    jointVelocity = Eigen::RowVectorXd(6);
-    jacobian = Eigen::MatrixXd(6,6);
-    operationalVelocity = Eigen::RowVectorXd(6);
-
-    operationalVelocity << 0,0,0,0,0,0;
-    jointVelocity << 0,0,0,0,0,0;
-    timeSinceStart = 0;
 }
 
 RobotState::~RobotState()
 {
 }
 
-//===============================================
-
-RobotMovementInfo::~RobotMovementInfo()
+void RobotState::set_kdlchain(Manipulator manipulator)
 {
-
+    if(manipulator==UR5)
+    {
+        mKDLChain = Ur5Chain();
+        KDL::ChainFkSolverPos_recursive mFKSolver(mKDLChain);
+        //mIKSolver = new KDL::ChainIkSolverPos_LMA(mKDLChain);
+    }
 }
 
-RobotMovementInfo::RobotMovementInfo():
-    acceleration(0),
-    velocity(0),
-    time(0),
-    radius(0),
-    motionReference(Eigen::Affine3d::Identity())
-{   
-    typeOfMovement = undefinedMove;
+void RobotState::set_jointState(Eigen::RowVectorXd jointConfig, Eigen::RowVectorXd jointVel, double timestamp)
+{
+    mTimestamp = timestamp;
+    mJointConfiguration = jointConfig;
+    mJointVelocity = jointVel;
 
-    targetJointVelocity = Eigen::RowVectorXd(6);
-    targetJointVelocity << 0,0,0,0,0,0;
+    bTee = transform_to_joint(mJointConfiguration, mKDLChain.getNrOfJoints());
 }
+
+Eigen::Affine3d RobotState::transform_to_joint(Eigen::RowVectorXd jointConfig, int jointNr)
+{
+    KDL::Frame output_T;
+
+    KDL::JntArray input_q(mKDLChain.getNrOfJoints());
+    for (unsigned int i = 0; i < 6; i++) {input_q(i)=jointConfig[i];}
+
+    mFKSolver.JntToCart(input_q, output_T, jointNr);
+
+    return KDLFrameToEigenAffine(output_T);
+}
+
+

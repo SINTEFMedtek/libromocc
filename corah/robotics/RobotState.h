@@ -1,9 +1,7 @@
 #ifndef ROBOTSTATE_H
 #define ROBOTSTATE_H
 
-#include <Eigen/Dense>
-
-typedef std::vector<struct RobotMovementInfo> MovementQueue;
+#include <utilities/corahHeaders.h>
 
 /**
  * Struct that holds UR5 robot information.
@@ -15,53 +13,35 @@ typedef std::vector<struct RobotMovementInfo> MovementQueue;
  */
 
 
-struct RobotState
+class RobotState
 {
-    RobotState(bool updated = false);
+
+public:
+    RobotState();
     ~RobotState();
 
-    Eigen::Vector3d cartAxis,cartAngles;
+    void set_kdlchain(Manipulator manipulator);
+    void set_jointState(Eigen::RowVectorXd q, Eigen::RowVectorXd q_vel, double timestamp);
 
-    Eigen::RowVectorXd jointConfiguration;
-    Eigen::RowVectorXd jointVelocity;
-    Eigen::RowVectorXd operationalVelocity;
+    Eigen::RowVectorXd mJointConfiguration;
+    Eigen::RowVectorXd mJointVelocity;
+    Eigen::Affine3d bTee;
 
-    Eigen::MatrixXd jacobian;
-    Eigen::Affine3d bMee;
+    //Eigen::RowVectorXd operationalVelocity;
+    //Eigen::Vector3d cartAxis,cartAngles;
+    //Eigen::MatrixXd jacobian;
 
-    double timeSinceStart;
+private:
+    KDL::Chain mKDLChain;
+    KDL::ChainFkSolverPos_recursive mFKSolver;
+    //KDL::ChainIkSolverPos_LMA* mIKSolver;
 
-    bool updated;
-};
+    Eigen::Affine3d transform_to_joint(Eigen::RowVectorXd jointConfig, int jointNr);
 
-struct RobotMovementInfo
-{
-    RobotMovementInfo();
-    ~RobotMovementInfo();
+    double mTimestamp;
 
-    Eigen::Affine3d target_xMe;
-    Eigen::Affine3d motionReference; // prMx
 
-    double acceleration;
-    double velocity;
-    double radius;
-    double time;
 
-    enum movementType
-    {
-        movej,
-        movep,
-        movel,
-        speedj,
-        speedl,
-        stopj,
-        stopl,
-        undefinedMove
-    };
-
-    movementType typeOfMovement;
-
-    Eigen::RowVectorXd targetJointVelocity;
 };
 
 #endif // ROBOTSTATE_H
