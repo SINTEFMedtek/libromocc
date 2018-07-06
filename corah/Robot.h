@@ -5,7 +5,7 @@
 #ifndef CORAH_ROBOT_H
 #define CORAH_ROBOT_H
 
-#include <QObject>
+#include "utilities/corahHeaders.h"
 
 #include "robotics/RobotState.h"
 #include "communication/CommunicationInterface.h"
@@ -27,7 +27,7 @@ public:
 
 
 private:
-    void updateCurrentState(RobotState state);
+    void updateCurrentState(JointState state);
 
     CommunicationInterface mCommunicationInterface;
     RobotState mCurrentState;

@@ -3,7 +3,6 @@
 //
 
 #include <iostream>
-#include <Eigen/Dense>
 
 #include "Robot.h"
 
@@ -21,6 +20,8 @@ void Robot::setup(Manipulator manipulator, QString host, int port)
 {
     mCommunicationInterface.set_communication_protocol(manipulator);
     mCommunicationInterface.config_connection(host, port);
+
+    mCurrentState.set_kdlchain(manipulator);
 }
 
 bool Robot::initialize()
@@ -33,9 +34,12 @@ RobotState Robot::getCurrentState()
     return mCurrentState;
 }
 
-void Robot::updateCurrentState(RobotState state)
+void Robot::updateCurrentState(JointState state)
 {
-    mCurrentState = state;
+    mCurrentState.set_jointState(state.jointConfiguration, state.jointVelocity, state.timestamp);
+
+    std::cout << mCurrentState.bTee.matrix() << std::endl << std::endl;
+    std::cout << AffineToRowVector(mCurrentState.bTee) << std::endl << std::endl;
 }
 
 void Robot::move(Eigen::RowVectorXd jointConfiguration, double acc, double vel, double t, double rad)
