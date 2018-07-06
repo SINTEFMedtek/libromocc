@@ -56,7 +56,7 @@ generate_export_header(corah EXPORT_FILE_NAME corahExport.hpp)
 
 #### Link everything
 message("-- LIBS: ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES}")
-target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES})
+target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} orocos-kdl)
 qt5_use_modules(corah Widgets Network) # Add Qt 5 modules
 
 add_executable(setup_robot_example corah/examples/setup_robot.cpp)
