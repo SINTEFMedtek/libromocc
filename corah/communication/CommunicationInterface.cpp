@@ -50,8 +50,8 @@ void CommunicationInterface::set_communication_protocol(Manipulator manipulator)
 
 void CommunicationInterface::decodePackage(QByteArray package)
 {
-    RobotState state;
-    state = mDecoder->analyzeRawPacket(package);
+    JointState state;
+    state = mDecoder->analyzeTCPSegment(package);
 
     emit(stateChanged(state));
 }

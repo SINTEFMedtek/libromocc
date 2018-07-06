@@ -5,14 +5,12 @@
 #ifndef CORAH_COMMUNICATIONINTERFACE_H
 #define CORAH_COMMUNICATIONINTERFACE_H
 
-#include <QObject>
+#include <utilities/corahHeaders.h>
 
 #include "robotics/RobotState.h"
 #include "communication/Client.h"
 #include "communication/MessageDecoder.h"
 #include "communication/MessageEncoder.h"
-
-typedef enum {UR5} Manipulator;
 
 class CommunicationInterface : public QObject
 {
@@ -35,7 +33,7 @@ private slots:
     void decodePackage(QByteArray package);
 
 signals:
-    void stateChanged(RobotState state);
+    void stateChanged(JointState state);
 
 private:
     MessageEncoder* mEncoder;
