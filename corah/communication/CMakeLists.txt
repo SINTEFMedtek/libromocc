@@ -3,4 +3,8 @@ corah_add_sources(
         CommunicationInterface.h
         Client.cpp
         Client.h
+        MessageEncoder.cpp
+        MessageEncoder.h
+        MessageDecoder.cpp
+        MessageDecoder.h
 )
