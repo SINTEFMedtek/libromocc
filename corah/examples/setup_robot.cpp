@@ -3,28 +3,24 @@
 //
 
 #include <QApplication>
-#include "communication/CommunicationInterface.h"
-#include "communication/Client.h"
 
+#include "Robot.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    // Robot ur5;
-    // ur5.setup_manipulator("ur5");
-    // ur5.setup_connection(ip_address, port);
-    // ur5.initialize();
 
-    CommunicationInterface comInf;
+    Robot ur5;
+    ur5.setup(UR5, "localhost", 30003);
+    ur5.initialize();
 
-    Client client;
+    //ur5.move(home, 0.3, 0.1);
 
-    QString IPaddress = "localhost";
-    int port = 30003;
+    //Eigen::RowVectorXd q(6);
+    //q << dh_home[0], dh_home[1], dh_home[2], dh_home[3], dh_home[4], dh_home[5];
 
-    comInf.connectToRobot(IPaddress, port);
-
-    comInf.sendMessage(QString("movel(p[-130.1,-440.2,-131.9,0.0012,-3.14,-0.05],a=0.1,v=0.1)"));
+    //KDL::JntArray q_home = KDL::JntArray(6);
+    //for (unsigned int i = 0; i < 6; i++) {q_home(i)=dh_home[i];}
 
     return app.exec();
 }
