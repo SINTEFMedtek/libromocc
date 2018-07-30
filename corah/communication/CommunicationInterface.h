@@ -26,6 +26,7 @@ public:
     bool connectToRobot();
 
     void moveJoints(Eigen::RowVectorXd jointConfiguration, double acc, double vel, double t, double rad);
+    void movePose(Eigen::Affine3d pose, double acc, double vel, double t, double rad);
 
     bool sendMessage(QString message);
 
