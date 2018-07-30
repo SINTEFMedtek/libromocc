@@ -27,16 +27,16 @@ public:
     Eigen::RowVectorXd mJointVelocity;
     Eigen::Affine3d bTee;
 
-    //Eigen::RowVectorXd operationalVelocity;
-    //Eigen::Vector3d cartAxis,cartAngles;
-    //Eigen::MatrixXd jacobian;
+    KDL::ChainFkSolverPos_recursive getFKSolver();
+    KDL::ChainIkSolverPos_NR getIKSolver();
 
 private:
     KDL::Chain mKDLChain;
-    KDL::ChainFkSolverPos_recursive mFKSolver;
-    //KDL::ChainIkSolverPos_LMA* mIKSolver;
+    KDL::ChainFkSolverPos_recursive *mFKSolver;
+    KDL::ChainIkSolverPos_NR *mIKSolver;
+    KDL::ChainIkSolverVel_pinv *mIKSolverVel;
 
-    Eigen::Affine3d transform_to_joint(Eigen::RowVectorXd jointConfig, int jointNr);
+    Eigen::Affine3d transform_to_joint(Eigen::RowVectorXd jointConfig, int jointNr=-1);
 
     double mTimestamp;
 
