@@ -5,11 +5,30 @@ QString Ur5MessageEncoder::moveJoints(Eigen::RowVectorXd jointConfig,double acc,
     return movej(jointConfig, acc, vel, t, r);
 }
 
+QString Ur5MessageEncoder::movePose(Eigen::Affine3d pose, double acc, double vel, double t, double radius)
+{
+    Eigen::RowVectorXd vec = AffineToRowVector(pose);
+    return movep(vec, acc, vel, t, radius);
+}
 
-QString Ur5MessageEncoder::movej(Eigen::RowVectorXd p,double a, double v,double t,double r)
+QString Ur5MessageEncoder::movej(Eigen::RowVectorXd q,double a, double v,double t,double r)
 {
     return QString("movej([%1,%2,%3,%4,%5,%6],a=%7,v=%8,t=%9,r=%10)")
-            .arg(p(0)).arg(p(1)).arg(p(2)).arg(p(3)).arg(p(4)).arg(p(5)).arg(a).arg(v).arg(t).arg(r);
+            .arg(q(0)).arg(q(1)).arg(q(2)).arg(q(3)).arg(q(4)).arg(q(5)).arg(a).arg(v).arg(t).arg(r);
+}
+
+QString Ur5MessageEncoder::movep(Eigen::RowVectorXd op,double a, double v,double t,double r)
+{
+    return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,r=%9)")
+            .arg(op(0)/1000).arg(op(1)/1000).arg(op(2)/1000)
+            .arg(op(3)).arg(op(4)).arg(op(5)).arg(a).arg(v).arg(r);
+}
+
+QString Ur5MessageEncoder::speedj(Eigen::RowVectorXd jointVelocity, double a, double t)
+{
+    return QString("speedj([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
+            .arg(jointVelocity(0)).arg(jointVelocity(1)).arg(jointVelocity(2)).arg(jointVelocity(3))
+            .arg(jointVelocity(4)).arg(jointVelocity(5)).arg(a).arg(t);
 }
 
 
