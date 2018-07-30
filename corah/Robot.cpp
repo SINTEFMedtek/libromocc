@@ -16,7 +16,7 @@ Robot::~Robot()
 
 }
 
-void Robot::setup(Manipulator manipulator, QString host, int port)
+void Robot::configure(Manipulator manipulator, QString host, int port)
 {
     mCommunicationInterface.set_communication_protocol(manipulator);
     mCommunicationInterface.config_connection(host, port);
@@ -24,7 +24,7 @@ void Robot::setup(Manipulator manipulator, QString host, int port)
     mCurrentState.set_kdlchain(manipulator);
 }
 
-bool Robot::initialize()
+bool Robot::start()
 {
     return mCommunicationInterface.connectToRobot();
 }
@@ -46,3 +46,5 @@ void Robot::move(Eigen::RowVectorXd jointConfiguration, double acc, double vel, 
 {
     mCommunicationInterface.moveJoints(jointConfiguration, acc, vel, t, rad);
 }
+
+
