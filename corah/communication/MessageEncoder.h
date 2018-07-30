@@ -11,6 +11,7 @@
 class MessageEncoder {
 public:
     virtual QString moveJoints(Eigen::RowVectorXd jointConfiguration, double acc, double vel, double t, double rad) = 0;
+    virtual QString movePose(Eigen::Affine3d pose, double acc, double vel, double t, double rad) = 0;
 };
 
 
