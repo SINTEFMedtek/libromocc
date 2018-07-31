@@ -12,7 +12,7 @@ Client::Client(QObject *parent) : QObject(parent)
         , mSocket(new QTcpSocket(this))
 {
     connect(mSocket, &QIODevice::readyRead, this, &Client::readPackage);
-    connect(mSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), this, &Client::displayError);
+    //connect(mSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), this, &Client::displayError);
 }
 
 bool Client::isConnected()
