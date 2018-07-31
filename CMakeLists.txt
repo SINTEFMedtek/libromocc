@@ -4,7 +4,7 @@ project(corah)
 include(cmake/Macros.cmake)
 
 #### Options
-option(DOWNLOAD_AND_BUILD_QT5 "Download and build Qt 5.9. Turn this OFF if you want to use pre-built binaries you already have on your machine." ON)
+option(DOWNLOAD_AND_BUILD_QT5 "Download and build Qt 5.9. Turn this OFF if you want to use pre-built binaries you already have on your machine." OFF)
 
 #### Set build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -57,7 +57,7 @@ generate_export_header(corah EXPORT_FILE_NAME corahExport.hpp)
 #### Link everything
 message("-- LIBS: ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES}")
 target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} orocos-kdl)
-qt5_use_modules(corah Widgets Network) # Add Qt 5 modules
+#qt5_use_modules(corah Widgets Network) # Add Qt 5 modules
 
 add_executable(setup_robot_example corah/examples/setup_robot.cpp)
 target_link_libraries(setup_robot_example corah)
