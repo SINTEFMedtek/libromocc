@@ -51,12 +51,16 @@ message("-- INCLUDE DIRS: ${CORAH_INCLUDE_DIRS}")
 #### Create library and executables
 add_library(corah SHARED ${CORAH_SOURCE_FILES} ${HEADERS_MOC})
 add_dependencies(corah ${CORAH_EXTERNAL_DEPENDENCIES})
-include(GenerateExportHeader)
-generate_export_header(corah EXPORT_FILE_NAME corahExport.hpp)
+#include(GenerateExportHeader)
+#generate_export_header(corah EXPORT_FILE_NAME corahExport.hpp)
 
 #### Link everything
 message("-- LIBS: ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES}")
-target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} orocos-kdl)
+target_link_libraries(corah
+        PUBLIC
+            ${LIBRARIES}
+            ${CORAH_SYSTEM_LIBRARIES}
+            orocos-kdl)
 #qt5_use_modules(corah Widgets Network) # Add Qt 5 modules
 
 add_executable(setup_robot_example corah/examples/setup_robot.cpp)
