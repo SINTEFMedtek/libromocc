@@ -27,7 +27,7 @@ set(CORAH_SOURCE_DIR "${PROJECT_SOURCE_DIR}/corah/")
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/ ${CMAKE_MODULE_PATH}) # For finding the custom Find modules
 
 #### Source and includes
-set(CORAH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/corah ${CMAKE_CURRENT_BINARY_DIR})
+set(CORAH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/corah ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 #### Setup all external depedencies
 include(cmake/Requirements.cmake)
@@ -35,6 +35,7 @@ message("-- Qt version: ${Qt5Widgets_VERSION}")
 
 #### Set include dirs
 include_directories(${CORAH_INCLUDE_DIRS})
+
 get_directory_property(hasParent PARENT_DIRECTORY)
 if(hasParent)
     set(CORAH_INCLUDE_DIRS ${CORAH_INCLUDE_DIRS} PARENT_SCOPE)
@@ -44,24 +45,23 @@ endif()
 corah_add_subdirectories(corah)
 qt5_wrap_cpp(HEADERS_MOC ${CORAH_SOURCE_FILES})
 
-message("-- SOURCE FILES: ${CORAH_SOURCE_FILES}")
-message("-- HEADERS MOC: ${HEADERS_MOC}")
-message("-- INCLUDE DIRS: ${CORAH_INCLUDE_DIRS}")
+message("-- CORAH SOURCE FILES: ${CORAH_SOURCE_FILES}")
+message("-- CORAH HEADERS MOC: ${HEADERS_MOC}")
+message("-- CORAH INCLUDE DIRS: ${CORAH_INCLUDE_DIRS}")
+message("-- CORAH DEPENDENCIES: ${CORAH_EXTERNAL_DEPENDENCIES}")
 
 #### Create library and executables
 add_library(corah SHARED ${CORAH_SOURCE_FILES} ${HEADERS_MOC})
 add_dependencies(corah ${CORAH_EXTERNAL_DEPENDENCIES})
-#include(GenerateExportHeader)
-#generate_export_header(corah EXPORT_FILE_NAME corahExport.hpp)
+include(GenerateExportHeader)
+generate_export_header(corah EXPORT_FILE_NAME corahExport.hpp)
 
 #### Link everything
-message("-- LIBS: ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES}")
-target_link_libraries(corah
-        PUBLIC
-            ${LIBRARIES}
-            ${CORAH_SYSTEM_LIBRARIES}
-            orocos-kdl)
+message("-- LIBS: ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} -L${CORAH_EXTERNAL_INSTALL_DIR}/lib")
+target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} -L${CORAH_EXTERNAL_INSTALL_DIR}/lib orocos-kdl)
 #qt5_use_modules(corah Widgets Network) # Add Qt 5 modules
+
+target_include_directories(corah PUBLIC ${CORAH_INCLUDE_DIRS} -L${CORAH_EXTERNAL_INSTALL_DIR}/include)
 
 add_executable(setup_robot_example corah/examples/setup_robot.cpp)
 target_link_libraries(setup_robot_example corah)
