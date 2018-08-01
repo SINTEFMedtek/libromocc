@@ -13,7 +13,7 @@ class Client : public QObject
     Q_OBJECT
 
 public:
-    explicit Client(QObject *parent = nullptr);
+    explicit Client(QObject *parent = NULL);
 
     bool requestConnect(QString ip_address, int port);
     bool isConnected();
