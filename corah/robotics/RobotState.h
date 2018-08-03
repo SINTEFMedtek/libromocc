@@ -23,6 +23,8 @@ public:
     void set_kdlchain(Manipulator manipulator);
     void set_jointState(Eigen::RowVectorXd q, Eigen::RowVectorXd q_vel, double timestamp);
 
+    Eigen::Affine3d getTransformToJoint(int jointNr);
+
     Eigen::RowVectorXd mJointConfiguration;
     Eigen::RowVectorXd mJointVelocity;
     Eigen::Affine3d bTee;
@@ -30,6 +32,8 @@ public:
 
     KDL::ChainFkSolverPos_recursive getFKSolver();
     KDL::ChainIkSolverPos_NR getIKSolver();
+
+    double timestamp;
 
 private:
     KDL::Chain mKDLChain;
@@ -39,7 +43,6 @@ private:
 
     Eigen::Affine3d transform_to_joint(Eigen::RowVectorXd jointConfig, int jointNr=-1);
 
-    double mTimestamp;
 
 
 

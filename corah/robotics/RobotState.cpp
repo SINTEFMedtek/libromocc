@@ -26,7 +26,7 @@ void RobotState::set_kdlchain(Manipulator manipulator)
 
 void RobotState::set_jointState(Eigen::RowVectorXd jointConfig, Eigen::RowVectorXd jointVel, double timestamp)
 {
-    mTimestamp = timestamp;
+    timestamp = timestamp;
     mJointConfiguration = jointConfig;
     mJointVelocity = jointVel;
 
@@ -43,7 +43,21 @@ Eigen::Affine3d RobotState::transform_to_joint(Eigen::RowVectorXd jointConfig, i
 
     mFKSolver->JntToCart(input_q, output_T, jointNr);
 
-    return KDLFrameToEigenAffine(output_T);
+    Eigen::Affine3d transform = KDLFrameToEigenAffine(output_T);
+    return ScaleTranslationAffine(transform, 1000);
+}
+
+Eigen::Affine3d RobotState::getTransformToJoint(int jointNr)
+{
+    KDL::Frame output_T;
+
+    KDL::JntArray input_q(mKDLChain.getNrOfJoints());
+    for (unsigned int i = 0; i < 6; i++) {input_q(i)=mJointConfiguration[i];}
+
+    mFKSolver->JntToCart(input_q, output_T, jointNr);
+
+    Eigen::Affine3d transform = KDLFrameToEigenAffine(output_T);
+    return ScaleTranslationAffine(transform, 1000);
 }
 
 KDL::ChainIkSolverPos_NR RobotState::getIKSolver()
