@@ -26,6 +26,7 @@ public:
     Eigen::RowVectorXd mJointConfiguration;
     Eigen::RowVectorXd mJointVelocity;
     Eigen::Affine3d bTee;
+    Eigen::RowVectorXd operationalConfiguration;
 
     KDL::ChainFkSolverPos_recursive getFKSolver();
     KDL::ChainIkSolverPos_NR getIKSolver();

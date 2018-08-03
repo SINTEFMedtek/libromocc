@@ -31,6 +31,7 @@ void RobotState::set_jointState(Eigen::RowVectorXd jointConfig, Eigen::RowVector
     mJointVelocity = jointVel;
 
     bTee = transform_to_joint(mJointConfiguration);
+    operationalConfiguration = AffineToRowVector(bTee);
 }
 
 Eigen::Affine3d RobotState::transform_to_joint(Eigen::RowVectorXd jointConfig, int jointNr)
