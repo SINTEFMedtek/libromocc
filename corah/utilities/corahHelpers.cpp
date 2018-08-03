@@ -16,6 +16,12 @@ Eigen::Affine3d KDLFrameToEigenAffine(KDL::Frame frame)
     return affine;
 }
 
+Eigen::Affine3d ScaleTranslationAffine(Eigen::Affine3d affine, double scale)
+{
+    affine.translation() = affine.translation()*1000;
+    return affine;
+}
+
 Eigen::RowVectorXd AffineToRowVector(Eigen::Affine3d affine)
 {
     Eigen::RowVectorXd vector(6);
