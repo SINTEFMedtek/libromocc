@@ -5,6 +5,9 @@
 #ifndef CORAH_CORAHHEADERS_H
 #define CORAH_CORAHHEADERS_H
 
+// Standard library
+#include <memory>
+
 // Qt
 #include <QObject>
 
@@ -22,6 +25,6 @@
 
 // Supported manipulators
 typedef enum {UR5} Manipulator;
-
+typedef enum {movej,movep,speedj,speedl,stopj,stopl} MotionType;
 
 #endif //CORAH_CORAHHEADERS_H
