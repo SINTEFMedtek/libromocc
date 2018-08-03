@@ -10,9 +10,12 @@
 #include "robotics/RobotState.h"
 #include "communication/CommunicationInterface.h"
 
+typedef std::shared_ptr<class Robot> RobotPtr;
+
 class Robot : public QObject
 {
     Q_OBJECT
+
 
 public:
     Robot();
@@ -20,12 +23,17 @@ public:
 
     void configure(Manipulator manipulator, QString ip_address, int port);
     bool start();
+    bool isConnected();
 
     RobotState getCurrentState();
 
-    void move(Eigen::Affine3d pose, double acc, double vel, double t=0, double rad=0);
-    void move(Eigen::RowVectorXd jointConfiguration, double acc, double vel, double t=0, double rad=0);
+    void stopMove(QString typeOfMovement, double acc);
 
+    template <class Target>
+    void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0);
+
+signals:
+    void stateUpdated();
 
 private:
     void updateCurrentState(JointState state);
@@ -33,6 +41,12 @@ private:
     CommunicationInterface mCommunicationInterface;
     RobotState mCurrentState;
 
+};
+
+template <class Target>
+void Robot::move(MotionType type, Target target, double acc, double vel, double t, double rad)
+{
+    mCommunicationInterface.move(type, target, acc, vel, t, rad);
 };
 
 

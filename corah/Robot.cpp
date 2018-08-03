@@ -29,6 +29,11 @@ bool Robot::start()
     return mCommunicationInterface.connectToRobot();
 }
 
+bool Robot::isConnected()
+{
+    return mCommunicationInterface.isConnected();
+}
+
 RobotState Robot::getCurrentState()
 {
     return mCurrentState;
@@ -37,14 +42,10 @@ RobotState Robot::getCurrentState()
 void Robot::updateCurrentState(JointState state)
 {
     mCurrentState.set_jointState(state.jointConfiguration, state.jointVelocity, state.timestamp);
-
-    std::cout << mCurrentState.bTee.matrix() << std::endl << std::endl;
-    std::cout << AffineToRowVector(mCurrentState.bTee) << std::endl << std::endl;
+    emit stateUpdated();
 }
 
-void Robot::move(Eigen::RowVectorXd jointConfiguration, double acc, double vel, double t, double rad)
+void Robot::stopMove(QString typeOfStop, double acc)
 {
-    mCommunicationInterface.moveJoints(jointConfiguration, acc, vel, t, rad);
+    mCommunicationInterface.stopMove(typeOfStop, acc);
 }
-
-

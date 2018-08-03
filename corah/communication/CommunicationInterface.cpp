@@ -7,7 +7,6 @@
 #include "manipulators/ur5/Ur5MessageEncoder.h"
 #include "manipulators/ur5/Ur5MessageDecoder.h"
 
-
 CommunicationInterface::CommunicationInterface()
 {
     connect(&mClient,&Client::packageReceived,this,&CommunicationInterface::decodePackage);
@@ -15,12 +14,16 @@ CommunicationInterface::CommunicationInterface()
 
 CommunicationInterface::~CommunicationInterface()
 {
-
 }
 
 bool CommunicationInterface::connectToRobot()
 {
     return mClient.requestConnect(mHost, mPort);
+}
+
+bool CommunicationInterface::isConnected()
+{
+    return mClient.isConnected();
 }
 
 bool CommunicationInterface::sendMessage(QString message)
@@ -56,12 +59,7 @@ void CommunicationInterface::decodePackage(QByteArray package)
     emit(stateChanged(state));
 }
 
-void CommunicationInterface::moveJoints(Eigen::RowVectorXd jointConfiguration, double acc, double vel, double t, double rad)
+void CommunicationInterface::stopMove(QString typeOfStop, double acc)
 {
-    sendMessage(mEncoder->moveJoints(jointConfiguration, acc, vel, t, rad));
-}
-
-void CommunicationInterface::movePose(Eigen::Affine3d pose, double acc, double vel, double t, double rad)
-{
-    sendMessage(mEncoder->movePose(pose, acc, vel, t, rad));
+    sendMessage(mEncoder->stopCommand(typeOfStop, acc));
 }

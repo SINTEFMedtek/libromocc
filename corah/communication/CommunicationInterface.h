@@ -24,11 +24,14 @@ public:
     void set_communication_protocol(Manipulator manipulator);
 
     bool connectToRobot();
+    bool isConnected();
 
-    void moveJoints(Eigen::RowVectorXd jointConfiguration, double acc, double vel, double t, double rad);
-    void movePose(Eigen::Affine3d pose, double acc, double vel, double t, double rad);
+    void stopMove(QString typeOfStop, double acc);
 
     bool sendMessage(QString message);
+
+    template <class TargetConfiguration>
+    void move(MotionType typeOfMotion, TargetConfiguration target, double acc, double vel, double t, double rad);
 
 private slots:
     void decodePackage(QByteArray package);
@@ -37,12 +40,18 @@ signals:
     void stateChanged(JointState state);
 
 private:
-    MessageEncoder* mEncoder;
-    MessageDecoder* mDecoder;
+    MessageEncoder *mEncoder;
+    MessageDecoder *mDecoder;
     Client mClient;
 
     QString mHost;
     int mPort;
+};
+
+template <class TargetConfiguration>
+void CommunicationInterface::move(MotionType typeOfMotion, TargetConfiguration target, double acc, double vel, double t, double rad)
+{
+    sendMessage(mEncoder->moveCommand(typeOfMotion, target, acc, vel, t, rad));
 };
 
 
