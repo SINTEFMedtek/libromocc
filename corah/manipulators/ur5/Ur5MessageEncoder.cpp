@@ -1,14 +1,33 @@
 #include "Ur5MessageEncoder.h"
+#include <iostream>
 
-QString Ur5MessageEncoder::moveJoints(Eigen::RowVectorXd jointConfig,double acc, double vel,double t,double r)
+QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowVectorXd targetConfiguration, double acc,
+                                      double vel, double t, double rad)
 {
-    return movej(jointConfig, acc, vel, t, r);
+    if(typeOfMovement==MotionType::movej)
+        return movej(targetConfiguration,acc,vel,t,rad);
+    else if(typeOfMovement==MotionType::movep)
+        return movep(targetConfiguration,acc,vel,t,rad);
+    else if(typeOfMovement==MotionType::speedl)
+        return speedl(targetConfiguration,acc,t);
+    else if(typeOfMovement == MotionType::speedj)
+        return speedj(targetConfiguration,acc,t);
+    else if(typeOfMovement == MotionType::stopj)
+        return stopj(acc);
 }
 
-QString Ur5MessageEncoder::movePose(Eigen::Affine3d pose, double acc, double vel, double t, double radius)
+QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::Affine3d pose, double acc, double vel, double t, double radius)
 {
-    Eigen::RowVectorXd vec = AffineToRowVector(pose);
-    return movep(vec, acc, vel, t, radius);
+    Eigen::RowVectorXd vector = AffineToRowVector(pose);
+    return moveCommand(typeOfMovement, vector, acc, vel, t, radius);
+}
+
+QString Ur5MessageEncoder::stopCommand(QString typeOfStop, double acc)
+{
+    if(typeOfStop=="stopj")
+        return stopj(acc);
+    else if(typeOfStop=="stopl")
+        return stopl(acc);
 }
 
 QString Ur5MessageEncoder::movej(Eigen::RowVectorXd q,double a, double v,double t,double r)
@@ -20,7 +39,7 @@ QString Ur5MessageEncoder::movej(Eigen::RowVectorXd q,double a, double v,double 
 QString Ur5MessageEncoder::movep(Eigen::RowVectorXd op,double a, double v,double t,double r)
 {
     return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,r=%9)")
-            .arg(op(0)/1000).arg(op(1)/1000).arg(op(2)/1000)
+            .arg(op(0)).arg(op(1)).arg(op(2))
             .arg(op(3)).arg(op(4)).arg(op(5)).arg(a).arg(v).arg(r);
 }
 
@@ -31,6 +50,12 @@ QString Ur5MessageEncoder::speedj(Eigen::RowVectorXd jointVelocity, double a, do
             .arg(jointVelocity(4)).arg(jointVelocity(5)).arg(a).arg(t);
 }
 
+QString Ur5MessageEncoder::speedl(Eigen::RowVectorXd operationalVelocity, double a, double t)
+{
+    return QString("speedl([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
+            .arg(operationalVelocity(0)).arg(operationalVelocity(1)).arg(operationalVelocity(2))
+            .arg(operationalVelocity(3)).arg(operationalVelocity(4)).arg(operationalVelocity(5)).arg(a).arg(t);
+}
 
 QString Ur5MessageEncoder::stopl(double a)
 {

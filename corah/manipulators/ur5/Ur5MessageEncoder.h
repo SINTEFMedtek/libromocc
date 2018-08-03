@@ -16,22 +16,26 @@
 class Ur5MessageEncoder : public MessageEncoder
 {
 public:
-    virtual QString moveJoints(Eigen::RowVectorXd jointConfig, double acc, double vel, double t, double radius);
-    virtual QString movePose(Eigen::Affine3d pose, double acc, double vel, double t, double radius);
+    virtual QString moveCommand(MotionType type, Eigen::RowVectorXd targetConfiguration, double acc, double vel, double t, double rad);
+    virtual QString stopCommand(QString typeOfStop, double acc);
 
-    virtual QString powerdown();
+    QString moveCommand(MotionType type, Eigen::Affine3d targetPose, double acc, double vel, double t, double rad);
 
 private:
     QString movej(Eigen::RowVectorXd jointConfig, double a, double v, double t, double r);
     QString movep(Eigen::RowVectorXd operationalConfig, double a, double v, double t, double r);
 
     QString speedj(Eigen::RowVectorXd jointVelocity, double a, double t);
+    QString speedl(Eigen::RowVectorXd operationalVelocity, double a, double t);
 
     QString stopj(double a);
     QString stopl(double a);
 
     QString textmsg(QString msg);
     QString sleep(double time);
+
+    QString powerdown();
+
 };
 
 #endif // UR5MESSAGEENCODER_H

@@ -8,10 +8,12 @@
 #include <QObject>
 #include <Eigen/Dense>
 
+#include "utilities/corahHeaders.h"
+
 class MessageEncoder {
 public:
-    virtual QString moveJoints(Eigen::RowVectorXd jointConfiguration, double acc, double vel, double t, double rad) = 0;
-    virtual QString movePose(Eigen::Affine3d pose, double acc, double vel, double t, double rad) = 0;
+    virtual QString moveCommand(MotionType type, Eigen::RowVectorXd jointConfig, double acc, double vel, double t, double rad) = 0;
+    virtual QString stopCommand(QString type, double acc) = 0;
 };
 
 
