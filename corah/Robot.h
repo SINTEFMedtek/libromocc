@@ -24,6 +24,8 @@ public:
     void configure(Manipulator manipulator, QString ip_address, int port);
     bool start();
     bool isConnected();
+    bool disconnect();
+    void shutdown();
 
     RobotState getCurrentState();
 

@@ -34,6 +34,16 @@ bool Robot::isConnected()
     return mCommunicationInterface.isConnected();
 }
 
+bool Robot::disconnect()
+{
+    return mCommunicationInterface.disconnectFromRobot();
+}
+
+void Robot::shutdown()
+{
+    mCommunicationInterface.shutdownRobot();
+}
+
 RobotState Robot::getCurrentState()
 {
     return mCurrentState;

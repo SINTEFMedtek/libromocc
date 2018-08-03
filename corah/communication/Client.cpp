@@ -37,6 +37,12 @@ bool Client::requestConnect(QString host, int port)
     return isConnected();
 }
 
+bool Client::requestDisconnect()
+{
+    mSocket->disconnectFromHost();
+    return mSocket->waitForDisconnected();
+}
+
 void Client::readPackage()
 {
     mCurrentTimestamp = QDateTime::currentMSecsSinceEpoch();

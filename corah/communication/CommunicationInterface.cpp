@@ -26,6 +26,16 @@ bool CommunicationInterface::isConnected()
     return mClient.isConnected();
 }
 
+bool CommunicationInterface::disconnectFromRobot()
+{
+    return mClient.requestDisconnect();
+}
+
+void CommunicationInterface::shutdownRobot()
+{
+    sendMessage(mEncoder->shutdownCommand());
+}
+
 bool CommunicationInterface::sendMessage(QString message)
 {
     message.append('\n');

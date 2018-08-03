@@ -14,6 +14,8 @@ class MessageEncoder {
 public:
     virtual QString moveCommand(MotionType type, Eigen::RowVectorXd jointConfig, double acc, double vel, double t, double rad) = 0;
     virtual QString stopCommand(QString type, double acc) = 0;
+
+    virtual QString shutdownCommand() = 0;
 };
 
 

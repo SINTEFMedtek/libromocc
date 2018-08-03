@@ -25,6 +25,8 @@ public:
 
     bool connectToRobot();
     bool isConnected();
+    bool disconnectFromRobot();
+    void shutdownRobot();
 
     void stopMove(QString typeOfStop, double acc);
 

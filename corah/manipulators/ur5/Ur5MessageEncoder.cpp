@@ -30,6 +30,11 @@ QString Ur5MessageEncoder::stopCommand(QString typeOfStop, double acc)
         return stopl(acc);
 }
 
+QString Ur5MessageEncoder::shutdownCommand()
+{
+    return powerdown();
+}
+
 QString Ur5MessageEncoder::movej(Eigen::RowVectorXd q,double a, double v,double t,double r)
 {
     return QString("movej([%1,%2,%3,%4,%5,%6],a=%7,v=%8,t=%9,r=%10)")
@@ -66,7 +71,6 @@ QString Ur5MessageEncoder::stopj(double a)
 {
     return QString("stopj(%1)").arg(a);
 }
-
 
 QString Ur5MessageEncoder::powerdown()
 {

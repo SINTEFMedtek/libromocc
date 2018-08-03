@@ -18,6 +18,7 @@ class Ur5MessageEncoder : public MessageEncoder
 public:
     virtual QString moveCommand(MotionType type, Eigen::RowVectorXd targetConfiguration, double acc, double vel, double t, double rad);
     virtual QString stopCommand(QString typeOfStop, double acc);
+    virtual QString shutdownCommand();
 
     QString moveCommand(MotionType type, Eigen::Affine3d targetPose, double acc, double vel, double t, double rad);
 

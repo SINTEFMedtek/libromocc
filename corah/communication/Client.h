@@ -16,6 +16,8 @@ public:
     explicit Client(QObject *parent = NULL);
 
     bool requestConnect(QString ip_address, int port);
+    bool requestDisconnect();
+
     bool isConnected();
 
     bool sendPackage(QByteArray package);
