@@ -4,9 +4,9 @@
 #include <utilities/corahHeaders.h>
 
 /**
- * Struct that holds UR5 robot information.
+ * Struct that holds robot state information.
  *
- * \ingroup org_custusx_robot_ur5
+ * \ingroup org_custusx_robotinterface
  *
  * \author Andreas Østvik
  * \date 2015-07-10
@@ -25,10 +25,11 @@ public:
 
     Eigen::Affine3d getTransformToJoint(int jointNr);
 
-    Eigen::RowVectorXd mJointConfiguration;
-    Eigen::RowVectorXd mJointVelocity;
-    Eigen::Affine3d bTee;
+    Eigen::RowVectorXd jointConfiguration;
+    Eigen::RowVectorXd jointVelocity;
+
     Eigen::RowVectorXd operationalConfiguration;
+    Eigen::Affine3d bMee;
 
     KDL::ChainFkSolverPos_recursive getFKSolver();
     KDL::ChainIkSolverPos_NR getIKSolver();
