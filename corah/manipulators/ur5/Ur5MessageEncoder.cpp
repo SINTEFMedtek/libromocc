@@ -22,11 +22,11 @@ QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::Affine3
     return moveCommand(typeOfMovement, vector, acc, vel, t, radius);
 }
 
-QString Ur5MessageEncoder::stopCommand(QString typeOfStop, double acc)
+QString Ur5MessageEncoder::stopCommand(MotionType typeOfStop, double acc)
 {
-    if(typeOfStop=="stopj")
+    if(typeOfStop==MotionType::stopj)
         return stopj(acc);
-    else if(typeOfStop=="stopl")
+    else if(typeOfStop==MotionType::stopl)
         return stopl(acc);
 }
 
