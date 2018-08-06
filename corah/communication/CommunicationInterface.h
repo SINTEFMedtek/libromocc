@@ -28,12 +28,12 @@ public:
     bool disconnectFromRobot();
     void shutdownRobot();
 
-    void stopMove(QString typeOfStop, double acc);
 
     bool sendMessage(QString message);
 
     template <class TargetConfiguration>
     void move(MotionType typeOfMotion, TargetConfiguration target, double acc, double vel, double t, double rad);
+    void stopMove(MotionType typeOfStop, double acc);
 
 private slots:
     void decodePackage(QByteArray package);

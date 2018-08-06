@@ -69,7 +69,7 @@ void CommunicationInterface::decodePackage(QByteArray package)
     emit(stateChanged(state));
 }
 
-void CommunicationInterface::stopMove(QString typeOfStop, double acc)
+void CommunicationInterface::stopMove(MotionType typeOfStop, double acc)
 {
     sendMessage(mEncoder->stopCommand(typeOfStop, acc));
 }
