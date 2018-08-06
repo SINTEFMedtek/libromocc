@@ -6,7 +6,9 @@
 
 #include "Robot.h"
 
-Robot::Robot()
+Robot::Robot():
+eeMt(Eigen::Affine3d::Identity()),
+rMb(Eigen::Affine3d::Identity())
 {
     connect(&mCommunicationInterface,&CommunicationInterface::stateChanged,this,&Robot::updateCurrentState);
 }
@@ -55,7 +57,18 @@ void Robot::updateCurrentState(JointState state)
     emit stateUpdated();
 }
 
-void Robot::stopMove(QString typeOfStop, double acc)
+void Robot::stopMove(MotionType type, double acc)
 {
-    mCommunicationInterface.stopMove(typeOfStop, acc);
+    mCommunicationInterface.stopMove(type, acc);
+};
+
+
+void Robot::set_eeMt(Eigen::Affine3d eeMt)
+{
+    this->eeMt = eeMt;
+}
+
+void Robot::set_rMb(Eigen::Affine3d rMb)
+{
+    this->rMb = rMb;
 }

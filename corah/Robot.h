@@ -29,12 +29,15 @@ public:
 
     RobotState getCurrentState();
 
-    void stopMove(QString typeOfMovement, double acc);
 
     template <class Target>
     void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0);
+    void stopMove(MotionType type, double acc);
 
-signals:
+    void set_eeMt(Eigen::Affine3d eeMt);
+    void set_rMb(Eigen::Affine3d rMb);
+
+    signals:
     void stateUpdated();
 
 private:
@@ -42,6 +45,10 @@ private:
 
     CommunicationInterface mCommunicationInterface;
     RobotState mCurrentState;
+
+    Eigen::Affine3d eeMt, rMb;
+
+
 
 };
 
