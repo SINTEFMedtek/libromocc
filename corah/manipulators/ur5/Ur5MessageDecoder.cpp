@@ -2,13 +2,16 @@
 #include <QDebug>
 #include <set>
 #include <QDataStream>
+#include <iostream>
 
 JointState Ur5MessageDecoder::analyzeTCPSegment(QByteArray packet)
 {
+    JointState state;
     if(headerLength(packet)==812 || headerLength(packet) == 1044)
     {
-        return setRTState(slicePacket(packet,sizeof(int),headerLength(packet)));
+        state = setRTState(slicePacket(packet,sizeof(int),headerLength(packet)));
     }
+    return state;
 }
 
 JointState Ur5MessageDecoder::setRTState(QByteArray data)
