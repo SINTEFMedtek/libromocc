@@ -36,7 +36,7 @@ bool Robot::isConnected()
     return mCommunicationInterface.isConnected();
 }
 
-bool Robot::disconnect()
+bool Robot::disconnectFromRobot()
 {
     return mCommunicationInterface.disconnectFromRobot();
 }
@@ -55,6 +55,68 @@ void Robot::updateCurrentState(JointState state)
 {
     mCurrentState.set_jointState(state.jointConfiguration, state.jointVelocity, state.timestamp);
     emit stateUpdated();
+}
+
+void Robot::runMotionQueue(MotionQueue queue)
+{
+    mMotionQueue = queue;
+    RobotMotion target = mMotionQueue.front();
+    target.targetPose.translation() = target.targetPose.translation()/1000;
+    this->move(MotionType::movep, target.targetPose, target.acceleration, target.velocity);
+
+    connect(this, &Robot::stateUpdated, this, &Robot::waitForMove);
+}
+
+void Robot::stopRunMotionQueue()
+{
+    disconnect(this, &Robot::stateUpdated, this, &Robot::waitForMove);
+    this->stopMove(MotionType::stopj, 1.0);
+}
+
+void Robot::waitForMove()
+{
+    RobotMotion target = mMotionQueue.front();
+
+    double remainingDistance = ((mCurrentState.bMee*eeMt).translation()-target.targetPose.translation()).norm();
+    
+    if(remainingDistance<=target.blendRadius)
+    {
+        mMotionQueue.erase(mMotionQueue.begin());
+        RobotMotion target = mMotionQueue.front();
+    }
+
+    if(target.motionType == MotionType::speedj)
+    {
+        Vector6d targetJointVelocity = calculateJointVelocity(target);
+        this->move(target.motionType, targetJointVelocity, target.acceleration, 0.0, 5.0, 0.0); // vel and r not used
+    }
+
+
+    if(mMotionQueue.empty())
+    {
+        this->stopMove(MotionType::stopj, target.acceleration);
+        disconnect(this, &Robot::stateUpdated, this, &Robot::waitForMove);
+    }
+}
+
+Vector6d Robot::calculateJointVelocity(RobotMotion target)
+{
+    Vector3d tangent = (target.targetPose.translation()-(mCurrentState.bMee*eeMt).translation());
+    tangent = tangent/tangent.norm();
+
+    Vector3d velocity =  tangent*target.velocity/1000;
+
+    Vector3d rtangent = AffineToAxisAngle(target.targetPose)-AffineToAxisAngle(mCurrentState.bMee*eeMt);
+    rtangent = rtangent/rtangent.norm();
+    Vector3d rvelocity = rvelocity*target.velocity/1000;
+
+    Vector6d velocityEndEffector;
+    velocityEndEffector << velocity(0),velocity(1),velocity(2), 0, 0, 0;
+
+    Vector6d jointVelocity = mCurrentState.getJacobian().inverse()*velocityEndEffector;
+
+    return jointVelocity;
+
 }
 
 void Robot::stopMove(MotionType type, double acc)

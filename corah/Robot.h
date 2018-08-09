@@ -8,6 +8,7 @@
 #include "utilities/corahHeaders.h"
 
 #include "robotics/RobotState.h"
+#include "robotics/RobotMotion.h"
 #include "communication/CommunicationInterface.h"
 
 typedef std::shared_ptr<class Robot> RobotPtr;
@@ -17,39 +18,46 @@ class Robot : public QObject
     Q_OBJECT
 
 
-public:
-    Robot();
-    ~Robot();
+    public:
+        Robot();
+        ~Robot();
 
-    void configure(Manipulator manipulator, QString ip_address, int port);
-    bool start();
-    bool isConnected();
-    bool disconnect();
-    void shutdown();
+        void configure(Manipulator manipulator, QString ip_address, int port);
+        bool start();
+        bool isConnected();
+        bool disconnectFromRobot();
+        void shutdown();
 
-    RobotState getCurrentState();
+        RobotState getCurrentState();
 
 
-    template <class Target>
-    void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0);
-    void stopMove(MotionType type, double acc);
+        template <class Target>
+        void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0);
+        void stopMove(MotionType type, double acc);
 
-    void set_eeMt(Eigen::Affine3d eeMt);
-    void set_rMb(Eigen::Affine3d rMb);
+        Transform3d get_rMb(){ return rMb;};
+        Transform3d get_eeMt(){ return eeMt;};
+
+        void set_eeMt(Eigen::Affine3d eeMt);
+        void set_rMb(Eigen::Affine3d rMb);
+
+        void runMotionQueue(MotionQueue queue);
+        void stopRunMotionQueue();
 
     signals:
-    void stateUpdated();
+        void stateUpdated();
 
-private:
-    void updateCurrentState(JointState state);
+    private:
+        void updateCurrentState(JointState state);
+        void waitForMove();
 
-    CommunicationInterface mCommunicationInterface;
-    RobotState mCurrentState;
+        CommunicationInterface mCommunicationInterface;
+        RobotState mCurrentState;
+        MotionQueue mMotionQueue;
 
-    Eigen::Affine3d eeMt, rMb;
+        Transform3d eeMt, rMb;
 
-
-
+        Vector6d calculateJointVelocity(RobotMotion target);
 };
 
 template <class Target>
