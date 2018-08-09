@@ -5,7 +5,8 @@
 RobotState::RobotState() :
     mFKSolver(NULL),
     mIKSolverVel(NULL),
-    mIKSolver(NULL)
+    mIKSolver(NULL),
+    mJacSolver(NULL)
 {
 }
 
@@ -21,10 +22,11 @@ void RobotState::set_kdlchain(Manipulator manipulator)
         mFKSolver = new KDL::ChainFkSolverPos_recursive(mKDLChain);
         mIKSolverVel = new KDL::ChainIkSolverVel_pinv(mKDLChain);
         mIKSolver = new KDL::ChainIkSolverPos_NR(mKDLChain, *mFKSolver, *mIKSolverVel, 100, 1e-6);
+        mJacSolver = new KDL::ChainJntToJacSolver(mKDLChain);
     }
 }
 
-void RobotState::set_jointState(Eigen::RowVectorXd jointConfig, Eigen::RowVectorXd jointVel, double timestamp)
+void RobotState::set_jointState(RowVector6d jointConfig, RowVector6d jointVel, double timestamp)
 {
     timestamp = timestamp;
     jointConfiguration = jointConfig;
@@ -34,7 +36,7 @@ void RobotState::set_jointState(Eigen::RowVectorXd jointConfig, Eigen::RowVector
     operationalConfiguration = AffineToRowVector(bMee);
 }
 
-Eigen::Affine3d RobotState::transform_to_joint(Eigen::RowVectorXd jointConfig, int jointNr)
+Transform3d RobotState::transform_to_joint(RowVector6d jointConfig, int jointNr)
 {
     KDL::Frame output_T;
 
@@ -43,8 +45,24 @@ Eigen::Affine3d RobotState::transform_to_joint(Eigen::RowVectorXd jointConfig, i
 
     mFKSolver->JntToCart(input_q, output_T, jointNr);
 
-    Eigen::Affine3d transform = KDLFrameToEigenAffine(output_T);
+    Transform3d transform = KDLFrameToEigenAffine(output_T);
     return ScaleTranslationAffine(transform, 1000);
+}
+
+Matrix6d RobotState::getJacobian(int jointNr)
+{
+    KDL::JntArray input_q(mKDLChain.getNrOfJoints());
+    for (unsigned int i = 0; i < 6; i++) {input_q(i)=jointConfiguration[i];}
+
+    KDL::Jacobian output_jac(mKDLChain.getNrOfJoints());
+    mJacSolver->JntToJac(input_q, output_jac, jointNr);
+
+    return output_jac.data;
+}
+
+Vector6d RobotState::getOperationalVelocity()
+{
+    return this->getJacobian()*jointVelocity;
 }
 
 Eigen::Affine3d RobotState::getTransformToJoint(int jointNr)

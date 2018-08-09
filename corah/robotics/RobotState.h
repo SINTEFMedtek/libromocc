@@ -21,31 +21,29 @@ public:
     ~RobotState();
 
     void set_kdlchain(Manipulator manipulator);
-    void set_jointState(Eigen::RowVectorXd q, Eigen::RowVectorXd q_vel, double timestamp);
+    void set_jointState(RowVector6d q, RowVector6d q_vel, double timestamp);
 
-    Eigen::Affine3d getTransformToJoint(int jointNr);
+    Transform3d getTransformToJoint(int jointNr=-1);
+    Matrix6d getJacobian(int jointNr=-1);
 
-    Eigen::RowVectorXd jointConfiguration;
-    Eigen::RowVectorXd jointVelocity;
+    Vector6d jointConfiguration, jointVelocity, operationalConfiguration;
 
-    Eigen::RowVectorXd operationalConfiguration;
-    Eigen::Affine3d bMee;
+    Transform3d bMee;
 
     KDL::ChainFkSolverPos_recursive getFKSolver();
     KDL::ChainIkSolverPos_NR getIKSolver();
 
     double timestamp;
+    Vector6d getOperationalVelocity();
 
 private:
     KDL::Chain mKDLChain;
     KDL::ChainFkSolverPos_recursive *mFKSolver;
     KDL::ChainIkSolverPos_NR *mIKSolver;
     KDL::ChainIkSolverVel_pinv *mIKSolverVel;
+    KDL::ChainJntToJacSolver *mJacSolver;
 
-    Eigen::Affine3d transform_to_joint(Eigen::RowVectorXd jointConfig, int jointNr=-1);
-
-
-
+    Transform3d transform_to_joint(RowVector6d jointConfig, int jointNr=-1);
 
 };
 
