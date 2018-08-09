@@ -78,7 +78,7 @@ void Robot::waitForMove()
     RobotMotion target = mMotionQueue.front();
 
     double remainingDistance = ((mCurrentState.bMee*eeMt).translation()-target.targetPose.translation()).norm();
-    
+
     if(remainingDistance<=target.blendRadius)
     {
         mMotionQueue.erase(mMotionQueue.begin());
