@@ -29,6 +29,7 @@ QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::Affine3
 
 QString Ur5MessageEncoder::stopCommand(MotionType typeOfStop, double acc)
 {
+    acc = acc/1000;
     if(typeOfStop==MotionType::stopj)
         return stopj(acc);
     else if(typeOfStop==MotionType::stopl)
