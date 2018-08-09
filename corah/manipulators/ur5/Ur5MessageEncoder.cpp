@@ -4,6 +4,10 @@
 QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowVectorXd targetConfiguration, double acc,
                                       double vel, double t, double rad)
 {
+    acc = acc/1000; // mm -> m
+    vel = vel/1000;
+    rad = rad/1000;
+
     if(typeOfMovement==MotionType::movej)
         return movej(targetConfiguration,acc,vel,t,rad);
     else if(typeOfMovement==MotionType::movep)
@@ -18,8 +22,9 @@ QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowVect
 
 QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::Affine3d pose, double acc, double vel, double t, double radius)
 {
+    pose.translation() = pose.translation()/1000;
     Eigen::RowVectorXd vector = AffineToRowVector(pose);
-    return moveCommand(typeOfMovement, vector, acc, vel, t, radius);
+    return moveCommand(MotionType::movep, vector, acc, vel, t, radius);
 }
 
 QString Ur5MessageEncoder::stopCommand(MotionType typeOfStop, double acc)
