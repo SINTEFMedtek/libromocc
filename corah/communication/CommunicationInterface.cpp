@@ -66,7 +66,8 @@ void CommunicationInterface::decodePackage(QByteArray package)
     JointState state;
     state = mDecoder->analyzeTCPSegment(package);
 
-    emit(stateChanged(state));
+    if(state.timestamp>0)
+        emit(stateChanged(state));
 }
 
 void CommunicationInterface::stopMove(MotionType typeOfStop, double acc)
