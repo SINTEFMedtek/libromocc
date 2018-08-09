@@ -13,7 +13,7 @@ struct JointState
 {
     Eigen::RowVectorXd jointConfiguration;
     Eigen::RowVectorXd jointVelocity;
-    double timestamp;
+    double timestamp = 0;
 };
 
 class MessageDecoder {
