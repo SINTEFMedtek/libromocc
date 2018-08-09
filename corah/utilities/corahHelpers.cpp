@@ -33,3 +33,9 @@ Eigen::RowVectorXd AffineToRowVector(Eigen::Affine3d affine)
 
     return vector;
 }
+
+Eigen::Vector3d AffineToAxisAngle(Eigen::Affine3d affine)
+{
+
+    return (Eigen::AngleAxisd(affine.linear())).angle()*(Eigen::AngleAxisd(affine.linear())).axis();
+}
