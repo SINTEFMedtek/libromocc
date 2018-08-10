@@ -23,7 +23,7 @@ QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowVect
 QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::Affine3d pose, double acc, double vel, double t, double radius)
 {
     pose.translation() = pose.translation()/1000;
-    Eigen::RowVectorXd vector = AffineToRowVector(pose);
+    Vector6d vector = AffineToVector6d(pose);
     return moveCommand(MotionType::movep, vector, acc, vel, t, radius);
 }
 
