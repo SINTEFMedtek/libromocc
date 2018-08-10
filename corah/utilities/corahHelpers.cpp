@@ -22,9 +22,9 @@ Eigen::Affine3d ScaleTranslationAffine(Eigen::Affine3d affine, double scale)
     return affine;
 }
 
-Eigen::RowVectorXd AffineToRowVector(Eigen::Affine3d affine)
+Vector6d AffineToVector6d(Eigen::Affine3d affine)
 {
-    Eigen::RowVectorXd vector(6);
+    Vector6d vector;
 
     Eigen::Vector3d pos = affine.translation();
     Eigen::Vector3d rxryrz = (Eigen::AngleAxisd(affine.linear())).angle()*(Eigen::AngleAxisd(affine.linear())).axis();
