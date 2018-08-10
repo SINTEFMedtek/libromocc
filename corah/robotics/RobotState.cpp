@@ -33,7 +33,7 @@ void RobotState::set_jointState(RowVector6d jointConfig, RowVector6d jointVel, d
     jointVelocity = jointVel;
 
     bMee = transform_to_joint(jointConfiguration);
-    operationalConfiguration = AffineToRowVector(bMee);
+    operationalConfiguration = AffineToVector6d(bMee);
 }
 
 Transform3d RobotState::transform_to_joint(RowVector6d jointConfig, int jointNr)
