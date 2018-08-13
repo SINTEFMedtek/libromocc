@@ -1,10 +1,7 @@
-//
-// Created by androst on 29.06.18.
-//
-
-#include <iostream>
-
 #include "Robot.h"
+
+namespace corah
+{
 
 Robot::Robot():
 eeMt(Eigen::Affine3d::Identity()),
@@ -148,4 +145,6 @@ Transform3d Robot::get_rMb()
 Transform3d Robot::get_eeMt()
 {
     return eeMt;
+}
+
 }

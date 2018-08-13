@@ -1,10 +1,7 @@
-//
-// Created by androst on 10.08.18.
-//
-
 #include "CalibrationHelpers.h"
 
-
+namespace corah
+{
 
 std::vector<Transform3d> invert_matrices(std::vector<Transform3d> matrices)
 {
@@ -55,4 +52,6 @@ std::vector<double> compute_linspace(double a, double b, int n)
 double sgn(double val)
 {
     return (double(0) < val) - (val < double(0));
+}
+
 }

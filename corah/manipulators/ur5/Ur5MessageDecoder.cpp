@@ -4,6 +4,9 @@
 #include <QDataStream>
 #include <iostream>
 
+namespace corah
+{
+
 JointState Ur5MessageDecoder::analyzeTCPSegment(QByteArray packet)
 {
     JointState state;
@@ -43,4 +46,6 @@ Eigen::RowVectorXd Ur5MessageDecoder::getJointVelocitiesRT(QByteArray data)
         jv(i) = pickDouble(data,(37+i)*sizeof(double));
     }
     return jv;
+}
+
 }

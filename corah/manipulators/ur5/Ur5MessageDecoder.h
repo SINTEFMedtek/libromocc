@@ -6,6 +6,9 @@
 #include "robotics/RobotState.h"
 #include "communication/MessageDecoder.h"
 
+namespace corah
+{
+
 /**
  * Class that handles UR5 robot recieved messages.
  *
@@ -15,8 +18,7 @@
  *
  */
 
-
-class Ur5MessageDecoder : public MessageDecoder
+class CORAH_EXPORT Ur5MessageDecoder : public MessageDecoder
 {
 public:
     virtual JointState analyzeTCPSegment(QByteArray packet);
@@ -27,5 +29,7 @@ private:
     Eigen::RowVectorXd getJointPositionsRT(QByteArray data);
     Eigen::RowVectorXd getJointVelocitiesRT(QByteArray data);
 };
+
+}
 
 #endif // UR5RECEIVE_H

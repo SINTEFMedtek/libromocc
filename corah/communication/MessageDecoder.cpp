@@ -1,10 +1,8 @@
-//
-// Created by androst on 02.07.18.
-//
-
 #include "MessageDecoder.h"
 #include <QDataStream>
 
+namespace corah
+{
 
 double MessageDecoder::pickDouble(QByteArray data, int index)
 {
@@ -44,4 +42,6 @@ int MessageDecoder::headerID(QByteArray data)
 QByteArray MessageDecoder::removeHeader(QByteArray data)
 {
     return data.mid(sizeof(int)+sizeof(char),data.size()-sizeof(int)-sizeof(char));
+}
+
 }

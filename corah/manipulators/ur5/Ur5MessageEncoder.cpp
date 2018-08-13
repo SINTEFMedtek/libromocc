@@ -1,5 +1,7 @@
 #include "Ur5MessageEncoder.h"
-#include <iostream>
+
+namespace corah
+{
 
 QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowVectorXd targetConfiguration, double acc,
                                       double vel, double t, double rad)
@@ -91,4 +93,6 @@ QString Ur5MessageEncoder::textmsg(QString str)
 QString Ur5MessageEncoder::sleep(double t)
 {
     return QString("sleep(%1)").arg(t);
+}
+
 }

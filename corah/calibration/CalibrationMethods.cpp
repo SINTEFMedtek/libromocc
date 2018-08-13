@@ -1,11 +1,10 @@
-//
-// Created by androst on 10.08.18.
-//
-
 #include "CalibrationMethods.h"
 
 #include <unsupported/Eigen/MatrixFunctions>
 #include <unsupported/Eigen/KroneckerProduct>
+
+namespace corah
+{
 
 CalibrationMatrices CalibrationMethods::Shah(std::vector<Transform3d> prMt, std::vector<Transform3d> bMee)
 {
@@ -242,3 +241,4 @@ CalibrationError CalibrationMethods::estimateCalibrationError(Transform3d prMb, 
     return calibrationError;
 }
 
+}

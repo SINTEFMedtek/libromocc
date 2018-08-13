@@ -1,12 +1,10 @@
-//
-// Created by androst on 27.06.18.
-//
-
 #include <QtNetwork>
 #include <QDateTime>
 
 #include "Client.h"
 
+namespace corah
+{
 
 Client::Client(QObject *parent) : QObject(parent)
         , mSocket(new QTcpSocket(this))
@@ -77,4 +75,6 @@ void Client::displayError(QAbstractSocket::SocketError socketError)
         default:
             qCritical() << QString("The following error occurred: %1.").arg(mSocket->errorString());
     }
+}
+
 }

@@ -1,8 +1,7 @@
-//
-// Created by androst on 06.07.18.
-//
-
 #include "corahHelpers.h"
+
+namespace corah
+{
 
 Eigen::Affine3d KDLFrameToEigenAffine(KDL::Frame frame)
 {
@@ -38,4 +37,6 @@ Eigen::Vector3d AffineToAxisAngle(Eigen::Affine3d affine)
 {
 
     return (Eigen::AngleAxisd(affine.linear())).angle()*(Eigen::AngleAxisd(affine.linear())).axis();
+}
+
 }

@@ -1,11 +1,10 @@
-//
-// Created by androst on 29.06.18.
-//
-
 #include "CommunicationInterface.h"
 
 #include "manipulators/ur5/Ur5MessageEncoder.h"
 #include "manipulators/ur5/Ur5MessageDecoder.h"
+
+namespace corah
+{
 
 CommunicationInterface::CommunicationInterface()
 {
@@ -73,4 +72,6 @@ void CommunicationInterface::decodePackage(QByteArray package)
 void CommunicationInterface::stopMove(MotionType typeOfStop, double acc)
 {
     sendMessage(mEncoder->stopCommand(typeOfStop, acc));
+}
+
 }

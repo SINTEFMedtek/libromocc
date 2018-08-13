@@ -11,12 +11,12 @@
 #include "robotics/RobotMotion.h"
 #include "communication/CommunicationInterface.h"
 
-typedef std::shared_ptr<class Robot> RobotPtr;
+namespace corah
+{
 
-class Robot : public QObject
+class CORAH_EXPORT Robot : public QObject
 {
     Q_OBJECT
-
 
     public:
         Robot();
@@ -67,5 +67,6 @@ void Robot::move(MotionType type, Target target, double acc, double vel, double 
     mCommunicationInterface.move(type, target, acc, vel, t, rad);
 };
 
+}
 
 #endif //CORAH_ROBOT_H

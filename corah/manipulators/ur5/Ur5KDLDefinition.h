@@ -1,9 +1,8 @@
-//
-// Created by androst on 06.07.18.
-//
-
 #ifndef CORAH_UR5KDLDEFINITION_H
 #define CORAH_UR5KDLDEFINITION_H
+
+namespace corah
+{
 
 static const double dh_d[6] = {0.089159, 0, 0, 0.10915, 0.09465, 0.0823};
 static const double dh_a[6] = {0,-0.42500,-0.39225,0,0,0};
@@ -17,6 +16,8 @@ KDL::Chain Ur5Chain(){
     }
 
     return Ur5;
+}
+
 }
 
 #endif //CORAH_UR5KDLDEFINITION_H

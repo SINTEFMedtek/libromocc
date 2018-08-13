@@ -6,6 +6,9 @@
 #include "communication/MessageEncoder.h"
 #include "robotics/RobotState.h"
 
+namespace corah
+{
+
 /**
  * Class that handles encoding of UR5 messages.
  *
@@ -13,8 +16,9 @@
  *
  */
 
-class Ur5MessageEncoder : public MessageEncoder
+class CORAH_EXPORT Ur5MessageEncoder : public MessageEncoder
 {
+
 public:
     virtual QString moveCommand(MotionType type, Eigen::RowVectorXd targetConfiguration, double acc, double vel, double t, double rad);
     virtual QString stopCommand(MotionType typeOfStop, double acc);
@@ -38,5 +42,7 @@ private:
     QString powerdown();
 
 };
+
+}
 
 #endif // UR5MESSAGEENCODER_H

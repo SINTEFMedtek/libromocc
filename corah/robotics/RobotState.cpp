@@ -2,22 +2,20 @@
 
 #include "manipulators/ur5/Ur5KDLDefinition.h"
 
+namespace corah {
+
 RobotState::RobotState() :
-    mFKSolver(NULL),
-    mIKSolverVel(NULL),
-    mIKSolver(NULL),
-    mJacSolver(NULL)
-{
+        mFKSolver(NULL),
+        mIKSolverVel(NULL),
+        mIKSolver(NULL),
+        mJacSolver(NULL) {
 }
 
-RobotState::~RobotState()
-{
+RobotState::~RobotState() {
 }
 
-void RobotState::set_kdlchain(Manipulator manipulator)
-{
-    if(manipulator==UR5)
-    {
+void RobotState::set_kdlchain(Manipulator manipulator) {
+    if (manipulator == UR5) {
         mKDLChain = Ur5Chain();
         mFKSolver = new KDL::ChainFkSolverPos_recursive(mKDLChain);
         mIKSolverVel = new KDL::ChainIkSolverVel_pinv(mKDLChain);
@@ -26,8 +24,7 @@ void RobotState::set_kdlchain(Manipulator manipulator)
     }
 }
 
-void RobotState::set_jointState(RowVector6d jointConfig, RowVector6d jointVel, double timestamp)
-{
+void RobotState::set_jointState(RowVector6d jointConfig, RowVector6d jointVel, double timestamp) {
     timestamp = timestamp;
     jointConfiguration = jointConfig;
     jointVelocity = jointVel;
@@ -36,12 +33,11 @@ void RobotState::set_jointState(RowVector6d jointConfig, RowVector6d jointVel, d
     operationalConfiguration = AffineToVector6d(bMee);
 }
 
-Transform3d RobotState::transform_to_joint(RowVector6d jointConfig, int jointNr)
-{
+Transform3d RobotState::transform_to_joint(RowVector6d jointConfig, int jointNr) {
     KDL::Frame output_T;
 
     KDL::JntArray input_q(mKDLChain.getNrOfJoints());
-    for (unsigned int i = 0; i < 6; i++) {input_q(i)=jointConfig[i];}
+    for (unsigned int i = 0; i < 6; i++) { input_q(i) = jointConfig[i]; }
 
     mFKSolver->JntToCart(input_q, output_T, jointNr);
 
@@ -49,10 +45,9 @@ Transform3d RobotState::transform_to_joint(RowVector6d jointConfig, int jointNr)
     return ScaleTranslationAffine(transform, 1000);
 }
 
-Matrix6d RobotState::getJacobian(int jointNr)
-{
+Matrix6d RobotState::getJacobian(int jointNr) {
     KDL::JntArray input_q(mKDLChain.getNrOfJoints());
-    for (unsigned int i = 0; i < 6; i++) {input_q(i)=jointConfiguration[i];}
+    for (unsigned int i = 0; i < 6; i++) { input_q(i) = jointConfiguration[i]; }
 
     KDL::Jacobian output_jac(mKDLChain.getNrOfJoints());
     mJacSolver->JntToJac(input_q, output_jac, jointNr);
@@ -60,17 +55,15 @@ Matrix6d RobotState::getJacobian(int jointNr)
     return output_jac.data;
 }
 
-Vector6d RobotState::getOperationalVelocity()
-{
-    return this->getJacobian()*jointVelocity;
+Vector6d RobotState::getOperationalVelocity() {
+    return this->getJacobian() * jointVelocity;
 }
 
-Eigen::Affine3d RobotState::getTransformToJoint(int jointNr)
-{
+Eigen::Affine3d RobotState::getTransformToJoint(int jointNr) {
     KDL::Frame output_T;
 
     KDL::JntArray input_q(mKDLChain.getNrOfJoints());
-    for (unsigned int i = 0; i < 6; i++) {input_q(i)=jointConfiguration[i];}
+    for (unsigned int i = 0; i < 6; i++) { input_q(i) = jointConfiguration[i]; }
 
     mFKSolver->JntToCart(input_q, output_T, jointNr);
 
@@ -78,12 +71,12 @@ Eigen::Affine3d RobotState::getTransformToJoint(int jointNr)
     return ScaleTranslationAffine(transform, 1000);
 }
 
-KDL::ChainIkSolverPos_NR RobotState::getIKSolver()
-{
+KDL::ChainIkSolverPos_NR RobotState::getIKSolver() {
     return *mIKSolver;
 }
 
-KDL::ChainFkSolverPos_recursive RobotState::getFKSolver()
-{
+KDL::ChainFkSolverPos_recursive RobotState::getFKSolver() {
     return *mFKSolver;
+}
+
 }

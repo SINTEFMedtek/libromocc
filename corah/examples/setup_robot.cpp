@@ -8,6 +8,8 @@
 #include "Robot.h"
 #include "manipulators/ur5/Ur5KDLDefinition.h"
 
+using namespace corah;
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);

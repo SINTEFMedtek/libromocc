@@ -7,7 +7,10 @@
 
 #include "CalibrationHelpers.h"
 
-class CalibrationMethods {
+namespace corah
+{
+
+class CORAH_EXPORT CalibrationMethods {
     public:
         static CalibrationMatrices Shah(std::vector<Transform3d> prMt, std::vector<Transform3d> bMee);
         static CalibrationMatrices Li(std::vector<Transform3d> prMt, std::vector<Transform3d> bMee);
@@ -19,5 +22,6 @@ class CalibrationMethods {
                                                             std::vector<Transform3d> prMt);
 };
 
+}
 
 #endif //CUSTUSX_CALIBRATIONMETHODS_H

@@ -1,7 +1,3 @@
-//
-// Created by androst on 29.06.18.
-//
-
 #ifndef CORAH_COMMUNICATIONINTERFACE_H
 #define CORAH_COMMUNICATIONINTERFACE_H
 
@@ -12,7 +8,10 @@
 #include "communication/MessageDecoder.h"
 #include "communication/MessageEncoder.h"
 
-class CommunicationInterface : public QObject
+namespace corah
+{
+
+class CORAH_EXPORT CommunicationInterface : public QObject
 {
     Q_OBJECT
 
@@ -56,5 +55,6 @@ void CommunicationInterface::move(MotionType typeOfMotion, TargetConfiguration t
     sendMessage(mEncoder->moveCommand(typeOfMotion, target, acc, vel, t, rad));
 };
 
+}
 
 #endif //CORAH_COMMUNICATIONINTERFACE_H

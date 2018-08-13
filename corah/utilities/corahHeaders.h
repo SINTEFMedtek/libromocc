@@ -22,8 +22,11 @@
 #include <chainiksolvervel_pinv.hpp>
 
 // Corah utilities
+#include <corahExport.hpp>
 #include <utilities/corahHelpers.h>
 
+namespace corah
+{
 
 // Supported manipulators
 typedef enum {UR5} Manipulator;
@@ -38,5 +41,7 @@ typedef Eigen::Vector3d Vector3d;
 typedef Eigen::Matrix<double,6,1> Vector6d;
 typedef Eigen::Matrix<double,1,6> RowVector6d;
 typedef Eigen::Matrix<double,6,6> Matrix6d;
+
+}
 
 #endif //CORAH_CORAHHEADERS_H

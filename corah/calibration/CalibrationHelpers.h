@@ -1,6 +1,11 @@
 #ifndef CALIBRATIONHELPERS_H
 #define CALIBRATIONHELPERS_H
 
+#include <utilities/corahHeaders.h>
+
+namespace corah
+{
+
 /**
 * Implementation of a calibration helper class.
 *
@@ -9,16 +14,15 @@
 * \author Andreas Østvik
 */
 
-#include <utilities/corahHeaders.h>
 
-struct CalibrationError{
+struct CORAH_EXPORT CalibrationError{
     double rotationError;
     double translationError;
     double rotStd;
     double transStd;
 };
 
-struct CalibrationMatrices{
+struct CORAH_EXPORT CalibrationMatrices{
     Transform3d prMb;
     Transform3d eeMt;
 };
@@ -28,5 +32,7 @@ std::vector<double> compute_linspace(double start, double end, int steps);
 double compute_average(std::vector<double> const &v);
 double compute_variance(std::vector<double> const &v, double mean);
 double sgn(double val);
+
+}
 
 #endif //CALIBRATIONHELPERS_H

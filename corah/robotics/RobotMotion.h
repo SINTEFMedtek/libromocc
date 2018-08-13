@@ -3,6 +3,7 @@
 
 #include <utilities/corahHeaders.h>
 
+namespace corah {
 /**
  * Struct that holds robot motion information.
  *
@@ -12,7 +13,7 @@
  * \date 2015-07-10
  */
 
-struct RobotMotion
+struct CORAH_EXPORT RobotMotion
 {
     Transform3d targetPose;
     RowVector6d targetJointConfiguration;
@@ -25,30 +26,30 @@ struct RobotMotion
     MotionType motionType;
 };
 
-class RobotMotionQueue
-{
-    public:
-        void add(Transform3d target, MotionType type, double acc, double vel, double time = 0, double blendRadius=0)
-        {
-            RobotMotion motion;
-            motion.targetPose = target;
-            motion.motionType = type;
-            motion.acceleration = acc;
-            motion.velocity = vel;
-            motion.time = time;
-            motion.blendRadius = blendRadius;
+class CORAH_EXPORT RobotMotionQueue {
 
-            mQueue.push_back(motion);
-        };
+        public:
+            void add(Transform3d target, MotionType type, double acc, double vel, double time = 0, double blendRadius = 0) {
+                RobotMotion motion;
+                motion.targetPose = target;
+                motion.motionType = type;
+                motion.acceleration = acc;
+                motion.velocity = vel;
+                motion.time = time;
+                motion.blendRadius = blendRadius;
 
-        void clear(){mQueue.clear();};
+                mQueue.push_back(motion);
+            };
 
-        MotionQueue getQueue(){ return mQueue;};
+            void clear() { mQueue.clear(); };
 
-    private:
-        MotionQueue mQueue;
+            MotionQueue getQueue() { return mQueue; };
+
+        private:
+            MotionQueue mQueue;
 
 };
 
+}
 
 #endif //ROBOTMOTION_H
