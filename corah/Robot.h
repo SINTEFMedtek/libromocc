@@ -35,8 +35,9 @@ class Robot : public QObject
         void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0);
         void stopMove(MotionType type, double acc);
 
-        Transform3d get_rMb(){ return rMb;};
-        Transform3d get_eeMt(){ return eeMt;};
+        Transform3d get_rMt();
+        Transform3d get_rMb();
+        Transform3d get_eeMt();
 
         void set_eeMt(Eigen::Affine3d eeMt);
         void set_rMb(Eigen::Affine3d rMb);

@@ -134,3 +134,18 @@ void Robot::set_rMb(Eigen::Affine3d rMb)
 {
     this->rMb = rMb;
 }
+
+Transform3d Robot::get_rMt()
+{
+    return rMb*getCurrentState().bMee*eeMt;
+}
+
+Transform3d Robot::get_rMb()
+{
+    return rMb;
+}
+
+Transform3d Robot::get_eeMt()
+{
+    return eeMt;
+}
