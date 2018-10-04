@@ -70,5 +70,5 @@ target_include_directories(corah PUBLIC ${CORAH_INCLUDE_DIRS} -L${CORAH_EXTERNAL
 add_executable(setup_robot_example corah/examples/setup_robot.cpp)
 target_link_libraries(setup_robot_example corah)
 
-install(TARGETS corah DESTINATION corah/lib)
-install(FILES ${PROJECT_BINARY_DIR}/corahExport.hpp DESTINATION corah/include)
+install(TARGETS corah DESTINATION lib RUNTIME DESTINATION bin)
+install(DIRECTORY ${PROJECT_BINARY_DIR} DESTINATION include)
