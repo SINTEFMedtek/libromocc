@@ -8,7 +8,8 @@ ExternalProject_Add(orocos
         GIT_REPOSITORY "https://github.com/orocos/orocos_kinematics_dynamics.git"
         GIT_TAG "master"
         INSTALL_DIR ${CORAH_EXTERNAL_INSTALL_DIR}
-        SOURCE_SUBDIR "../orocos/orocos_kdl"
+        CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+            <SOURCE_DIR>/orocos_kdl
         CMAKE_CACHE_ARGS
             -DCMAKE_BUILD_TYPE:STRING=Release
             -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF
