@@ -28,7 +28,6 @@ class CORAH_EXPORT Robot : public QObject
 
         RobotState getCurrentState();
 
-
         template <class Target>
         void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0);
         void stopMove(MotionType type, double acc);

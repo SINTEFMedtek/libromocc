@@ -27,14 +27,14 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 #### Paths
-set(CORAH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} "${PROJECT_SOURCE_DIR}/corah/")
+set(CORAH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} "source/corah/")
 set(CORAH_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 #### Module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/) # For finding the custom Find modules
 
 #### Includes
-set(CORAH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+set(CORAH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/source ${CMAKE_CURRENT_BINARY_DIR})
 
 #### Setup all external depedencies
 include(cmake/Requirements.cmake)
@@ -48,7 +48,7 @@ if(hasParent)
 endif()
 
 #### Add all subdirs
-corah_add_subdirectories(corah)
+corah_add_subdirectories(source/corah)
 qt5_wrap_cpp(HEADERS_MOC ${CORAH_SOURCE_FILES})
 
 message("-- CORAH SOURCE FILES: ${CORAH_SOURCE_FILES}")
@@ -66,9 +66,7 @@ generate_export_header(corah EXPORT_FILE_NAME corahExport.hpp)
 message("-- LIBS: ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES}")
 target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} orocos-kdl)
 
-target_include_directories(corah PUBLIC ${CORAH_INCLUDE_DIRS} -L${CORAH_EXTERNAL_INSTALL_DIR}/include)
-
-add_executable(setup_robot_example corah/examples/setup_robot.cpp)
+add_executable(setup_robot_example source/corah/examples/setup_robot.cpp)
 target_link_libraries(setup_robot_example corah)
 
 install(TARGETS corah DESTINATION lib RUNTIME DESTINATION bin)

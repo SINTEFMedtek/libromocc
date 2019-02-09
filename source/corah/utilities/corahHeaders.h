@@ -23,7 +23,7 @@
 
 // Corah utilities
 #include "corahExport.hpp"
-#include "corah/utilities/corahHelpers.h"
+#include "corahHelpers.h"
 
 namespace corah
 {

@@ -2,11 +2,11 @@
 #define CORAH_COMMUNICATIONINTERFACE_H
 
 #include "corah/utilities/corahHeaders.h"
-
 #include "corah/robotics/RobotState.h"
-#include "corah/communication/Client.h"
-#include "corah/communication/MessageDecoder.h"
-#include "corah/communication/MessageEncoder.h"
+
+#include "Client.h"
+#include "MessageDecoder.h"
+#include "MessageEncoder.h"
 
 namespace corah
 {
