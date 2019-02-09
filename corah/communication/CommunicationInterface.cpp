@@ -1,7 +1,7 @@
 #include "CommunicationInterface.h"
 
-#include "manipulators/ur5/Ur5MessageEncoder.h"
-#include "manipulators/ur5/Ur5MessageDecoder.h"
+#include "corah/manipulators/ur5/Ur5MessageEncoder.h"
+#include "corah/manipulators/ur5/Ur5MessageDecoder.h"
 
 namespace corah
 {

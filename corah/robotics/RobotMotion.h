@@ -1,7 +1,7 @@
 #ifndef ROBOTMOTION_H
 #define ROBOTMOTION_H
 
-#include <utilities/corahHeaders.h>
+#include <corah/utilities/corahHeaders.h>
 
 namespace corah {
 /**

@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-#include "communication/MessageEncoder.h"
-#include "robotics/RobotState.h"
+#include "corah/communication/MessageEncoder.h"
+#include "corah/robotics/RobotState.h"
 
 namespace corah
 {

@@ -1,15 +1,13 @@
 #ifndef CALIBRATIONHELPERS_H
 #define CALIBRATIONHELPERS_H
 
-#include <utilities/corahHeaders.h>
+#include "corah/utilities/corahHeaders.h"
 
 namespace corah
 {
 
 /**
 * Implementation of a calibration helper class.
-*
-* \ingroup org_custusx_robot_ur5
 *
 * \author Andreas Østvik
 */

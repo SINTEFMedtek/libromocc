@@ -22,8 +22,8 @@
 #include <chainiksolvervel_pinv.hpp>
 
 // Corah utilities
-#include <corahExport.hpp>
-#include <utilities/corahHelpers.h>
+#include "corahExport.hpp"
+#include "corah/utilities/corahHelpers.h"
 
 namespace corah
 {

@@ -1,6 +1,5 @@
-#include <utilities/corahHeaders.h>
-
-#include "robotics/RobotState.h"
+#include "corah/utilities/corahHeaders.h"
+#include "corah/robotics/RobotState.h"
 
 #ifndef CORAH_MESSAGEDECODER_H
 #define CORAH_MESSAGEDECODER_H

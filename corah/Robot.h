@@ -5,11 +5,9 @@
 #ifndef CORAH_ROBOT_H
 #define CORAH_ROBOT_H
 
-#include "utilities/corahHeaders.h"
-
-#include "robotics/RobotState.h"
-#include "robotics/RobotMotion.h"
-#include "communication/CommunicationInterface.h"
+#include "corah/robotics/RobotState.h"
+#include "corah/robotics/RobotMotion.h"
+#include "corah/communication/CommunicationInterface.h"
 
 namespace corah
 {

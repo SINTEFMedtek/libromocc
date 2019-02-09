@@ -1,5 +1,11 @@
 ﻿cmake_minimum_required(VERSION 3.1)
+
 project(corah)
+
+# Current version
+set (CORAH_VERSION_MAJOR 0)
+set (CORAH_VERSION_MINOR 0)
+set (CORAH_VERSION_PATCH 1)
 
 include(cmake/Macros.cmake)
 
@@ -21,13 +27,14 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 #### Paths
-set(CORAH_SOURCE_DIR "${PROJECT_SOURCE_DIR}/corah/")
+set(CORAH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} "${PROJECT_SOURCE_DIR}/corah/")
+set(CORAH_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 #### Module path
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/ ${CMAKE_MODULE_PATH}) # For finding the custom Find modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/) # For finding the custom Find modules
 
-#### Source and includes
-set(CORAH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/corah ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+#### Includes
+set(CORAH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 #### Setup all external depedencies
 include(cmake/Requirements.cmake)
@@ -35,7 +42,6 @@ message("-- Qt version: ${Qt5Widgets_VERSION}")
 
 #### Set include dirs
 include_directories(${CORAH_INCLUDE_DIRS})
-
 get_directory_property(hasParent PARENT_DIRECTORY)
 if(hasParent)
     set(CORAH_INCLUDE_DIRS ${CORAH_INCLUDE_DIRS} PARENT_SCOPE)
@@ -59,11 +65,6 @@ generate_export_header(corah EXPORT_FILE_NAME corahExport.hpp)
 #### Link everything
 message("-- LIBS: ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES}")
 target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} orocos-kdl)
-#qt5_use_modules(corah Widgets Network) # Add Qt 5 modules
-
-message("-- LIBS: ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} -L${CORAH_EXTERNAL_INSTALL_DIR}/lib")
-target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} -L${CORAH_EXTERNAL_INSTALL_DIR}/lib orocos-kdl)
-#qt5_use_modules(corah Widgets Network) # Add Qt 5 modules
 
 target_include_directories(corah PUBLIC ${CORAH_INCLUDE_DIRS} -L${CORAH_EXTERNAL_INSTALL_DIR}/include)
 

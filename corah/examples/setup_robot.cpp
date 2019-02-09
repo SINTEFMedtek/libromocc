@@ -5,8 +5,8 @@
 #include <QApplication>
 #include <iostream>
 
-#include "Robot.h"
-#include "manipulators/ur5/Ur5KDLDefinition.h"
+#include "corah/Robot.h"
+#include "corah/manipulators/ur5/Ur5KDLDefinition.h"
 
 using namespace corah;
 
