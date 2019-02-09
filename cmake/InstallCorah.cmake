@@ -71,3 +71,7 @@ install(DIRECTORY ${PROJECT_BINARY_DIR}/include/
     DESTINATION include/
     FILES_MATCHING REGEX "/[^.]+$" # Files with no extension
 )
+install(DIRECTORY ${PROJECT_BINARY_DIR}/include/
+        DESTINATION include/
+        FILES_MATCHING PATTERN "*.inl"
+)
