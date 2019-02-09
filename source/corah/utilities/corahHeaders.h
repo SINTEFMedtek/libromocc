@@ -15,11 +15,11 @@
 #include <Eigen/Dense>
 
 // Orocos KDL
-#include <chain.hpp>
-#include <chainjnttojacsolver.hpp>
-#include <chainfksolverpos_recursive.hpp>
-#include <chainiksolverpos_nr.hpp>
-#include <chainiksolvervel_pinv.hpp>
+#include <kdl/chain.hpp>
+#include <kdl/chainjnttojacsolver.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+#include <kdl/chainiksolverpos_nr.hpp>
+#include <kdl/chainiksolvervel_pinv.hpp>
 
 // Corah utilities
 #include "corahExport.hpp"

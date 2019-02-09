@@ -18,7 +18,7 @@ ExternalProject_Add(orocos
             -DBUILD_TESTING:BOOL=OFF
         )
 
-list(APPEND CORAH_INCLUDE_DIRS ${CORAH_EXTERNAL_INSTALL_DIR}/include/kdl/)
+list(APPEND CORAH_INCLUDE_DIRS ${CORAH_EXTERNAL_INSTALL_DIR}/include/)
 list(APPEND CORAH_EXTERNAL_DEPENDENCIES orocos)
 
 add_dependencies(orocos eigen)
