@@ -10,7 +10,7 @@ set (CORAH_VERSION_PATCH 1)
 include(cmake/Macros.cmake)
 
 #### Options
-option(DOWNLOAD_AND_BUILD_QT5 "Download and build Qt. Turn this OFF if you want to use pre-built binaries you already have on your machine." OFF)
+option(DOWNLOAD_AND_BUILD_QT5 "Download and build Qt. Turn this OFF if you want to use pre-built binaries you already have on your machine." ON)
 
 #### Set build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -26,15 +26,30 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations") # Remove deprecated warnings GCC
 endif()
 
+## Set build folders
+# First for the generic no-config case (e.g. with mingw)
+cmake_policy(SET CMP0043 OLD)
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
+# Second, for multi-config builds (e.g. msvc)
+foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
+    # Force libs and bins to go into bin and lib directory instead of Release/Debug
+    string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
+    set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/bin )
+    set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib )
+    set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib )
+endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
+
 #### Paths
 set(CORAH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} "source/corah/")
 set(CORAH_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 #### Module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/) # For finding the custom Find modules
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/ ${CMAKE_MODULE_PATH}) # For finding the custom Find modules
 
 #### Includes
-set(CORAH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/source ${CMAKE_CURRENT_BINARY_DIR})
+set(CORAH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/source/ ${CMAKE_CURRENT_BINARY_DIR})
 
 #### Setup all external depedencies
 include(cmake/Requirements.cmake)
@@ -52,7 +67,6 @@ corah_add_subdirectories(source/corah)
 qt5_wrap_cpp(HEADERS_MOC ${CORAH_SOURCE_FILES})
 
 message("-- CORAH SOURCE FILES: ${CORAH_SOURCE_FILES}")
-message("-- CORAH HEADERS MOC: ${HEADERS_MOC}")
 message("-- CORAH INCLUDE DIRS: ${CORAH_INCLUDE_DIRS}")
 message("-- CORAH DEPENDENCIES: ${CORAH_EXTERNAL_DEPENDENCIES}")
 
@@ -69,6 +83,4 @@ target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} orocos
 add_executable(setup_robot_example source/corah/examples/setup_robot.cpp)
 target_link_libraries(setup_robot_example corah)
 
-#install(TARGETS corah DESTINATION lib RUNTIME DESTINATION bin)
-#install(DIRECTORY ${PROJECT_BINARY_DIR} DESTINATION include)
 include(cmake/InstallCorah.cmake)
