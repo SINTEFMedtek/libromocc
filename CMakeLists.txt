@@ -69,5 +69,6 @@ target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} orocos
 add_executable(setup_robot_example source/corah/examples/setup_robot.cpp)
 target_link_libraries(setup_robot_example corah)
 
-install(TARGETS corah DESTINATION lib RUNTIME DESTINATION bin)
-install(DIRECTORY ${PROJECT_BINARY_DIR} DESTINATION include)
+#install(TARGETS corah DESTINATION lib RUNTIME DESTINATION bin)
+#install(DIRECTORY ${PROJECT_BINARY_DIR} DESTINATION include)
+include(cmake/InstallCorah.cmake)
