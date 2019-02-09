@@ -32,6 +32,7 @@ else(DOWNLOAD_AND_BUILD_QT5)
     list(APPEND LIBRARIES Qt5::OpenGL)
     list(APPEND LIBRARIES Qt5::Multimedia)
     list(APPEND LIBRARIES Qt5::MultimediaWidgets)
+    list(APPEND LIBRARIES Qt5::Network)
 endif(DOWNLOAD_AND_BUILD_QT5)
 
 list(APPEND CORAH_INCLUDE_DIRS ${Qt5Widgets_INCLUDE_DIRS})

@@ -10,7 +10,7 @@ set (CORAH_VERSION_PATCH 1)
 include(cmake/Macros.cmake)
 
 #### Options
-option(DOWNLOAD_AND_BUILD_QT5 "Download and build Qt 5.9. Turn this OFF if you want to use pre-built binaries you already have on your machine." OFF)
+option(DOWNLOAD_AND_BUILD_QT5 "Download and build Qt. Turn this OFF if you want to use pre-built binaries you already have on your machine." OFF)
 
 #### Set build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
