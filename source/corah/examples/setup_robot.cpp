@@ -2,7 +2,6 @@
 // Created by androst on 29.06.18.
 //
 
-#include <QApplication>
 #include <iostream>
 
 #include "corah/Robot.h"
@@ -12,7 +11,6 @@ using namespace corah;
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
 
     Robot ur5;
     ur5.configure(UR5, "localhost", 30003);
@@ -39,7 +37,4 @@ int main(int argc, char *argv[])
 
     //Eigen::RowVectorXd q(6);
     //q << dh_home[0], dh_home[1], dh_home[2], dh_home[3], dh_home[4], dh_home[5];
-
-
-    return app.exec();
 }

@@ -3,14 +3,16 @@
 project(corah)
 
 # Current version
-set (CORAH_VERSION_MAJOR 0)
-set (CORAH_VERSION_MINOR 0)
-set (CORAH_VERSION_PATCH 1)
+set (VERSION_MAJOR 0)
+set (VERSION_MINOR 0)
+set (VERSION_PATCH 1)
+set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 include(cmake/Macros.cmake)
 
 #### Options
-option(DOWNLOAD_AND_BUILD_QT5 "Download and build Qt. Turn this OFF if you want to use pre-built binaries you already have on your machine." ON)
+option(DOWNLOAD_AND_BUILD_QT5 "Download and build Qt. Turn OFF if you want to use pre-built binaries existing on your machine." ON)
+
 
 #### Set build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -28,7 +30,6 @@ endif()
 
 ## Set build folders
 # First for the generic no-config case (e.g. with mingw)
-cmake_policy(SET CMP0043 OLD)
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
@@ -46,14 +47,13 @@ set(CORAH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} "source/corah/")
 set(CORAH_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 #### Module path
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/ ${CMAKE_MODULE_PATH}) # For finding the custom Find modules
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/)
 
 #### Includes
 set(CORAH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/source/ ${CMAKE_CURRENT_BINARY_DIR})
 
 #### Setup all external depedencies
 include(cmake/Requirements.cmake)
-message("-- Qt version: ${Qt5Widgets_VERSION}")
 
 #### Set include dirs
 include_directories(${CORAH_INCLUDE_DIRS})

@@ -21,6 +21,7 @@ set(MODULES_TO_EXCLUDE
         -skip qtimageformats
         -skip qtlocation
         -skip qtmacextras
+        -skip qtmultimedia
         -skip qtnetworkauth
         -skip qtpim
         -skip qtpurchasing
@@ -127,7 +128,6 @@ endif()
 message("-- Qt build dir: ${CORAH_EXTERNAL_BUILD_DIR}")
 message("-- Qt install dir: ${CORAH_EXTERNAL_INSTALL_DIR}")
 
-
 ExternalProject_Add(qt5
         PREFIX ${CORAH_EXTERNAL_BUILD_DIR}/qt5
         BINARY_DIR ${CORAH_EXTERNAL_BUILD_DIR}/qt5
@@ -137,21 +137,12 @@ ExternalProject_Add(qt5
         BUILD_COMMAND ${BUILD_COMMAND}
         INSTALL_COMMAND ${BUILD_COMMAND} install
 )
+
 if(WIN32)
-    set(Qt5Gui_LIBRARY Qt5Gui.lib)
     set(Qt5Core_LIBRARY Qt5Core.lib)
-    set(Qt5Widgets_LIBRARY Qt5Widgets.lib)
-    set(Qt5OpenGL_LIBRARY Qt5OpenGL.lib)
-    set(Qt5Multimedia_LIBRARY Qt5Multimedia.lib)
-    set(Qt5MultimediaWidgets_LIBRARY Qt5MultimediaWidgets.lib)
+    set(Qt5Network_LIBRARY Qt5Network.lib)
 else()
-    set(Qt5Gui_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX}Qt5Gui${CMAKE_SHARED_LIBRARY_SUFFIX})
     set(Qt5Core_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX}Qt5Core${CMAKE_SHARED_LIBRARY_SUFFIX})
-    set(Qt5Widgets_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX}Qt5Widgets${CMAKE_SHARED_LIBRARY_SUFFIX})
-    set(Qt5OpenGL_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX}Qt5OpenGL${CMAKE_SHARED_LIBRARY_SUFFIX})
-    set(Qt5Multimedia_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX}Qt5Multimedia${CMAKE_SHARED_LIBRARY_SUFFIX})
-    set(Qt5MultimediaWidgets_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX}Qt5MultimediaWidgets${CMAKE_SHARED_LIBRARY_SUFFIX})
     set(Qt5Network_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX}Qt5Network${CMAKE_SHARED_LIBRARY_SUFFIX})
 endif()
 
-list(APPEND CORAH_EXTERNAL_DEPENDENCIES qt5)
