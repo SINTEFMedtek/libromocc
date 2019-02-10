@@ -11,8 +11,7 @@ set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 include(cmake/Macros.cmake)
 
 #### Options
-option(DOWNLOAD_AND_BUILD_QT5 "Download and build Qt. Turn OFF if you want to use pre-built binaries existing on your machine." ON)
-
+option(DOWNLOAD_AND_BUILD_QT5 "Download and build Qt. Turn OFF if you want to use pre-built binaries existing on your machine." OFF)
 
 #### Set build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
