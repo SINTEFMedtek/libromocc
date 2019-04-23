@@ -3,6 +3,8 @@
 
 #include <QTcpSocket>
 #include <QByteArray>
+#include "zmq.h"
+
 
 #include "corahExport.hpp"
 
@@ -41,6 +43,9 @@ class CORAH_EXPORT Client : public QObject
         int mCurrentTimestamp;
 
         QTcpSocket* mSocket;
+        //void* mContext;
+        //void* mSocket;
+        //uint8_t mSocketID [256];
 };
 
 }

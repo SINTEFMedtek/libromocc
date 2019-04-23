@@ -1,6 +1,7 @@
 #include <QtNetwork>
 #include <QDateTime>
 
+#include "zmq.h"
 #include "Client.h"
 
 namespace corah
@@ -11,6 +12,15 @@ Client::Client(QObject *parent) : QObject(parent)
 {
     connect(mSocket, &QIODevice::readyRead, this, &Client::readPackage);
     //connect(mSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), this, &Client::displayError);
+    auto context = zmq_ctx_new();
+    auto streamer = zmq_socket(context, ZMQ_STREAM);
+    int rc = zmq_connect(streamer, "tcp://localhost:30003");
+    uint8_t buffer[1044];
+    uint8_t id [256];
+    size_t  id_size = 256;
+
+    rc = zmq_getsockopt(streamer, ZMQ_IDENTITY, &id, &id_size);
+
 }
 
 bool Client::isConnected()
