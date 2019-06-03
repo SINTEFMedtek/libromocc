@@ -46,17 +46,11 @@ bool Client::requestDisconnect()
 
 bool Client::sendPackage(std::string package)
 {
-    auto context = zmq_ctx_new();
-    auto streamer = zmq_socket(context, ZMQ_STREAM);
-
-    int rc = zmq_connect(streamer, "tcp://localhost:30003");
-    byte buffer[1044];
     uint8_t id [256];
     size_t  id_size = 256;
-    zmq_getsockopt(streamer, ZMQ_IDENTITY, &id, &id_size);
-    //char msg [] = "movel(p[-0.020114,-0.431763,0.288153,-0.001221,3.116276,0.038892], a=0.3, v=0.05, r=0)\n";
-    zmq_send(streamer, id, id_size, ZMQ_SNDMORE);
-    zmq_send(streamer, package.c_str(), strlen(package.c_str()), 0);
+    zmq_getsockopt(mStreamer, ZMQ_IDENTITY, &id, &id_size);
+    zmq_send(mStreamer, id, id_size, ZMQ_SNDMORE);
+    zmq_send(mStreamer, package.c_str(), strlen(package.c_str()), 0);
     return true;
 }
 
