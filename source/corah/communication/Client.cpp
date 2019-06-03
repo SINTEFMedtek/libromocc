@@ -1,5 +1,7 @@
-#include <QtNetwork>
-#include <QDateTime>
+#include <sstream>
+#include <thread>
+#include <iostream>
+#include <cstring>
 
 #include "zmq.h"
 #include "Client.h"
@@ -7,84 +9,91 @@
 namespace corah
 {
 
-Client::Client(QObject *parent) : QObject(parent)
-        , mSocket(new QTcpSocket(this))
+Client::Client()
 {
-    connect(mSocket, &QIODevice::readyRead, this, &Client::readPackage);
-    //connect(mSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), this, &Client::displayError);
-    auto context = zmq_ctx_new();
-    auto streamer = zmq_socket(context, ZMQ_STREAM);
-    int rc = zmq_connect(streamer, "tcp://localhost:30003");
-    uint8_t buffer[1044];
-    uint8_t id [256];
-    size_t  id_size = 256;
-
-    rc = zmq_getsockopt(streamer, ZMQ_IDENTITY, &id, &id_size);
-
+    mContext = zmq_ctx_new();
+    mStreamer = zmq_socket(mContext, ZMQ_STREAM);
 }
 
 bool Client::isConnected()
 {
-    return mSocket->waitForConnected();
+    // Not implemented
+    return false;
+    //return mSocket->waitForConnected();
 }
 
-bool Client::requestConnect(QString host, int port)
+bool Client::requestConnect(std::string host, int port)
 {
     mConnectionInfo.host = host;
     mConnectionInfo.port = port;
 
-    qInfo() << "Trying to connect...";
-    mSocket->abort();
-    mSocket->connectToHost(host, port);
+    int rc = zmq_connect(mStreamer, "tcp://localhost:30003");
 
-    if(isConnected())
-    {
-        qInfo() << "Connected to host";
-    }
+    uint8_t id [256];
+    size_t  id_size = 256;
 
+    rc = zmq_getsockopt(mStreamer, ZMQ_IDENTITY, &id, &id_size);
+    std::thread thread_(std::bind(&Client::start, this));
+
+    thread_.detach();
     return isConnected();
 }
 
 bool Client::requestDisconnect()
 {
-    mSocket->disconnectFromHost();
-    return mSocket->waitForDisconnected();
+    // Not implemented
+    return true;
 }
 
-void Client::readPackage()
+bool Client::sendPackage(std::string package)
 {
-    mCurrentTimestamp = QDateTime::currentMSecsSinceEpoch();
+    std::cout << "Enters client send package" << std::endl;
+    std::cout << package << std::endl;
 
-    QByteArray buffer;
-    buffer = mSocket->readAll();
+    auto context = zmq_ctx_new();
+    auto streamer = zmq_socket(context, ZMQ_STREAM);
 
-    emit(packageReceived(buffer));
+    int rc = zmq_connect(streamer, "tcp://localhost:30003");
+    byte buffer[1044];
+    uint8_t id [256];
+    size_t  id_size = 256;
+    zmq_getsockopt(streamer, ZMQ_IDENTITY, &id, &id_size);
+    //char msg [] = "movel(p[-0.020114,-0.431763,0.288153,-0.001221,3.116276,0.038892], a=0.3, v=0.05, r=0)\n";
+    zmq_send(streamer, id, id_size, ZMQ_SNDMORE);
+    zmq_send(streamer, package.c_str(), strlen(package.c_str()), 0);
+    return true;
 }
 
-bool Client::sendPackage(QByteArray package)
+int Client::getMessageSize(unsigned char* buffer)
 {
-    if(!mSocket->waitForConnected())
-        return false;
+    std::stringstream ss;
+    unsigned int x;
+    for(int i=0; i<sizeof(int); i++)
+        ss << std::hex << (int)buffer[i];
+    ss >> x;
 
-    qint64 writtenBytes = mSocket->write(package);
-    return writtenBytes>0;
+    return static_cast<int>(x);
 }
 
-void Client::displayError(QAbstractSocket::SocketError socketError)
+void Client::start()
 {
-    switch (socketError) {
-        case QAbstractSocket::RemoteHostClosedError:
-            break;
-        case QAbstractSocket::HostNotFoundError:
-            qCritical() << "The host was not found. Please check the host name and port settings.";
-            break;
-        case QAbstractSocket::ConnectionRefusedError:
-            qCritical() << "The connection was refused by the peer. Make sure the server is running, "
-                           "and check that the host name and port settings are correct.";
-            break;
-        default:
-            qCritical() << QString("The following error occurred: %1.").arg(mSocket->errorString());
+    byte buffer[1044];
+    void *ctx = zmq_ctx_new();
+    void *publisher = zmq_socket(ctx, ZMQ_PUB);
+    zmq_bind(publisher, "tcp://*:5556");
+
+    try{
+        while(true){
+            zmq_recv(mStreamer, buffer, 1044, 0);
+            int packetLength = getMessageSize(buffer);
+
+            if(packetLength == 1044)
+            {
+                zmq_send(publisher, buffer, 1044, 0);
+            }
+        }
     }
+    catch (std::exception &error){}
 }
 
 }

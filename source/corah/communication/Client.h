@@ -1,51 +1,47 @@
 #ifndef CORAH_CLIENT_H
 #define CORAH_CLIENT_H
 
-#include <QTcpSocket>
-#include <QByteArray>
+#include <string>
+
 #include "zmq.h"
-
-
 #include "corahExport.hpp"
 
 namespace corah
 {
 
-class CORAH_EXPORT Client : public QObject
+class CORAH_EXPORT Client
 {
-    Q_OBJECT
-
     public:
-        explicit Client(QObject *parent = NULL);
+        typedef unsigned char byte;
 
-        bool requestConnect(QString ip_address, int port);
+        explicit Client();
+
+        bool requestConnect(std::string ip_address, int port);
         bool requestDisconnect();
 
         bool isConnected();
 
-        bool sendPackage(QByteArray package);
+        bool sendPackage(std::string package);
 
         struct ConnectionInfo
         {
-            QString host;
+            std::string host;
             int port;
         };
 
-    signals:
-        void packageReceived(QByteArray package);
-
-    private slots:
-        void readPackage();
-        void displayError(QAbstractSocket::SocketError socketError);
-
     private:
+        int getMessageSize(unsigned char* buffer);
+        void packageReceived(void* buffer);
+
         ConnectionInfo mConnectionInfo;
         int mCurrentTimestamp;
 
-        QTcpSocket* mSocket;
-        //void* mContext;
-        //void* mSocket;
-        //uint8_t mSocketID [256];
+        void* mContext;
+        void* mStreamer;
+        void readPackage();
+
+        void start();
+        void bufferReady(){};
 };
 
 }
