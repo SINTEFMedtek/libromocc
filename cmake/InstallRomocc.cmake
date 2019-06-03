@@ -40,16 +40,6 @@ else()
 	)
 endif()
 
-# Install Qt plugins
-install(DIRECTORY ${PROJECT_BINARY_DIR}/plugins/
-    DESTINATION QtPlugins/
-)
-
-## Install qt.conf
-install(FILES ${PROJECT_SOURCE_DIR}/cmake/InstallFiles/qt.conf
-    DESTINATION bin
-)
-
 # Install headers
 install(DIRECTORY ${ROMOCC_SOURCE_DIR}
 	DESTINATION include/romocc/
