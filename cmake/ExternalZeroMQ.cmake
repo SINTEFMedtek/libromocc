@@ -1,14 +1,13 @@
-# Download and set up Eigen
+# Download and set up ZeroMQ
 
 include(cmake/Externals.cmake)
 
 ExternalProject_Add(zeromq
         PREFIX ${ROMOCC_EXTERNAL_BUILD_DIR}/zeromq
-        BINARY_DIR ${ROMOCC_EXTERNAL_BUILD_DIR}/zeromq/build
+        BINARY_DIR ${ROMOCC_EXTERNAL_BUILD_DIR}/zeromq
         GIT_REPOSITORY "https://github.com/zeromq/libzmq.git"
         GIT_TAG "latest_release"
         UPDATE_COMMAND ""
-        INSTALL_DIR ${ROMOCC_EXTERNAL_INSTALL_DIR}
         CMAKE_ARGS
             -DCMAKE_BUILD_TYPE:STRING=Release
             -DCMAKE_INSTALL_PREFIX:PATH=${ROMOCC_EXTERNAL_INSTALL_DIR}
