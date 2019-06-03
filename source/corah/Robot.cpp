@@ -57,7 +57,6 @@ void Robot::update()
 void Robot::updateCurrentState()
 {
     JointState state = mCommunicationInterface.getCurrentState();
-    std::cout << state.jointConfiguration << std::endl;
     mCurrentState.set_jointState(state.jointConfiguration, state.jointVelocity, state.timestamp);
 }
 
@@ -71,7 +70,6 @@ void Robot::runMotionQueue(MotionQueue queue)
 
 void Robot::stopRunMotionQueue()
 {
-    //disconnect(this, &Robot::stateUpdated, this, &Robot::waitForMove);
     this->stopMove(MotionType::stopj, 1.0);
 }
 
