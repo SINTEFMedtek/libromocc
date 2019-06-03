@@ -17,17 +17,26 @@ struct CORAH_EXPORT JointState
 class CORAH_EXPORT MessageDecoder {
 
     public:
-        virtual JointState analyzeTCPSegment(QByteArray packet) = 0;
+        virtual JointState analyzeTCPSegment(unsigned char* packet) = 0;
 
-        QByteArray slicePacket(QByteArray data, int pos, int length);
-        QByteArray getHeader(QByteArray data,int pos);
-        QByteArray removeHeader(QByteArray data);
+    protected:
+        int packageSize(unsigned char* package);
 
-        double pickDouble(QByteArray data, int pos);
-        int pickInteger(QByteArray data, int pos);
-        int headerLength(QByteArray data);
-        int headerID(QByteArray data);
+        template<typename T> static T toLittleEndian(T *big_endian_number)
+        {
+            T little_endian_number;
+            char *big_endian_data    = reinterpret_cast<char*>(big_endian_number);
+            char *little_endian_data = reinterpret_cast<char*>(&little_endian_number);
 
+            size_t length = sizeof(T);
+            for (size_t i = 0; i < length; ++i)
+            {
+                little_endian_data[i] = big_endian_data[length - i - 1];
+            }
+            return little_endian_number;
+        }
+
+        double* arrayToLittleEndian(double* array, unsigned int N = 6);
 };
 
 }
