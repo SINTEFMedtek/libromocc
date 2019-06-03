@@ -58,6 +58,7 @@ void Robot::updateCurrentState()
 {
     JointState state = mCommunicationInterface.getCurrentState();
     mCurrentState.set_jointState(state.jointConfiguration, state.jointVelocity, state.timestamp);
+    stateUpdated();
 }
 
 void Robot::runMotionQueue(MotionQueue queue)

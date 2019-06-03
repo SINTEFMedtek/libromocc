@@ -42,7 +42,7 @@ class ROMOCC_EXPORT Robot : public Object
         void runMotionQueue(MotionQueue queue);
         void stopRunMotionQueue();
 
-        void stateUpdated(){};
+        void *stateUpdated(){};
 
     private:
         virtual void update() override;
