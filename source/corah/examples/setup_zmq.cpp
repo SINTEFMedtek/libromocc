@@ -8,128 +8,178 @@
 #include <vector>
 #include <sstream>
 #include <cstring>
-#include <iterator> // std::ostream_iterator
-#include <QByteArray>
+#include <iterator>
+#include <thread>
+#include <Eigen/Dense>
 
 typedef unsigned char byte;
 
-uint32_t extract_bits(uint8_t *arr, unsigned int bit_index, unsigned int bit_count)
+const int NUM_OF_JOINTS = 6;
+
+template<typename T> static T toLittleEndian(T *big_endian_number)
 {
-    /* Assert that we are not requested to extract more than 32 bits */
-    uint32_t result = 0;
-    //assert(bit_count <= sizeof(result)*8 && arr != NULL);
+    T little_endian_number;
+    char *big_endian_data    = reinterpret_cast<char*>(big_endian_number);
+    char *little_endian_data = reinterpret_cast<char*>(&little_endian_number);
 
-    /* You can additionally check if you are trying to extract bits exceeding the 16 byte range */
-    //assert(bit_index + bit_count <= 16 * 8);
+    size_t length = sizeof(T);
+    for (size_t i = 0; i < length; ++i)
+    {
+        little_endian_data[i] = big_endian_data[length - i - 1];
+    }
+    return little_endian_number;
+}
 
-    unsigned int arr_id = bit_index / 8;
-    unsigned int bit_offset = bit_index % 8;
+double* arrayToLittleEndian(double* array)
+{
+    for(unsigned int i = 0; i < NUM_OF_JOINTS; i++)
+        array[i] = toLittleEndian(&array[i]);
+    return array;
+}
 
-    if (bit_offset > 0) {
-        /* Extract first 'unaligned_bit_count' bits, which happen to be non-byte-aligned.
-         * When we do extract those bits, the remaining will be byte-aligned so
-         * we will thread them in different manner.
-         */
-        unsigned int unaligned_bit_count = 8 - bit_offset;
+struct __attribute__((packed)) ur_robot_state
+{
+    int32_t message_size_;
+    double time_;
+    double target_positions_[NUM_OF_JOINTS];
+    double target_velocities_[NUM_OF_JOINTS];
+    double target_accelerations_[NUM_OF_JOINTS];
+    double target_currents_[NUM_OF_JOINTS];
+    double target_torques_[NUM_OF_JOINTS];
+    double actual_positions_[NUM_OF_JOINTS];
+    double actual_velocities_[NUM_OF_JOINTS];
+    double actual_currents_[NUM_OF_JOINTS];
+    double joint_control_torques_[NUM_OF_JOINTS];
+    double actual_tool_coordinates_[NUM_OF_JOINTS];
+    double actual_tool_speed_[NUM_OF_JOINTS];
+    double generalised_tool_forces_[NUM_OF_JOINTS];
+    double target_tool_coordinates_[NUM_OF_JOINTS];
+    double target_tool_speed_[NUM_OF_JOINTS];
+    int64_t digital_pins_;
+    double motor_temperatures_[NUM_OF_JOINTS];
+    double controller_timer_;
+    double test_value_;
+    int64_t robot_mode_;
+    int64_t joint_modes_[NUM_OF_JOINTS];
+    int64_t safety_mode_;
+    int64_t unused_1_[6];
+    double tool_accelerometer_values_[3];
+    int64_t unused_2_[6];
+    double speed_scaling_;
+    double linear_momentum_norm_;
+    int64_t unused_3_[2];
+    double masterboard_main_voltage_;
+    double masterboard_robot_voltage_;
+    double masterboard_robot_current_;
+    double actual_joint_voltages_[NUM_OF_JOINTS];
+};
 
-        /* Check if we need less than the remaining unaligned bits */
-        if (bit_count < unaligned_bit_count) {
-            result = (arr[arr_id] >> bit_offset) & ((1 << bit_count) - 1);
-            return result;
+typedef Eigen::Matrix<double,1,6> RowVector6d;
+
+struct JointState
+{
+    RowVector6d jointConfiguration;
+    RowVector6d jointVelocity;
+    double timestamp = 0;
+};
+
+
+struct robot_state
+{
+    ur_robot_state* state_;
+    JointState jointState;
+
+    void update(void* buffer)
+    {
+        state_ = reinterpret_cast<ur_robot_state*>(buffer);
+
+        double timestamp = toLittleEndian(&state_->time_);
+        double* jointConfiguration = arrayToLittleEndian(state_->actual_positions_);
+        double* jointVelocity = arrayToLittleEndian(state_->actual_velocities_);
+
+        jointState.timestamp = timestamp;
+        jointState.jointConfiguration = RowVector6d(jointConfiguration);
+        jointState.jointVelocity = RowVector6d(jointVelocity);
+    }
+};
+
+
+
+int getMessageSize(unsigned char* buffer)
+{
+    std::stringstream ss;
+    unsigned int x;
+    for(int i=0; i<sizeof(int); i++)
+        ss << std::hex << (int)buffer[i];
+    ss >> x;
+
+    return static_cast<int>(x);
+}
+
+class streamer_task{
+    public:
+        robot_state* get_current_state(){ return rstate;};
+
+        streamer_task(void* context, void* streamer, ur_robot_state* state)
+        {
+            ctx_ = context;
+            streamer_ = streamer;
+            state_ = state;
+            rstate = new robot_state;
+        };
+
+        void start()
+        {
+            int rc = zmq_connect(streamer_, "tcp://localhost:30003");
+
+            byte buffer[1044];
+
+            try{
+                while(true){
+                    zmq_recv(streamer_, buffer, 1044, 0);
+                    int packetLength = getMessageSize(buffer);
+
+                    if(packetLength == 1044)
+                    {
+                        rstate->update(buffer);
+                    }
+                }
+            }
+            catch (std::exception &error){}
         }
 
-        /* We need them all */
-        result = arr[arr_id] >> bit_offset;
-        bit_count -= unaligned_bit_count;
+    private:
+        void* ctx_;
+        void* streamer_;
+        ur_robot_state* state_;
+        robot_state* rstate;
 
-        /* Move to next byte element */
-        arr_id++;
-    }
-
-    while (bit_count > 0) {
-        /* Try to extract up to 8 bits per iteration */
-        int bits_to_extract = bit_count > 8 ? 8 : bit_count;
-
-        if (bits_to_extract < 8) {
-            result = (result << bits_to_extract) | (arr[arr_id] & ((1 << bits_to_extract)-1));
-        }else {
-            result = (result << bits_to_extract) | arr[arr_id];
-        }
-
-        bit_count -= bits_to_extract;
-        arr_id++;
-    }
-
-    return result;
-}
-
-double pickDouble(uint8_t *data, int index)
-{
-    uint32_t sliced_data = extract_bits(data, 0, sizeof(int));
-
-    int a;
-    memcpy(&a, &sliced_data, sizeof(int));
-    std::cout << a << sliced_data << std::endl;
-    return 0;
-}
-
-int parts(unsigned char* array, int start, int end, int steps)
-{
-    int i, j;
-    char temp [(end-start)/steps + 1];
-    for (i = start , j = 0 ; i <= end ; i += steps , ++j)
-        temp[j] = array[i];
-    for (i = 0 ; i < (end - start)/steps + 1 ; ++i)
-        array[i] = temp[i];
-    //for ( ; i <= end ; ++i)
-    //      array[i] = ' ';
-    return (end - start)/steps + 1;
-}
+};
 
 int main(int argc, char *argv[])
 {
     auto context = zmq_ctx_new();
     auto streamer = zmq_socket(context, ZMQ_STREAM);
+
+    ur_robot_state *robot_state;
+
+    streamer_task st(context, streamer, robot_state);
+    std::thread thread_(std::bind(&streamer_task::start, &st));
+
+    // Send motion command **
     int rc = zmq_connect(streamer, "tcp://localhost:30003");
     byte buffer[1044];
     uint8_t id [256];
     size_t  id_size = 256;
     zmq_getsockopt(streamer, ZMQ_IDENTITY, &id, &id_size);
     char msg [] = "movel(p[-0.020114,-0.431763,0.288153,-0.001221,3.116276,0.038892], a=0.3, v=0.05, r=0)\n";
-
-    //zmq_msg_t zmsg;
-    //zmq_msg_init_size(&zmsg, msg.size());
-    //memcpy(zmq_msg_data(&zmsg), msg.data(), msg.size());
-
-    //auto bytemsg = zmq_msg_t(void*)msg.c_str(), msg.size()+1, NULL);
-    //std::cout << "Sending " << (const char*)bytemsg.data();
-    //std::vector<unsigned char> send_buffer(msg.length());
-    //msg.copy(&send_buffer[0], send_buffer.size());
     zmq_send(streamer, id, id_size, ZMQ_SNDMORE);
     zmq_send(streamer, msg, strlen(msg), 0);
+    // **
 
-    bool ok;
-    QByteArray databuf;
-
-    int hLength;
-    while(1){
-        zmq_recv(streamer, buffer, 1044, 0);
-
-        databuf = QByteArray(reinterpret_cast<char*>(buffer), 1044);
-        int headerLength = databuf.mid(0,sizeof(int)).toHex().toInt(&ok,16);
-
-        if(headerLength == 1044)
-            std::cout << headerLength << std::endl;
-
-
-        //memcpy(&hLength, buffer+4, sizeof(int));
-
-        //auto sliced_buffer = parts(buffer,0,3,1);
-        //memcpy(&hLength, &sliced_buffer, sizeof(int));
-        //hLength = (buffer[3] << 24) | (buffer[2] << 16) | (buffer[1] << 8) | (buffer[0]);
-        //std::cout << &hLength << std::endl;
-        //std::cout << &buffer[0] << &buffer[1] << &buffer[2] << &buffer[3] << " " << hLength << std::endl;
-        //int i = static_cast<int>(buffer);
-
+    while(true)
+    {
+        std::cout << st.get_current_state()->jointState.jointConfiguration << std::endl;
+        std::cout << st.get_current_state()->jointState.jointVelocity << std::endl;
     }
 }
