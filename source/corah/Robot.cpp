@@ -1,4 +1,5 @@
 #include "Robot.h"
+#include <iostream>
 
 namespace corah
 {
@@ -7,7 +8,7 @@ Robot::Robot():
 eeMt(Eigen::Affine3d::Identity()),
 rMb(Eigen::Affine3d::Identity())
 {
-    connect(&mCommunicationInterface,&CommunicationInterface::stateChanged,this,&Robot::updateCurrentState);
+    mCommunicationInterface.registerObserver(this);
 }
 
 Robot::~Robot()
@@ -15,7 +16,7 @@ Robot::~Robot()
 
 }
 
-void Robot::configure(Manipulator manipulator, QString host, int port)
+void Robot::configure(Manipulator manipulator, std::string host, int port)
 {
     mCommunicationInterface.set_communication_protocol(manipulator);
     mCommunicationInterface.config_connection(host, port);
@@ -48,10 +49,16 @@ RobotState Robot::getCurrentState()
     return mCurrentState;
 }
 
-void Robot::updateCurrentState(JointState state)
+void Robot::update()
 {
+    this->updateCurrentState();
+}
+
+void Robot::updateCurrentState()
+{
+    JointState state = mCommunicationInterface.getCurrentState();
+    std::cout << state.jointConfiguration << std::endl;
     mCurrentState.set_jointState(state.jointConfiguration, state.jointVelocity, state.timestamp);
-    emit stateUpdated();
 }
 
 void Robot::runMotionQueue(MotionQueue queue)
@@ -60,13 +67,11 @@ void Robot::runMotionQueue(MotionQueue queue)
     RobotMotion target = mMotionQueue.front();
     target.targetPose.translation() = target.targetPose.translation()/1000;
     this->move(MotionType::movep, target.targetPose, target.acceleration, target.velocity);
-
-    connect(this, &Robot::stateUpdated, this, &Robot::waitForMove);
 }
 
 void Robot::stopRunMotionQueue()
 {
-    disconnect(this, &Robot::stateUpdated, this, &Robot::waitForMove);
+    //disconnect(this, &Robot::stateUpdated, this, &Robot::waitForMove);
     this->stopMove(MotionType::stopj, 1.0);
 }
 
@@ -92,7 +97,6 @@ void Robot::waitForMove()
     if(mMotionQueue.empty())
     {
         this->stopMove(MotionType::stopj, target.acceleration);
-        disconnect(this, &Robot::stateUpdated, this, &Robot::waitForMove);
     }
 }
 
