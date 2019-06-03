@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.1)
 
-project(corah)
+project(romocc)
 
 # Current version
 set (VERSION_MAJOR 0)
@@ -42,46 +42,46 @@ foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
 endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
 #### Paths
-set(CORAH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} "source/corah/")
-set(CORAH_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(ROMOCC_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} "source/romocc/")
+set(ROMOCC_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 #### Module path
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/)
 
 #### Includes
-set(CORAH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/source/ ${CMAKE_CURRENT_BINARY_DIR})
+set(ROMOCC_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/source/ ${CMAKE_CURRENT_BINARY_DIR})
 
 #### Setup all external depedencies
 include(cmake/Requirements.cmake)
 
 #### Set include dirs
-include_directories(${CORAH_INCLUDE_DIRS})
+include_directories(${ROMOCC_INCLUDE_DIRS})
 get_directory_property(hasParent PARENT_DIRECTORY)
 if(hasParent)
-    set(CORAH_INCLUDE_DIRS ${CORAH_INCLUDE_DIRS} PARENT_SCOPE)
+    set(ROMOCC_INCLUDE_DIRS ${ROMOCC_INCLUDE_DIRS} PARENT_SCOPE)
 endif()
 
 #### Add all subdirs
-corah_add_subdirectories(source/corah)
+romocc_add_subdirectories(source/romocc)
 
-message("-- CORAH SOURCE FILES: ${CORAH_SOURCE_FILES}")
-message("-- CORAH INCLUDE DIRS: ${CORAH_INCLUDE_DIRS}")
-message("-- CORAH DEPENDENCIES: ${CORAH_EXTERNAL_DEPENDENCIES}")
+message("-- ROMOCC SOURCE FILES: ${ROMOCC_SOURCE_FILES}")
+message("-- ROMOCC INCLUDE DIRS: ${ROMOCC_INCLUDE_DIRS}")
+message("-- ROMOCC DEPENDENCIES: ${ROMOCC_EXTERNAL_DEPENDENCIES}")
 
 #### Create library and executables
-add_library(corah SHARED ${CORAH_SOURCE_FILES} ${HEADERS_MOC})
-add_dependencies(corah ${CORAH_EXTERNAL_DEPENDENCIES})
+add_library(romocc SHARED ${ROMOCC_SOURCE_FILES} ${HEADERS_MOC})
+add_dependencies(romocc ${ROMOCC_EXTERNAL_DEPENDENCIES})
 include(GenerateExportHeader)
-generate_export_header(corah EXPORT_FILE_NAME corahExport.hpp)
+generate_export_header(romocc EXPORT_FILE_NAME romoccExport.hpp)
 
 #### Link everything
-message("-- LIBS: ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES}")
-target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} pthread)
+message("-- LIBS: ${LIBRARIES} ${ROMOCC_SYSTEM_LIBRARIES}")
+target_link_libraries(romocc PUBLIC ${LIBRARIES} ${ROMOCC_SYSTEM_LIBRARIES} pthread)
 
-add_executable(setup_robot_example source/corah/examples/setup_robot.cpp)
-target_link_libraries(setup_robot_example corah)
+add_executable(setup_robot_example source/romocc/examples/setup_robot.cpp)
+target_link_libraries(setup_robot_example romocc)
 
-add_executable(setup_zmq_example source/corah/examples/setup_zmq.cpp)
-target_link_libraries(setup_zmq_example corah)
+add_executable(setup_zmq_example source/romocc/examples/setup_zmq.cpp)
+target_link_libraries(setup_zmq_example romocc)
 
-include(cmake/InstallCorah.cmake)
+include(cmake/InstallRomocc.cmake)

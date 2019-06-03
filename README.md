@@ -1,10 +1,10 @@
-# FAST-ROMO
+# libromocc
 
 **Compile**
 
 ```bash
-git clone https://github.com/androst/corah.git
-cd corah
+git clone https://github.com/androst/libromocc.git
+cd libromocc
 mkdir build
 cd build
 cmake ..

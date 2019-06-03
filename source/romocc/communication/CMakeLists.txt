@@ -1,0 +1,10 @@
+romocc_add_sources(
+        CommunicationInterface.cpp
+        CommunicationInterface.h
+        Client.cpp
+        Client.h
+        MessageEncoder.cpp
+        MessageEncoder.h
+        MessageDecoder.cpp
+        MessageDecoder.h
+)
