@@ -2,8 +2,9 @@
 
 include(cmake/Externals.cmake)
 
-ExternalProject_Add(ZMQ
-        PREFIX ${ROMOCC_EXTERNAL_BUILD_DIR}/ZMQ
+ExternalProject_Add(zeromq
+        PREFIX ${ROMOCC_EXTERNAL_BUILD_DIR}/zeromq
+        BINARY_DIR ${ROMOCC_EXTERNAL_BUILD_DIR}/zeromq/build
         GIT_REPOSITORY "https://github.com/zeromq/libzmq.git"
         GIT_TAG "latest_release"
         UPDATE_COMMAND ""
@@ -22,4 +23,4 @@ ExternalProject_Add(ZMQ
 
 list(APPEND ROMOCC_INCLUDE_DIRS ${ROMOCC_EXTERNAL_INSTALL_DIR}/include/)
 list(APPEND LIBRARIES zmq)
-list(APPEND ROMOCC_EXTERNAL_DEPENDENCIES ZMQ)
+list(APPEND ROMOCC_EXTERNAL_DEPENDENCIES zeromq)
