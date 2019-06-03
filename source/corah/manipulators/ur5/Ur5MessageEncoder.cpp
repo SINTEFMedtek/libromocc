@@ -3,7 +3,7 @@
 namespace corah
 {
 
-QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowVectorXd targetConfiguration, double acc,
+std::string Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowVectorXd targetConfiguration, double acc,
                                       double vel, double t, double rad)
 {
     acc = acc/1000; // mm -> m
@@ -22,14 +22,14 @@ QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowVect
         return stopj(acc);
 }
 
-QString Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::Affine3d pose, double acc, double vel, double t, double radius)
+std::string Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::Affine3d pose, double acc, double vel, double t, double radius)
 {
     pose.translation() = pose.translation()/1000;
     Vector6d vector = AffineToVector6d(pose);
     return moveCommand(MotionType::movep, vector, acc, vel, t, radius);
 }
 
-QString Ur5MessageEncoder::stopCommand(MotionType typeOfStop, double acc)
+std::string Ur5MessageEncoder::stopCommand(MotionType typeOfStop, double acc)
 {
     acc = acc/1000;
     if(typeOfStop==MotionType::stopj)
@@ -38,61 +38,54 @@ QString Ur5MessageEncoder::stopCommand(MotionType typeOfStop, double acc)
         return stopl(acc);
 }
 
-QString Ur5MessageEncoder::shutdownCommand()
+std::string Ur5MessageEncoder::shutdownCommand()
 {
     return powerdown();
 }
 
-QString Ur5MessageEncoder::movej(Eigen::RowVectorXd q,double a, double v,double t,double r)
+std::string Ur5MessageEncoder::movej(Eigen::RowVectorXd q, double a, double v,double t,double r)
 {
-    return QString("movej([%1,%2,%3,%4,%5,%6],a=%7,v=%8,t=%9,r=%10)")
-            .arg(q(0)).arg(q(1)).arg(q(2)).arg(q(3)).arg(q(4)).arg(q(5)).arg(a).arg(v).arg(t).arg(r);
+    return format("movej([%f,%f,%f,%f,%f,%f],a=%f,v=%f,t=%f,r=%f)", q(0), q(1), q(2), q(3), q(4), q(5), a, v, t, r);
 }
 
-QString Ur5MessageEncoder::movep(Eigen::RowVectorXd op,double a, double v,double t,double r)
+std::string Ur5MessageEncoder::movep(Eigen::RowVectorXd op,double a, double v,double t,double r)
 {
-    return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,r=%9)")
-            .arg(op(0)).arg(op(1)).arg(op(2))
-            .arg(op(3)).arg(op(4)).arg(op(5)).arg(a).arg(v).arg(r);
+    return format("movej(p[%f,%f,%f,%f,%f,%f],a=%f,v=%f,r=%f)", op(0), op(1), op(2), op(3), op(4), op(5), a, v, r);
 }
 
-QString Ur5MessageEncoder::speedj(Eigen::RowVectorXd jointVelocity, double a, double t)
+std::string Ur5MessageEncoder::speedj(Eigen::RowVectorXd jv, double a, double t)
 {
-    return QString("speedj([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
-            .arg(jointVelocity(0)).arg(jointVelocity(1)).arg(jointVelocity(2)).arg(jointVelocity(3))
-            .arg(jointVelocity(4)).arg(jointVelocity(5)).arg(a).arg(t);
+    return format("speedj([%f,%f,%f,%f,%f,%f],a=%f,t_min=%f)", jv(0), jv(1), jv(2), jv(3), jv(4), jv(5), a, t);
 }
 
-QString Ur5MessageEncoder::speedl(Eigen::RowVectorXd operationalVelocity, double a, double t)
+std::string Ur5MessageEncoder::speedl(Eigen::RowVectorXd ov, double a, double t)
 {
-    return QString("speedl([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
-            .arg(operationalVelocity(0)).arg(operationalVelocity(1)).arg(operationalVelocity(2))
-            .arg(operationalVelocity(3)).arg(operationalVelocity(4)).arg(operationalVelocity(5)).arg(a).arg(t);
+    return format("speedl([%f,%f,%f,%f,%f,%f],a=%f,t_min=%f)", ov(0), ov(1), ov(2), ov(3), ov(4), ov(5), a, t);
 }
 
-QString Ur5MessageEncoder::stopl(double a)
+std::string Ur5MessageEncoder::stopl(double a)
 {
-    return QString("stopl(%1)").arg(a);
+    return format("stopl(%f", a);
 }
 
-QString Ur5MessageEncoder::stopj(double a)
+std::string Ur5MessageEncoder::stopj(double a)
 {
-    return QString("stopj(%1)").arg(a);
+    return format("stopj(%f)", a);
 }
 
-QString Ur5MessageEncoder::powerdown()
+std::string Ur5MessageEncoder::powerdown()
 {
-    return QString("powerdown()");
+    return std::string("powerdown()");
 }
 
-QString Ur5MessageEncoder::textmsg(QString str)
+std::string Ur5MessageEncoder::textmsg(std::string str)
 {
-    return QString("textmsg(%1)").arg(str);
+    return format("textmsg(%s)", str.c_str());
 }
 
-QString Ur5MessageEncoder::sleep(double t)
+std::string Ur5MessageEncoder::sleep(double t)
 {
-    return QString("sleep(%1)").arg(t);
+    return std::string("sleep(%f)", t);
 }
 
 }

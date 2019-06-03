@@ -5,6 +5,7 @@
 #ifndef CORAH_ROBOT_H
 #define CORAH_ROBOT_H
 
+#include "corah/core/Object.h"
 #include "corah/robotics/RobotState.h"
 #include "corah/robotics/RobotMotion.h"
 #include "corah/communication/CommunicationInterface.h"
@@ -12,15 +13,14 @@
 namespace corah
 {
 
-class CORAH_EXPORT Robot : public QObject
+class CORAH_EXPORT Robot : public Object
 {
-    Q_OBJECT
 
     public:
         Robot();
         ~Robot();
 
-        void configure(Manipulator manipulator, QString ip_address, int port);
+        void configure(Manipulator manipulator, std::string ip_address, int port);
         bool start();
         bool isConnected();
         bool disconnectFromRobot();
@@ -42,11 +42,12 @@ class CORAH_EXPORT Robot : public QObject
         void runMotionQueue(MotionQueue queue);
         void stopRunMotionQueue();
 
-    signals:
-        void stateUpdated();
+        void stateUpdated(){};
 
     private:
-        void updateCurrentState(JointState state);
+        virtual void update() override;
+
+        void updateCurrentState();
         void waitForMove();
 
         CommunicationInterface mCommunicationInterface;
