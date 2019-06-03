@@ -82,7 +82,6 @@ void CommunicationInterface::decodePackage(unsigned char* package)
     JointState state;
     state = mDecoder->analyzeTCPSegment(package);
     mCurrentState = state;
-    std::cout << mCurrentState.jointConfiguration << std::endl;
     notifyObservers();
 }
 
@@ -105,7 +104,6 @@ void CommunicationInterface::removeObserver(Object *observer) {
 
 void CommunicationInterface::notifyObservers() {
     for (Object *observer : mObservers) {
-        std::cout << "Calling update" << std::endl;
         observer->update();
     }
 }

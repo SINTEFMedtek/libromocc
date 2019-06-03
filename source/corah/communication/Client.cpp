@@ -19,7 +19,6 @@ bool Client::isConnected()
 {
     // Not implemented
     return false;
-    //return mSocket->waitForConnected();
 }
 
 bool Client::requestConnect(std::string host, int port)
@@ -47,9 +46,6 @@ bool Client::requestDisconnect()
 
 bool Client::sendPackage(std::string package)
 {
-    std::cout << "Enters client send package" << std::endl;
-    std::cout << package << std::endl;
-
     auto context = zmq_ctx_new();
     auto streamer = zmq_socket(context, ZMQ_STREAM);
 
