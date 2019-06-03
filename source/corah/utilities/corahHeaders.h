@@ -8,9 +8,6 @@
 // Standard library
 #include <memory>
 
-// Qt
-#include <QObject>
-
 // Eigen
 #include <Eigen/Dense>
 
