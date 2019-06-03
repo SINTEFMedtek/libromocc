@@ -63,7 +63,6 @@ endif()
 
 #### Add all subdirs
 corah_add_subdirectories(source/corah)
-qt5_wrap_cpp(HEADERS_MOC ${CORAH_SOURCE_FILES})
 
 message("-- CORAH SOURCE FILES: ${CORAH_SOURCE_FILES}")
 message("-- CORAH INCLUDE DIRS: ${CORAH_INCLUDE_DIRS}")
@@ -77,7 +76,7 @@ generate_export_header(corah EXPORT_FILE_NAME corahExport.hpp)
 
 #### Link everything
 message("-- LIBS: ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES}")
-target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES})
+target_link_libraries(corah PUBLIC ${LIBRARIES} ${CORAH_SYSTEM_LIBRARIES} pthread)
 
 add_executable(setup_robot_example source/corah/examples/setup_robot.cpp)
 target_link_libraries(setup_robot_example corah)
