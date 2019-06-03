@@ -9,6 +9,9 @@ eeMt(Eigen::Affine3d::Identity()),
 rMb(Eigen::Affine3d::Identity())
 {
     mCommunicationInterface.registerObserver(this);
+
+    mContext = zmq_ctx_new();
+    mPublisher = zmq_socket(mContext, ZMQ_PUB);
 }
 
 Robot::~Robot()
@@ -26,6 +29,7 @@ void Robot::configure(Manipulator manipulator, std::string host, int port)
 
 bool Robot::start()
 {
+    zmq_bind(mPublisher, "tcp://*:5557");
     return mCommunicationInterface.connectToRobot();
 }
 
@@ -58,7 +62,11 @@ void Robot::updateCurrentState()
 {
     JointState state = mCommunicationInterface.getCurrentState();
     mCurrentState.set_jointState(state.jointConfiguration, state.jointVelocity, state.timestamp);
-    stateUpdated();
+    std::string msg = "State updated";
+    zmq_msg_t message;
+    zmq_msg_init_size(&message, msg.size());
+    memcpy(zmq_msg_data(&message), msg.c_str(), msg.size());
+    zmq_sendmsg(mPublisher, &message, ZMQ_DONTWAIT);
 }
 
 void Robot::runMotionQueue(MotionQueue queue)

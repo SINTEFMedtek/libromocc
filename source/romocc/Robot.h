@@ -56,6 +56,9 @@ class ROMOCC_EXPORT Robot : public Object
 
         Transform3d eeMt, rMb;
 
+        void* mContext;
+        void* mPublisher;
+
         Vector6d calculateJointVelocity(RobotMotion target);
 };
 
