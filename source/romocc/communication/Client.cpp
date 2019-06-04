@@ -67,13 +67,22 @@ int Client::getMessageSize(unsigned char* buffer)
 
 void Client::start()
 {
+    auto streamer = zmq_socket(mContext, ZMQ_STREAM);
+    auto rc = zmq_connect(streamer, ("tcp://" + mConnectionInfo.host + ":" + std::to_string(mConnectionInfo.port)).c_str());
+    assert(rc == 0);
+
+    uint8_t id [256];
+    size_t  id_size = 256;
+    zmq_getsockopt(streamer, ZMQ_IDENTITY, &id, &id_size);
+
     byte buffer[1044];
     auto publisher = zmq_socket(mContext, ZMQ_PUB);
-    auto rc = zmq_bind(publisher, "inproc://raw_buffer"); assert(rc == 0);
+    rc = zmq_bind(publisher, "inproc://raw_buffer");
+    assert(rc == 0);
 
     try{
         while(true){
-            zmq_recv(mStreamer, buffer, 1044, 0);
+            zmq_recv(streamer, buffer, 1044, 0);
             auto packetLength = getMessageSize(buffer);
 
             if(packetLength == 1044)
