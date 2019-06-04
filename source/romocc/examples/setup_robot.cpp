@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
     std::this_thread::sleep_for(std::chrono::seconds(1));
     std::cout << "Finished waiting" << std::endl;
     std::cout << ur5.getCurrentState().jointConfiguration << std::endl;
+    auto initJointConfig = ur5.getCurrentState().jointConfiguration;
 
     KDL::ChainFkSolverPos_recursive fk_solver = ur5.getCurrentState().getFKSolver();
     KDL::ChainIkSolverPos_NR ik_solver = ur5.getCurrentState().getIKSolver();
@@ -37,6 +38,23 @@ int main(int argc, char *argv[])
     std::cout << q_target.data << std::endl;
 
     ur5.move(romocc::MotionType::movej, q_target.data, 50, 25);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    void *ctx = zmq_ctx_new();
+    void *subscriber = zmq_socket(ctx, ZMQ_SUB);
+    std::string msg_buffer;
+    zmq_connect(subscriber, "tcp://localhost:5557");
+    zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "", 0);
+    zmq_msg_t message;
+    zmq_msg_init(&message);
+    zmq_recvmsg(subscriber, &message, 0);
+    int size = zmq_msg_size(&message);
+    msg_buffer.assign((const char *) zmq_msg_data(&message), size);
+    std::cout << "Msg buffer : " << msg_buffer << std::endl;
+
     std::cout << ur5.getCurrentState().jointConfiguration << std::endl;
+    ur5.move(romocc::MotionType::movej, initJointConfig, 50, 25);
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::cout << ur5.getCurrentState().jointConfiguration << std::endl;
+
 }
