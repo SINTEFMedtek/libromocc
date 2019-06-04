@@ -1,7 +1,7 @@
 #ifndef ROBOTMOTION_H
 #define ROBOTMOTION_H
 
-#include "romocc/utilities/romoccHeaders.h"
+#include "romocc/core/ForwardDeclarations.h"
 
 namespace romocc {
 /**

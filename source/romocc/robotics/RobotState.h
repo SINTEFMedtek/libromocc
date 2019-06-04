@@ -1,7 +1,8 @@
 #ifndef ROBOTSTATE_H
 #define ROBOTSTATE_H
 
-#include "romocc/utilities/romoccHeaders.h"
+#include "romocc/core/ForwardDeclarations.h"
+#include "romocc/utilities/MathUtils.h"
 
 namespace romocc
 {
@@ -9,10 +10,7 @@ namespace romocc
 /**
  * Struct that holds robot state information.
  *
- * \ingroup org_custusx_robotinterface
- *
  * \author Andreas Østvik
- * \date 2015-07-10
  */
 
 
