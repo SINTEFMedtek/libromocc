@@ -12,6 +12,11 @@ namespace romocc
 
 CommunicationInterface::CommunicationInterface()
 {
+    mClient = Client::New();
+    mContext = mClient->getContext();
+
+    mUpdateNotifier = UpdateNotifier::New();
+    mUpdateNotifier->setContext(mContext);
 }
 
 CommunicationInterface::~CommunicationInterface()
@@ -19,7 +24,7 @@ CommunicationInterface::~CommunicationInterface()
 }
 
 bool CommunicationInterface::connectToRobot() {
-    bool connected = mClient.requestConnect(mHost, mPort);
+    bool connected = mClient->requestConnect(mHost, mPort);
     std::thread thread_(std::bind(&CommunicationInterface::decodeReceivedPackages, this));
     thread_.detach();
     return connected;
@@ -27,9 +32,8 @@ bool CommunicationInterface::connectToRobot() {
 
 void CommunicationInterface::decodeReceivedPackages()
 {
-    void *ctx = zmq_ctx_new();
-    void *subscriber = zmq_socket(ctx, ZMQ_SUB);
-    zmq_connect(subscriber, "tcp://localhost:5556");
+    auto subscriber = zmq_socket(mContext, ZMQ_SUB);
+    auto rc = zmq_connect(subscriber, "inproc://raw_buffer"); assert(rc == 0);
     zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "", 0);
 
     unsigned char buffer[1044];
@@ -43,12 +47,12 @@ void CommunicationInterface::decodeReceivedPackages()
 
 bool CommunicationInterface::isConnected()
 {
-    return mClient.isConnected();
+    return mClient->isConnected();
 }
 
 bool CommunicationInterface::disconnectFromRobot()
 {
-    return mClient.requestDisconnect();
+    return mClient->requestDisconnect();
 }
 
 void CommunicationInterface::shutdownRobot()
@@ -59,7 +63,7 @@ void CommunicationInterface::shutdownRobot()
 bool CommunicationInterface::sendMessage(std::string message)
 {
     message.append("\n");
-    return mClient.sendPackage(message);
+    return mClient->sendPackage(message);
 }
 
 void CommunicationInterface::config_connection(std::string host, int port)
@@ -72,8 +76,8 @@ void CommunicationInterface::set_communication_protocol(Manipulator manipulator)
 {
     if(manipulator==UR5)
     {
-        mEncoder = new Ur5MessageEncoder();
-        mDecoder = new Ur5MessageDecoder();
+        mEncoder = Ur5MessageEncoder::New();
+        mDecoder = Ur5MessageDecoder::New();
     }
 }
 
