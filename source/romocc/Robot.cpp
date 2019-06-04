@@ -8,10 +8,8 @@ Robot::Robot():
 eeMt(Eigen::Affine3d::Identity()),
 rMb(Eigen::Affine3d::Identity())
 {
-    mCommunicationInterface.registerObserver(this);
-
-    mContext = zmq_ctx_new();
-    mPublisher = zmq_socket(mContext, ZMQ_PUB);
+    mCommunicationInterface = CommunicationInterface::New();
+    mCommunicationInterface->registerObserver(this);
 }
 
 Robot::~Robot()
@@ -21,31 +19,30 @@ Robot::~Robot()
 
 void Robot::configure(Manipulator manipulator, std::string host, int port)
 {
-    mCommunicationInterface.set_communication_protocol(manipulator);
-    mCommunicationInterface.config_connection(host, port);
-
+    mCommunicationInterface->set_communication_protocol(manipulator);
+    mCommunicationInterface->config_connection(host, port);
     mCurrentState.set_kdlchain(manipulator);
 }
 
 bool Robot::start()
 {
-    zmq_bind(mPublisher, "tcp://*:5557");
-    return mCommunicationInterface.connectToRobot();
+    mCommunicationInterface->getNotifier()->setupNotifier(5557);
+    return mCommunicationInterface->connectToRobot();
 }
 
 bool Robot::isConnected()
 {
-    return mCommunicationInterface.isConnected();
+    return mCommunicationInterface->isConnected();
 }
 
 bool Robot::disconnectFromRobot()
 {
-    return mCommunicationInterface.disconnectFromRobot();
+    return mCommunicationInterface->disconnectFromRobot();
 }
 
 void Robot::shutdown()
 {
-    mCommunicationInterface.shutdownRobot();
+    mCommunicationInterface->shutdownRobot();
 }
 
 RobotState Robot::getCurrentState()
@@ -55,18 +52,9 @@ RobotState Robot::getCurrentState()
 
 void Robot::update()
 {
-    this->updateCurrentState();
-}
-
-void Robot::updateCurrentState()
-{
-    JointState state = mCommunicationInterface.getCurrentState();
+    JointState state = mCommunicationInterface->getCurrentState();
     mCurrentState.set_jointState(state.jointConfiguration, state.jointVelocity, state.timestamp);
-    std::string msg = "State updated";
-    zmq_msg_t message;
-    zmq_msg_init_size(&message, msg.size());
-    memcpy(zmq_msg_data(&message), msg.c_str(), msg.size());
-    zmq_sendmsg(mPublisher, &message, ZMQ_DONTWAIT);
+    mCommunicationInterface->getNotifier()->broadcastUpdate();
 }
 
 void Robot::runMotionQueue(MotionQueue queue)
@@ -129,7 +117,7 @@ Vector6d Robot::calculateJointVelocity(RobotMotion target)
 
 void Robot::stopMove(MotionType type, double acc)
 {
-    mCommunicationInterface.stopMove(type, acc);
+    mCommunicationInterface->stopMove(type, acc);
 };
 
 

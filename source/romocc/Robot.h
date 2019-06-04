@@ -32,32 +32,25 @@ class ROMOCC_EXPORT Robot : public Object
         void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0);
         void stopMove(MotionType type, double acc);
 
-        Transform3d get_rMt();
-        Transform3d get_rMb();
-        Transform3d get_eeMt();
-
-        void set_eeMt(Eigen::Affine3d eeMt);
-        void set_rMb(Eigen::Affine3d rMb);
-
         void runMotionQueue(MotionQueue queue);
         void stopRunMotionQueue();
 
-        const char* stateUpdated(){};
+        Transform3d get_rMt();
+        Transform3d get_rMb();
+        Transform3d get_eeMt();
+        void set_eeMt(Eigen::Affine3d eeMt);
+        void set_rMb(Eigen::Affine3d rMb);
 
     private:
-        virtual void update() override;
-
-        void updateCurrentState();
+        void update();
         void waitForMove();
 
-        CommunicationInterface mCommunicationInterface;
+        SharedPointer<CommunicationInterface> mCommunicationInterface;
+
         RobotState mCurrentState;
         MotionQueue mMotionQueue;
 
         Transform3d eeMt, rMb;
-
-        void* mContext;
-        void* mPublisher;
 
         Vector6d calculateJointVelocity(RobotMotion target);
 };
@@ -65,7 +58,7 @@ class ROMOCC_EXPORT Robot : public Object
 template <class Target>
 void Robot::move(MotionType type, Target target, double acc, double vel, double t, double rad)
 {
-    mCommunicationInterface.move(type, target, acc, vel, t, rad);
+    mCommunicationInterface->move(type, target, acc, vel, t, rad);
 };
 
 }
