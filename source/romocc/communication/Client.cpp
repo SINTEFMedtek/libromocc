@@ -2,6 +2,7 @@
 #include <thread>
 #include <iostream>
 #include <cstring>
+#include <assert.h>
 
 #include "zmq.h"
 #include "Client.h"
@@ -12,7 +13,6 @@ namespace romocc
 Client::Client()
 {
     mContext = zmq_ctx_new();
-    mStreamer = zmq_socket(mContext, ZMQ_STREAM);
 }
 
 bool Client::isConnected()
@@ -26,14 +26,14 @@ bool Client::requestConnect(std::string host, int port)
     mConnectionInfo.host = host;
     mConnectionInfo.port = port;
 
-    int rc = zmq_connect(mStreamer, "tcp://localhost:30003");
+    mStreamer = zmq_socket(mContext, ZMQ_STREAM);
+    zmq_connect(mStreamer, ("tcp://" + host + ":" + std::to_string(port)).c_str());
 
     uint8_t id [256];
     size_t  id_size = 256;
+    zmq_getsockopt(mStreamer, ZMQ_IDENTITY, &id, &id_size);
 
-    rc = zmq_getsockopt(mStreamer, ZMQ_IDENTITY, &id, &id_size);
     std::thread thread_(std::bind(&Client::start, this));
-
     thread_.detach();
     return isConnected();
 }
@@ -47,7 +47,7 @@ bool Client::requestDisconnect()
 bool Client::sendPackage(std::string package)
 {
     uint8_t id [256];
-    size_t  id_size = 256;
+    size_t id_size = 256;
     zmq_getsockopt(mStreamer, ZMQ_IDENTITY, &id, &id_size);
     zmq_send(mStreamer, id, id_size, ZMQ_SNDMORE);
     zmq_send(mStreamer, package.c_str(), strlen(package.c_str()), 0);
@@ -68,14 +68,13 @@ int Client::getMessageSize(unsigned char* buffer)
 void Client::start()
 {
     byte buffer[1044];
-    void *ctx = zmq_ctx_new();
-    void *publisher = zmq_socket(ctx, ZMQ_PUB);
-    zmq_bind(publisher, "tcp://*:5556");
+    auto publisher = zmq_socket(mContext, ZMQ_PUB);
+    auto rc = zmq_bind(publisher, "inproc://raw_buffer"); assert(rc == 0);
 
     try{
         while(true){
             zmq_recv(mStreamer, buffer, 1044, 0);
-            int packetLength = getMessageSize(buffer);
+            auto packetLength = getMessageSize(buffer);
 
             if(packetLength == 1044)
             {

@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "romocc/core/SmartPointers.h"
 #include "zmq.h"
 #include "romoccExport.hpp"
 
@@ -11,6 +12,8 @@ namespace romocc
 
 class ROMOCC_EXPORT Client
 {
+    ROMOCC_OBJECT(Client)
+
     public:
         typedef unsigned char byte;
 
@@ -20,7 +23,6 @@ class ROMOCC_EXPORT Client
         bool requestDisconnect();
 
         bool isConnected();
-
         bool sendPackage(std::string package);
 
         struct ConnectionInfo
@@ -29,19 +31,20 @@ class ROMOCC_EXPORT Client
             int port;
         };
 
+        void* getContext(){ return mContext;};
+
     private:
         int getMessageSize(unsigned char* buffer);
-        void packageReceived(void* buffer);
 
         ConnectionInfo mConnectionInfo;
         int mCurrentTimestamp;
 
         void* mContext;
         void* mStreamer;
-        void readPackage();
 
         void start();
-        void bufferReady(){};
+
+        std::weak_ptr<Client> mPtr;
 };
 
 }
