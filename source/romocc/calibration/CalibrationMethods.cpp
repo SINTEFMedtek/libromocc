@@ -169,12 +169,13 @@ CalibrationMatrices CalibrationMethods::Park(std::vector<Transform3d> prMt, std:
 
     for(int i = 0; i<A.size(); i++)
     {
-        if(AffineToAxisAngle(A.at(i)).norm()!=0 && AffineToAxisAngle(B.at(i)).norm()!=0)
+
+        if(TransformUtils::Affine::toAxisAngle(A.at(i)).norm()!=0 && TransformUtils::Affine::toAxisAngle(B.at(i)).norm()!=0)
         {
-            a = AffineToAxisAngle(A.at(i));
-            b = AffineToAxisAngle(B.at(i));
-            aa = AffineToAxisAngle(AA.at(i));
-            bb = AffineToAxisAngle(BB.at(i));
+            a = TransformUtils::Affine::toAxisAngle(A.at(i));
+            b = TransformUtils::Affine::toAxisAngle(B.at(i));
+            aa = TransformUtils::Affine::toAxisAngle(AA.at(i));
+            bb = TransformUtils::Affine::toAxisAngle(BB.at(i));
         }
         else
         {
@@ -227,7 +228,7 @@ CalibrationError CalibrationMethods::estimateCalibrationError(Transform3d prMb, 
     for(int i = 0; i < nMatrices; i++)
     {
         Transform3d errorMatrix = prMb*bMee.at(i)*eeMt*prMt.at(i).inverse();
-        rotError.push_back(AffineToAxisAngle(errorMatrix).norm());
+        rotError.push_back(TransformUtils::Affine::toAxisAngle(errorMatrix).norm());
 
         Vector3d translError = bMee.at(i).linear()*eeMt.translation()+bMee.at(i).translation()-prMb.linear().inverse()*prMt.at(i).translation()-prMb.inverse().translation();
         transError.push_back(translError.norm());

@@ -30,7 +30,7 @@ void RobotState::set_jointState(RowVector6d jointConfig, RowVector6d jointVel, d
     jointVelocity = jointVel;
 
     bMee = transform_to_joint(jointConfiguration);
-    operationalConfiguration = AffineToVector6d(bMee);
+    operationalConfiguration = TransformUtils::Affine::toVector6D(bMee);
 }
 
 Transform3d RobotState::transform_to_joint(RowVector6d jointConfig, int jointNr) {
@@ -41,8 +41,8 @@ Transform3d RobotState::transform_to_joint(RowVector6d jointConfig, int jointNr)
 
     mFKSolver->JntToCart(input_q, output_T, jointNr);
 
-    Transform3d transform = KDLFrameToEigenAffine(output_T);
-    return ScaleTranslationAffine(transform, 1000);
+    Transform3d transform = TransformUtils::kdl::toAffine(output_T);
+    return TransformUtils::Affine::scaleTranslation(transform, 1000);
 }
 
 Matrix6d RobotState::getJacobian(int jointNr) {
@@ -67,8 +67,8 @@ Eigen::Affine3d RobotState::getTransformToJoint(int jointNr) {
 
     mFKSolver->JntToCart(input_q, output_T, jointNr);
 
-    Eigen::Affine3d transform = KDLFrameToEigenAffine(output_T);
-    return ScaleTranslationAffine(transform, 1000);
+    Eigen::Affine3d transform = TransformUtils::kdl::toAffine(output_T);
+    return TransformUtils::Affine::scaleTranslation(transform, 1000);
 }
 
 KDL::ChainIkSolverPos_NR RobotState::getIKSolver() {

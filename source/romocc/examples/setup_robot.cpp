@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 
     KDL::JntArray q_target = KDL::JntArray(6);
     std::cout << ik_solver.CartToJnt(q_home, target_pose, q_target) << std::endl;
-    std::cout << KDLFrameToEigenAffine(target_pose).matrix() << std::endl;
+    std::cout << TransformUtils::kdl::toAffine(target_pose).matrix() << std::endl;
     std::cout << q_target.data << std::endl;
 
     ur5.move(romocc::MotionType::movej, q_target.data, 50, 25);
