@@ -1,7 +1,7 @@
 #ifndef ROMOCC_MESSAGEDECODER_H
 #define ROMOCC_MESSAGEDECODER_H
 
-#include "romocc/utilities/romoccHeaders.h"
+#include "romocc/core/ForwardDeclarations.h"
 #include "romocc/robotics/RobotState.h"
 
 namespace romocc
@@ -37,6 +37,7 @@ class ROMOCC_EXPORT MessageDecoder {
         }
 
         double* arrayToLittleEndian(double* array, unsigned int N = 6);
+        std::weak_ptr<MessageDecoder> mPtr;
 };
 
 }
