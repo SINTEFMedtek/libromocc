@@ -1,7 +1,8 @@
 #ifndef CALIBRATIONHELPERS_H
 #define CALIBRATIONHELPERS_H
 
-#include "romocc/utilities/romoccHeaders.h"
+#include "romocc/core/ForwardDeclarations.h"
+#include "romocc/utilities/MathUtils.h"
 
 namespace romocc
 {
