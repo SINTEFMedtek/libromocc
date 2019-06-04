@@ -17,7 +17,7 @@ Eigen::Affine3d KDLFrameToEigenAffine(KDL::Frame frame)
 
 Eigen::Affine3d ScaleTranslationAffine(Eigen::Affine3d affine, double scale)
 {
-    affine.translation() = affine.translation()*1000;
+    affine.translation() = affine.translation()*scale;
     return affine;
 }
 
