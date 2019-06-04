@@ -1,5 +1,4 @@
 romocc_add_sources(
-        romoccHeaders.h
-        romoccHelpers.cpp
-        romoccHelpers.h
+        MathUtils.cpp
+        MathUtils.h
 )
