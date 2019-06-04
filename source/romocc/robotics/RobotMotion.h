@@ -50,6 +50,11 @@ class ROMOCC_EXPORT RobotMotionQueue {
 
 };
 
+struct ROMOCC_EXPORT RobotMotionUtils
+{
+    static Vector6d calcJointVelocity(Transform3d targetPose, Transform3d currentPose, Matrix6d jacobian, double velocity);
+};
+
 }
 
 #endif //ROBOTMOTION_H

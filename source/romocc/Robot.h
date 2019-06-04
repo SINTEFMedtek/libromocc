@@ -42,17 +42,14 @@ class ROMOCC_EXPORT Robot : public Object
         void set_rMb(Eigen::Affine3d rMb);
 
     private:
-        void update();
+        void update() override;
         void waitForMove();
 
         SharedPointer<CommunicationInterface> mCommunicationInterface;
 
         RobotState mCurrentState;
         MotionQueue mMotionQueue;
-
         Transform3d eeMt, rMb;
-
-        Vector6d calculateJointVelocity(RobotMotion target);
 };
 
 template <class Target>
