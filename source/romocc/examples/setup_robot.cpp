@@ -11,6 +11,11 @@
 
 using namespace romocc;
 
+void updateSignal()
+{
+    std::cout << "This actually worked" << std::endl;
+}
+
 int main(int argc, char *argv[])
 {
     Robot ur5;
@@ -40,6 +45,7 @@ int main(int argc, char *argv[])
     ur5.move(romocc::MotionType::movej, q_target.data, 50, 25);
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
+    std::cout << "Initialized context? " << ZMQUtils::isInitialized() << std::endl;
     void *ctx = zmq_ctx_new();
     void *subscriber = zmq_socket(ctx, ZMQ_SUB);
     std::string msg_buffer;
@@ -51,6 +57,8 @@ int main(int argc, char *argv[])
     int size = zmq_msg_size(&message);
     msg_buffer.assign((const char *) zmq_msg_data(&message), size);
     std::cout << "Msg buffer : " << msg_buffer << std::endl;
+
+    ur5.updateSubscription(updateSignal);
 
     std::cout << ur5.getCurrentState().jointConfiguration << std::endl;
     ur5.move(romocc::MotionType::movej, initJointConfig, 50, 25);
