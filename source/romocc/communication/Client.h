@@ -31,15 +31,12 @@ class ROMOCC_EXPORT Client
             int port;
         };
 
-        void* getContext(){ return mContext;};
-
     private:
         int getMessageSize(unsigned char* buffer);
 
         ConnectionInfo mConnectionInfo;
         int mCurrentTimestamp;
 
-        void* mContext;
         void* mStreamer;
 
         void start();
