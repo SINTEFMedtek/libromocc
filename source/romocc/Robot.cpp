@@ -8,6 +8,9 @@ namespace romocc
 
 Robot::Robot()
 {
+    rMb = Eigen::Affine3d::Identity();
+    eeMt = Eigen::Affine3d::Identity();
+
     mCommunicationInterface = CommunicationInterface::New();
     mCommunicationInterface->registerObserver(this);
 }
