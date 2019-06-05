@@ -1,19 +1,19 @@
 #include "Robot.h"
 #include <iostream>
+#include <thread>
+#include <functional>
 
 namespace romocc
 {
 
-Robot::Robot():
-eeMt(Eigen::Affine3d::Identity()),
-rMb(Eigen::Affine3d::Identity())
+Robot::Robot()
 {
     mCommunicationInterface = CommunicationInterface::New();
     mCommunicationInterface->registerObserver(this);
 }
 
 
-void Robot::configure(Manipulator manipulator, std::string host, int port)
+void Robot::configure(Manipulator manipulator, const std::string& host, const int& port)
 {
     mCommunicationInterface->set_communication_protocol(manipulator);
     mCommunicationInterface->config_connection(host, port);
@@ -26,7 +26,7 @@ bool Robot::start()
     return mCommunicationInterface->connectToRobot();
 }
 
-bool Robot::isConnected()
+bool Robot::isConnected() const
 {
     return mCommunicationInterface->isConnected();
 }
@@ -41,7 +41,7 @@ void Robot::shutdown()
     mCommunicationInterface->shutdownRobot();
 }
 
-RobotState Robot::getCurrentState()
+RobotState Robot::getCurrentState() const
 {
     return mCurrentState;
 }
@@ -121,6 +121,31 @@ Transform3d Robot::get_rMb()
 Transform3d Robot::get_eeMt()
 {
     return eeMt;
+}
+
+void Robot::updateSubscription(std::function<void()> updateSignal)
+{
+    std::thread thread_(std::bind(&Robot::newSubscription, this, updateSignal));
+    thread_.detach();
+}
+
+void Robot::newSubscription(std::function<void()> updateSignal)
+{
+    void *subscriber = zmq_socket(ZMQUtils::getContext(), ZMQ_SUB);
+    std::string msg_buffer;
+    zmq_connect(subscriber, "tcp://localhost:5557");
+    zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "", 0);
+    zmq_msg_t message;
+    zmq_msg_init(&message);
+
+    while(true)
+    {
+        int rc = zmq_recvmsg(subscriber, &message, 0);
+        assert(rc == 0);
+        int size = zmq_msg_size(&message);
+        msg_buffer.assign((const char *) zmq_msg_data(&message), size);
+        updateSignal();
+    }
 }
 
 Robot::~Robot()

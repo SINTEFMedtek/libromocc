@@ -21,13 +21,14 @@ class ROMOCC_EXPORT Robot : public Object
         Robot();
         ~Robot();
 
-        void configure(Manipulator manipulator, std::string ip_address, int port);
+        void configure(Manipulator manipulator, const std::string& ip_address, const int& port);
+
         bool start();
-        bool isConnected();
         bool disconnectFromRobot();
         void shutdown();
+        bool isConnected() const;
 
-        RobotState getCurrentState();
+        RobotState getCurrentState() const;
 
         template <class Target>
         void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0);
@@ -36,7 +37,10 @@ class ROMOCC_EXPORT Robot : public Object
         void runMotionQueue(MotionQueue queue);
         void stopRunMotionQueue();
 
-        Transform3d get_rMt();
+        void updateSubscription(std::function<void()> updateSignal);
+
+
+    Transform3d get_rMt();
         Transform3d get_rMb();
         Transform3d get_eeMt();
         void set_eeMt(Eigen::Affine3d eeMt);
@@ -47,6 +51,7 @@ class ROMOCC_EXPORT Robot : public Object
         void waitForMove();
 
         SharedPointer<CommunicationInterface> mCommunicationInterface;
+        void newSubscription(std::function<void()> updateSignal);
 
         RobotState mCurrentState;
         MotionQueue mMotionQueue;
@@ -59,6 +64,6 @@ void Robot::move(MotionType type, Target target, double acc, double vel, double 
     mCommunicationInterface->move(type, target, acc, vel, t, rad);
 };
 
-}
+} // namespace romocc
 
 #endif //ROMOCC_ROBOT_H
