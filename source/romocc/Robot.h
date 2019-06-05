@@ -15,6 +15,7 @@ namespace romocc
 
 class ROMOCC_EXPORT Robot : public Object
 {
+    ROMOCC_OBJECT(Robot)
 
     public:
         Robot();

@@ -11,6 +11,7 @@ set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 include(cmake/Macros.cmake)
 
 #### Options
+option(ROMOCC_BUILD_TESTS "Build romocc tests." ON)
 option(DOWNLOAD_AND_BUILD_QT5 "Download and build Qt. Turn OFF if you want to use pre-built binaries existing on your machine." OFF)
 
 #### Set build type
@@ -77,6 +78,12 @@ generate_export_header(romocc EXPORT_FILE_NAME romoccExport.hpp)
 #### Link everything
 message("-- LIBS: ${LIBRARIES} ${ROMOCC_SYSTEM_LIBRARIES}")
 target_link_libraries(romocc PUBLIC ${LIBRARIES} ${ROMOCC_SYSTEM_LIBRARIES} pthread)
+
+## Build test executable
+if(ROMOCC_BUILD_TESTS)
+    add_executable(testROMOCC ${ROMOCC_TEST_SOURCE_FILES})
+    target_link_libraries(testROMOCC romocc)
+endif()
 
 add_executable(setup_robot_example source/romocc/examples/setup_robot.cpp)
 target_link_libraries(setup_robot_example romocc)
