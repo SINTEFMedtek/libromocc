@@ -1,6 +1,7 @@
 #include <thread>
 #include <string>
 #include <iostream>
+#include <romocc/utilities/ZMQUtils.h>
 
 #include "CommunicationInterface.h"
 
@@ -13,10 +14,8 @@ namespace romocc
 CommunicationInterface::CommunicationInterface()
 {
     mClient = Client::New();
-    mContext = mClient->getContext();
 
     mUpdateNotifier = UpdateNotifier::New();
-    mUpdateNotifier->setContext(mContext);
 }
 
 CommunicationInterface::~CommunicationInterface()
@@ -32,7 +31,7 @@ bool CommunicationInterface::connectToRobot() {
 
 void CommunicationInterface::decodeReceivedPackages()
 {
-    auto subscriber = zmq_socket(mContext, ZMQ_SUB);
+    auto subscriber = zmq_socket(ZMQUtils::getContext(), ZMQ_SUB);
     auto rc = zmq_connect(subscriber, "inproc://raw_buffer"); assert(rc == 0);
     zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "", 0);
 

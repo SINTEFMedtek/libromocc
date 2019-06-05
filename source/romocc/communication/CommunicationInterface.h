@@ -1,6 +1,7 @@
 #ifndef ROMOCC_COMMUNICATIONINTERFACE_H
 #define ROMOCC_COMMUNICATIONINTERFACE_H
 
+#include <romocc/utilities/ZMQUtils.h>
 #include "romocc/core/Object.h"
 #include "romocc/robotics/RobotState.h"
 
@@ -42,9 +43,8 @@ class ROMOCC_EXPORT CommunicationInterface
             ROMOCC_OBJECT(UpdateNotifier)
 
             public:
-                void setContext(void* context){mContext = context;};
                 void setupNotifier(int port = 5557){
-                    mPublisher = zmq_socket(mContext, ZMQ_PUB);
+                    mPublisher = zmq_socket(ZMQUtils::getContext(), ZMQ_PUB);
                     zmq_bind(mPublisher, ("tcp://*:" + std::to_string(port)).c_str());
                 }
 
@@ -58,7 +58,6 @@ class ROMOCC_EXPORT CommunicationInterface
             private:
                 UpdateNotifier(){};
 
-                void* mContext;
                 void* mPublisher;
                 std::weak_ptr<UpdateNotifier> mPtr;
         };
@@ -83,8 +82,6 @@ class ROMOCC_EXPORT CommunicationInterface
         void notifyObservers();
 
         SharedPointer<UpdateNotifier> mUpdateNotifier;
-        void* mContext;
-
         std::weak_ptr<CommunicationInterface> mPtr;
 };
 
