@@ -13,6 +13,7 @@ include(cmake/Macros.cmake)
 #### Options
 option(ROMOCC_BUILD_TESTS "Build tests." ON)
 option(ROMOCC_BUILD_EXAMPLES "Build examples." ON)
+option(ROMOCC_BUILD_URSIMULATOR "Download and install UR Simulator" ON)
 
 #### Set build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
