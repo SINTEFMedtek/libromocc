@@ -1,10 +1,6 @@
 # Setup all dependencies, both internal (have to be installed on the system)
 # and external (downloaded and built automatically)
 
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-    add_definitions("-fPIC") # Get rid of Qt error with position independent code
-endif()
-
 ## External depedencies
 include(cmake/ExternalEigen.cmake)
 include(cmake/ExternalOrocos.cmake)
