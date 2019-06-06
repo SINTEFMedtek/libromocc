@@ -64,7 +64,6 @@ endif()
 
 #### Add all subdirs
 romocc_add_subdirectories(source/romocc)
-romocc_add_subdirectories(examples)
 
 message("-- ROMOCC SOURCE FILES: ${ROMOCC_SOURCE_FILES}")
 message("-- ROMOCC INCLUDE DIRS: ${ROMOCC_INCLUDE_DIRS}")
@@ -79,6 +78,11 @@ generate_export_header(romocc EXPORT_FILE_NAME romoccExport.hpp)
 #### Link everything
 message("-- LIBS: ${LIBRARIES} ${ROMOCC_SYSTEM_LIBRARIES}")
 target_link_libraries(romocc PUBLIC ${LIBRARIES} ${ROMOCC_SYSTEM_LIBRARIES} pthread)
+
+## Build examples
+if(ROMOCC_BUILD_EXAMPLES)
+    romocc_add_subdirectories(examples)
+endif()
 
 ## Build test executable
 if(ROMOCC_BUILD_TESTS)
