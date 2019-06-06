@@ -22,7 +22,7 @@ class ROMOCC_EXPORT RobotState {
         ~RobotState();
 
         void setKDLchain(Manipulator manipulator);
-        void setJointState(RowVector6d q, RowVector6d q_vel, double timestamp);
+        void setState(RowVector6d q, RowVector6d q_vel, double timestamp);
 
         Transform3d getTransformToJoint(int jointNr = -1) const;
         Transform3d get_bMee() const;

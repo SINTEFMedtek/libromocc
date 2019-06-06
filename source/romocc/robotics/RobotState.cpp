@@ -24,7 +24,7 @@ void RobotState::setKDLchain(Manipulator manipulator) {
     }
 }
 
-void RobotState::setJointState(RowVector6d jointConfig, RowVector6d jointVel, double timestamp) {
+void RobotState::setState(RowVector6d jointConfig, RowVector6d jointVel, double timestamp) {
     mTimestamp = timestamp;
     mJointConfiguration = jointConfig;
     mJointVelocity = jointVel;
