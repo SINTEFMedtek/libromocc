@@ -9,6 +9,7 @@ namespace romocc
 Robot::Robot()
 {
     mCoordinateSystem = RobotCoordinateSystem::New();
+    mCurrentState = RobotState::New();
     mCommunicationInterface = CommunicationInterface::New();
     mCommunicationInterface->registerObserver(this);
 }
@@ -18,7 +19,8 @@ void Robot::configure(Manipulator manipulator, const std::string& host, const in
 {
     mCommunicationInterface->set_communication_protocol(manipulator);
     mCommunicationInterface->config_connection(host, port);
-    mCurrentState.set_kdlchain(manipulator);
+
+    mCurrentState->setKDLchain(manipulator);
 }
 
 bool Robot::start()
@@ -42,7 +44,7 @@ void Robot::shutdown()
     mCommunicationInterface->shutdownRobot();
 }
 
-RobotState Robot::getCurrentState() const
+RobotState::pointer Robot::getCurrentState() const
 {
     return mCurrentState;
 }
@@ -50,7 +52,7 @@ RobotState Robot::getCurrentState() const
 void Robot::update()
 {
     JointState state = mCommunicationInterface->getCurrentState();
-    mCurrentState.set_jointState(state.jointConfiguration, state.jointVelocity, state.timestamp);
+    mCurrentState->setJointState(state.jointConfiguration, state.jointVelocity, state.timestamp);
     mCommunicationInterface->getNotifier()->broadcastUpdate();
 }
 
@@ -71,7 +73,7 @@ void Robot::waitForMove()
 {
     auto target = mMotionQueue.front();
 
-    double remainingDistance = ((mCurrentState.bMee*mCoordinateSystem->get_eeMt()).translation()
+    double remainingDistance = ((mCurrentState->get_bMee()*mCoordinateSystem->get_eeMt()).translation()
                                 -target.targetPose.translation()).norm();
 
     if(remainingDistance<=target.blendRadius)
@@ -83,7 +85,7 @@ void Robot::waitForMove()
     if(target.motionType == MotionType::speedj)
     {
         auto targetJointVelocity = RobotMotionUtils::calcJointVelocity(target.targetPose,
-                mCurrentState.bMee*mCoordinateSystem->get_eeMt(), mCurrentState.getJacobian(), target.velocity);
+                mCurrentState->get_bMee()*mCoordinateSystem->get_eeMt(), mCurrentState->getJacobian(), target.velocity);
         this->move(target.motionType, targetJointVelocity, target.acceleration, 0.0, 5.0, 0.0); // vel and r not used
     }
 

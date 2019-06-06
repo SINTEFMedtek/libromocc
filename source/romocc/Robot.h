@@ -27,7 +27,7 @@ class ROMOCC_EXPORT Robot : public Object
 
         void shutdown();
 
-        RobotState getCurrentState() const;
+        RobotState::pointer getCurrentState() const;
         void addUpdateSubscription(std::function<void()> updateFunction);
 
         template <class Target>
@@ -50,7 +50,7 @@ class ROMOCC_EXPORT Robot : public Object
         void startSubscription(std::function<void()> updateSignal);
 
         SharedPointer<RobotCoordinateSystem> mCoordinateSystem;
-        RobotState mCurrentState;
+        SharedPointer<RobotState> mCurrentState;
         MotionQueue mMotionQueue;
 };
 
