@@ -6,6 +6,9 @@
 #include "romocc/tests/catch.hpp"
 #include "romocc/utilities/ZMQUtils.h"
 
+namespace romocc
+{
+
 TEST_CASE("Send message manual approach", "[romocc][ZMQUtils]") {
     ZMQUtils::createContext();
     auto streamer = zmq_socket(ZMQUtils::getContext(), ZMQ_STREAM);
@@ -20,4 +23,6 @@ TEST_CASE("Send message manual approach", "[romocc][ZMQUtils]") {
     zmq_send(streamer, id, id_size, ZMQ_SNDMORE);
     zmq_send(streamer, msg, strlen(msg), 0);
     // **
+}
+
 }
