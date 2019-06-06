@@ -90,10 +90,4 @@ if(ROMOCC_BUILD_TESTS)
     target_link_libraries(testROMOCC romocc)
 endif()
 
-add_executable(setup_robot_example source/romocc/examples/setup_robot.cpp)
-target_link_libraries(setup_robot_example romocc)
-
-add_executable(setup_zmq_example source/romocc/examples/setup_zmq.cpp)
-target_link_libraries(setup_zmq_example romocc)
-
 include(cmake/InstallRomocc.cmake)
