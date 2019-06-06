@@ -6,6 +6,7 @@ ExternalProject_Add(ursim
         PREFIX ${ROMOCC_EXTERNAL_BUILD_DIR}/ursim
         DOWNLOAD_DIR ${ROMOCC_EXTERNAL_BUILD_DIR}/ursim
         URL https://s3-eu-west-1.amazonaws.com/ur-support-site/16646/ursim-3.0.16471.tar.gz
+        URL_HASH MD5=6f23e90767eef99b756854beef8f1867
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND ""
         BUILD_COMMAND cd ${ROMOCC_EXTERNAL_BUILD_DIR}/ursim/src/ursim/ && ./install.sh
