@@ -48,8 +48,8 @@ TEST_CASE("Initialize robot and test kinematics", "[romocc][Robot]") {
     Robot::pointer robot = Robot::New();
     robot->configure(UR5, "localhost", 30003);
 
-    KDL::ChainFkSolverPos_recursive fk_solver = robot->getCurrentState().getFKSolver();
-    KDL::ChainIkSolverPos_NR ik_solver = robot->getCurrentState().getIKSolver();
+    KDL::ChainFkSolverPos_recursive fk_solver = robot->getCurrentState()->getFKSolver();
+    KDL::ChainIkSolverPos_NR ik_solver = robot->getCurrentState()->getIKSolver();
 
     KDL::JntArray q_home = KDL::JntArray(6);
     for (unsigned int i = 0; i < 6; i++) {q_home(i)=dh_home[i];}
