@@ -24,6 +24,14 @@ typedef Eigen::Matrix<double,6,1> Vector6d;
 typedef Eigen::Matrix<double,1,6> RowVector6d;
 typedef Eigen::Matrix<double,6,6> Matrix6d;
 
+// KDL
+typedef KDL::Chain RobotChain;
+typedef KDL::ChainFkSolverPos_recursive FKSolver;
+typedef KDL::ChainIkSolverPos_NR IKSolver;
+typedef KDL::ChainIkSolverVel_pinv IKVelSolver;
+typedef KDL::ChainJntToJacSolver JacobianSolver;
+
+
 }
 
 #endif //ROMOCC_FORWARDDECLARATIONS_H
