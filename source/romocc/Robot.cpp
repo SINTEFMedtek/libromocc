@@ -44,6 +44,7 @@ void Robot::shutdown()
 
 RobotState::pointer Robot::getCurrentState() const
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     return mCurrentState;
 }
 

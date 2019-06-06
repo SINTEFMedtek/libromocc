@@ -5,6 +5,8 @@
 #ifndef ROMOCC_ROBOT_H
 #define ROMOCC_ROBOT_H
 
+#include <mutex>
+
 #include "romocc/core/Object.h"
 #include "romocc/robotics/RobotState.h"
 #include "romocc/robotics/RobotMotion.h"
@@ -51,6 +53,7 @@ class ROMOCC_EXPORT Robot
         SharedPointer<RobotState> mCurrentState;
         MotionQueue mMotionQueue;
 
+        mutable std::mutex mMutex;
         std::weak_ptr<Robot> mPtr;
 };
 
