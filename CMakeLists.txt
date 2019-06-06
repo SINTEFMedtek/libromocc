@@ -66,8 +66,6 @@ endif()
 #### Add all subdirs
 romocc_add_subdirectories(source/romocc)
 
-message("-- ROMOCC SOURCE FILES: ${ROMOCC_SOURCE_FILES}")
-message("-- ROMOCC INCLUDE DIRS: ${ROMOCC_INCLUDE_DIRS}")
 message("-- ROMOCC DEPENDENCIES: ${ROMOCC_EXTERNAL_DEPENDENCIES}")
 
 #### Create library and executables
@@ -77,7 +75,7 @@ include(GenerateExportHeader)
 generate_export_header(romocc EXPORT_FILE_NAME romoccExport.hpp)
 
 #### Link everything
-message("-- LIBS: ${LIBRARIES} ${ROMOCC_SYSTEM_LIBRARIES}")
+message("-- ROMOCC LIBS: ${LIBRARIES} ${ROMOCC_SYSTEM_LIBRARIES}")
 target_link_libraries(romocc PUBLIC ${LIBRARIES} ${ROMOCC_SYSTEM_LIBRARIES} pthread)
 
 ## Build examples
