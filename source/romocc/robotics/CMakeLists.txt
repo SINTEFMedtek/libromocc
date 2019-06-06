@@ -3,4 +3,6 @@ romocc_add_sources(
         RobotState.h
         RobotMotion.cpp
         RobotMotion.h
+        RobotCoordinateSystem.cpp
+        RobotCoordinateSystem.h
 )
