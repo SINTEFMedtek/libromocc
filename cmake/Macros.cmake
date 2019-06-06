@@ -36,7 +36,28 @@ macro (romocc_add_test_sources)
         endif()
     endforeach()
     if (_relPath)
-        # propagate FAST_TEST_SOURCE_FILES to parent directory
+        # propagate ROMOCC_TEST_SOURCE_FILES to parent directory
         set (ROMOCC_TEST_SOURCE_FILES ${ROMOCC_TEST_SOURCE_FILES} PARENT_SCOPE)
+    endif()
+endmacro()
+
+macro (romocc_add_example NAME)
+    if(ROMOCC_BUILD_EXAMPLES)
+        list(APPEND ROMOCC_EXAMPLES ${NAME})
+        add_executable(${NAME} ${ARGN})
+        target_link_libraries(${NAME} romocc)
+        install(TARGETS ${NAME}
+                DESTINATION romocc/bin
+                )
+        if(WIN32)
+            file(APPEND ${PROJECT_BINARY_DIR}/runAllExamples.bat "bin\\${NAME}.exe\r\n")
+        else()
+            file(APPEND ${PROJECT_BINARY_DIR}/runAllExamples.sh "./bin/${NAME}\n")
+        endif()
+        file (RELATIVE_PATH _relPath "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
+        if(_relPath)
+            # propagate to parent directory
+            set(ROMOCC_EXAMPLES ${ROMOCC_EXAMPLES} PARENT_SCOPE)
+        endif()
     endif()
 endmacro()
