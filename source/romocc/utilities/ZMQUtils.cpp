@@ -4,5 +4,8 @@
 
 #include "ZMQUtils.h"
 
-bool ZMQUtils::is_initialized = false;
-void* ZMQUtils::zmq_context = nullptr;
+namespace romocc
+{
+    bool ZMQUtils::is_initialized = false;
+    void* ZMQUtils::zmq_context = nullptr;
+}
