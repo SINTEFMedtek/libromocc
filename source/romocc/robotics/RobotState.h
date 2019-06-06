@@ -14,7 +14,8 @@ namespace romocc
  */
 
 
-class ROMOCC_EXPORT RobotState {
+class ROMOCC_EXPORT RobotState : public Object
+{
     ROMOCC_OBJECT(RobotState)
 
     public:
@@ -33,23 +34,21 @@ class ROMOCC_EXPORT RobotState {
         Vector6d getOperationalConfig() const;
         Vector6d getOperationalVelocity() const;
 
-        KDL::ChainFkSolverPos_recursive getFKSolver();
-        KDL::ChainIkSolverPos_NR getIKSolver();
+        std::shared_ptr<FKSolver> getFKSolver();
+        std::shared_ptr<IKSolver> getIKSolver();
 
     private:
         double mTimestamp;
         Vector6d mJointConfiguration, mJointVelocity, mOperationalConfiguration;
         Transform3d m_bMee;
 
-        KDL::Chain mKDLChain;
-        KDL::ChainFkSolverPos_recursive *mFKSolver;
-        KDL::ChainIkSolverPos_NR *mIKSolver;
-        KDL::ChainIkSolverVel_pinv *mIKSolverVel;
-        KDL::ChainJntToJacSolver *mJacSolver;
+        RobotChain mKDLChain;
+        std::shared_ptr<FKSolver> mFKSolver;
+        std::shared_ptr<IKSolver> mIKSolver;
+        std::shared_ptr<IKVelSolver> mIKSolverVel;
+        std::shared_ptr<JacobianSolver> mJacSolver;
 
         Transform3d transform_to_joint(RowVector6d jointConfig, int jointNr = -1);
-
-        std::weak_ptr<RobotState> mPtr;
 };
 
 }
