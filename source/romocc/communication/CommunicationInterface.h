@@ -28,60 +28,28 @@ class ROMOCC_EXPORT CommunicationInterface
         bool disconnectFromRobot();
         void shutdownRobot();
 
-        JointState getCurrentState(){return mCurrentState;};
+        void setRobotState(RobotState::pointer robotState);
         bool sendMessage(std::string message);
 
         template <class TargetConfiguration>
         void move(MotionType typeOfMotion, TargetConfiguration target, double acc, double vel, double t, double rad);
         void stopMove(MotionType typeOfStop, double acc);
 
-        void registerObserver(Object *observer);
-        void removeObserver(Object*observer);
 
-        class UpdateNotifier
-        {
-            ROMOCC_OBJECT(UpdateNotifier)
 
-            public:
-                void setupNotifier(int port = 5557){
-                    mPublisher = zmq_socket(ZMQUtils::getContext(), ZMQ_PUB);
-                    zmq_bind(mPublisher, ("tcp://*:" + std::to_string(port)).c_str());
-                }
-
-                void broadcastUpdate(std::string message = "State updated"){
-                    zmq_msg_t zmqMessage;
-                    zmq_msg_init_size(&zmqMessage, message.size());
-                    memcpy(zmq_msg_data(&zmqMessage), message.c_str(), message.size());
-                    zmq_sendmsg(mPublisher, &zmqMessage, ZMQ_DONTWAIT);
-                };
-
-            private:
-                UpdateNotifier(){};
-
-                void* mPublisher;
-                std::weak_ptr<UpdateNotifier> mPtr;
-        };
-
-        UpdateNotifier::pointer getNotifier(){ return mUpdateNotifier;};
-
-    private:
-        void decodePackage(unsigned char* package);
+private:
+        void updateState(unsigned char* package);
 
         SharedPointer<Client> mClient;
         SharedPointer<MessageEncoder> mEncoder;
         SharedPointer<MessageDecoder> mDecoder;
 
-        JointState mCurrentState;
-
+        RobotState::pointer mCurrentState;
         std::string mHost;
         int mPort;
 
         void decodeReceivedPackages();
 
-        std::vector<Object *> mObservers;
-        void notifyObservers();
-
-        SharedPointer<UpdateNotifier> mUpdateNotifier;
         std::weak_ptr<CommunicationInterface> mPtr;
 };
 

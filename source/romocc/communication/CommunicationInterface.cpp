@@ -14,8 +14,7 @@ namespace romocc
 CommunicationInterface::CommunicationInterface()
 {
     mClient = Client::New();
-
-    mUpdateNotifier = UpdateNotifier::New();
+    mCurrentState = RobotState::New();
 }
 
 CommunicationInterface::~CommunicationInterface()
@@ -35,12 +34,15 @@ void CommunicationInterface::decodeReceivedPackages()
     auto rc = zmq_connect(subscriber, "inproc://raw_buffer"); assert(rc == 0);
     zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "", 0);
 
+    auto notifier = ZMQUpdateNotifier("state_update_notifier");
+
     unsigned char buffer[1044];
 
     while(true)
     {
         zmq_recv(subscriber, buffer, 1044, 0);
-        decodePackage(buffer);
+        updateState(buffer);
+        notifier.broadcastUpdate("state_updated");
     }
 }
 
@@ -80,12 +82,15 @@ void CommunicationInterface::set_communication_protocol(Manipulator manipulator)
     }
 }
 
-void CommunicationInterface::decodePackage(unsigned char* package)
+void CommunicationInterface::setRobotState(romocc::RobotState::pointer robotState)
 {
-    JointState state;
-    state = mDecoder->analyzeTCPSegment(package);
-    mCurrentState = state;
-    notifyObservers();
+    mCurrentState = robotState;
+}
+
+void CommunicationInterface::updateState(unsigned char* package)
+{
+    JointState jointState = mDecoder->analyzeTCPSegment(package);
+    mCurrentState->setState(jointState.jointConfiguration, jointState.jointVelocity, jointState.timestamp);
 }
 
 void CommunicationInterface::stopMove(MotionType typeOfStop, double acc)
@@ -93,22 +98,5 @@ void CommunicationInterface::stopMove(MotionType typeOfStop, double acc)
     sendMessage(mEncoder->stopCommand(typeOfStop, acc));
 }
 
-void CommunicationInterface::registerObserver(Object *observer) {
-    mObservers.push_back(observer);
-}
-
-void CommunicationInterface::removeObserver(Object *observer) {
-    auto iterator = std::find(mObservers.begin(), mObservers.end(), observer);
-
-    if (iterator != mObservers.end()) {
-        mObservers.erase(iterator);
-    }
-}
-
-void CommunicationInterface::notifyObservers() {
-    for (Object *observer : mObservers) {
-        observer->update();
-    }
-}
 
 }
