@@ -6,6 +6,7 @@
 #include "catch.hpp"
 #include "romocc/Robot.h"
 #include <iostream>
+#include <thread>
 
 namespace romocc {
 
@@ -48,21 +49,33 @@ TEST_CASE("Initialize robot and test kinematics", "[romocc][Robot]") {
     Robot::pointer robot = Robot::New();
     robot->configure(UR5, "localhost", 30003);
 
-    KDL::ChainFkSolverPos_recursive fk_solver = robot->getCurrentState()->getFKSolver();
-    KDL::ChainIkSolverPos_NR ik_solver = robot->getCurrentState()->getIKSolver();
+    std::shared_ptr<FKSolver> fk_solver = robot->getCurrentState()->getFKSolver();
+    std::shared_ptr<IKSolver> ik_solver = robot->getCurrentState()->getIKSolver();
 
     KDL::JntArray q_home = KDL::JntArray(6);
     for (unsigned int i = 0; i < 6; i++) {q_home(i)=dh_home[i];}
 
     KDL::Frame target_pose = KDL::Frame::Identity();
-    fk_solver.JntToCart(q_home, target_pose);
+    fk_solver->JntToCart(q_home, target_pose);
 
     for (unsigned int i = 0; i < 6; i++) {q_home(i)=q_home(i);}
 
     KDL::JntArray q_target = KDL::JntArray(6);
-    ik_solver.CartToJnt(q_home, target_pose, q_target);
+    ik_solver->CartToJnt(q_home, target_pose, q_target);
 
     CHECK(q_target.data == q_home.data);
+}
+
+TEST_CASE("Initialize robot and listen for new states", "[romocc][Robot]") {
+    Robot::pointer robot = Robot::New();
+    robot->configure(UR5, "localhost", 30003);
+    robot->start();
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    for(int i = 0; i<1000; i++)
+    {
+        std::cout << robot->getCurrentState()->getJointConfig() << std::endl;
+    }
 }
 
 }
