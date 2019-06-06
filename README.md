@@ -36,5 +36,4 @@ The code base is currently undergoing large changes, thus there is no guarantee 
 
 ### Contributors
 
-libromocc is developed at [SINTEF Digital](http://www.sintef.no).
-This work has been partially funded by the Research Council of Norway under grant number 270941.
+libromocc is developed at [SINTEF Digital](http://www.sintef.no), and the work has been partially funded by the Research Council of Norway under grant number 270941.
