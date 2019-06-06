@@ -11,21 +11,19 @@ Robot::Robot()
     mCoordinateSystem = RobotCoordinateSystem::New();
     mCurrentState = RobotState::New();
     mCommunicationInterface = CommunicationInterface::New();
-    mCommunicationInterface->registerObserver(this);
 }
 
 
 void Robot::configure(Manipulator manipulator, const std::string& host, const int& port)
 {
+    mCurrentState->setKDLchain(manipulator);
     mCommunicationInterface->set_communication_protocol(manipulator);
     mCommunicationInterface->config_connection(host, port);
-
-    mCurrentState->setKDLchain(manipulator);
+    mCommunicationInterface->setRobotState(mCurrentState);
 }
 
 bool Robot::start()
 {
-    mCommunicationInterface->getNotifier()->setupNotifier(5557);
     return mCommunicationInterface->connectToRobot();
 }
 
@@ -47,13 +45,6 @@ void Robot::shutdown()
 RobotState::pointer Robot::getCurrentState() const
 {
     return mCurrentState;
-}
-
-void Robot::update()
-{
-    JointState state = mCommunicationInterface->getCurrentState();
-    mCurrentState->setJointState(state.jointConfiguration, state.jointVelocity, state.timestamp);
-    mCommunicationInterface->getNotifier()->broadcastUpdate();
 }
 
 void Robot::runMotionQueue(MotionQueue queue)
@@ -112,7 +103,7 @@ void Robot::startSubscription(std::function<void()> updateSignal)
 {
     void *subscriber = zmq_socket(ZMQUtils::getContext(), ZMQ_SUB);
     std::string msg_buffer;
-    zmq_connect(subscriber, "tcp://localhost:5557");
+    zmq_connect(subscriber, "inproc://state_update_notifier");
     zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "", 0);
     zmq_msg_t message;
     zmq_msg_init(&message);

@@ -14,13 +14,12 @@
 namespace romocc
 {
 
-class ROMOCC_EXPORT Robot : public Object
+class ROMOCC_EXPORT Robot
 {
     ROMOCC_OBJECT(Robot)
 
     public:
         void configure(Manipulator manipulator, const std::string& ip_address, const int& port);
-
         bool start();
         bool disconnectFromRobot();
         bool isConnected() const;
@@ -43,7 +42,6 @@ class ROMOCC_EXPORT Robot : public Object
         ~Robot();
 
     private:
-        void update() override;
         void waitForMove();
 
         SharedPointer<CommunicationInterface> mCommunicationInterface;
@@ -52,6 +50,8 @@ class ROMOCC_EXPORT Robot : public Object
         SharedPointer<RobotCoordinateSystem> mCoordinateSystem;
         SharedPointer<RobotState> mCurrentState;
         MotionQueue mMotionQueue;
+
+        std::weak_ptr<Robot> mPtr;
 };
 
 template <class Target>
