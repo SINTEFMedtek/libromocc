@@ -13,7 +13,7 @@ namespace romocc{
 class Object {
     public:
         typedef SharedPointer<Object> pointer;
-        virtual void update() = 0;
+        virtual ~Object() {};
 
     protected:
         std::weak_ptr<Object> mPtr;
