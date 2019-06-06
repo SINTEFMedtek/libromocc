@@ -83,7 +83,7 @@ std::string Ur5MessageEncoder::speedl(Eigen::RowVectorXd ov, double a, double t)
 
 std::string Ur5MessageEncoder::stopl(double a)
 {
-    return format("stopl(%f", a);
+    return format("stopl(%f)", a);
 }
 
 std::string Ur5MessageEncoder::stopj(double a)
