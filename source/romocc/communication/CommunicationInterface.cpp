@@ -31,7 +31,8 @@ bool CommunicationInterface::connectToRobot() {
 void CommunicationInterface::decodeReceivedPackages()
 {
     auto subscriber = zmq_socket(ZMQUtils::getContext(), ZMQ_SUB);
-    auto rc = zmq_connect(subscriber, "inproc://raw_buffer"); assert(rc == 0);
+    auto rc = zmq_connect(subscriber, "inproc://raw_buffer");
+    assert(rc == 0);
     zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "", 0);
 
     auto notifier = ZMQUpdateNotifier("state_update_notifier");
@@ -40,10 +41,15 @@ void CommunicationInterface::decodeReceivedPackages()
 
     while(true)
     {
-        zmq_recv(subscriber, buffer, 1044, 0);
-        updateState(buffer);
-        notifier.broadcastUpdate("state_updated");
+        rc = zmq_recv(subscriber, buffer, 1044, 0);
+        if(rc == 1044)
+        {
+            updateState(buffer);
+            notifier.broadcastUpdate("state_updated");
+        }
     }
+    zmq_close(subscriber);
+    notifier.close();
 }
 
 bool CommunicationInterface::isConnected()
