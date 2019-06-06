@@ -53,6 +53,11 @@ class ZMQUpdateNotifier
             zmq_sendmsg(mPublisher, &zmqMessage, ZMQ_DONTWAIT);
         }
 
+        void close()
+        {
+            zmq_close(mPublisher);
+        }
+
     private:
         void* mPublisher;
 };
