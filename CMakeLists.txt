@@ -11,8 +11,8 @@ set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 include(cmake/Macros.cmake)
 
 #### Options
-option(ROMOCC_BUILD_TESTS "Build romocc tests." ON)
-option(DOWNLOAD_AND_BUILD_QT5 "Download and build Qt. Turn OFF if you want to use pre-built binaries existing on your machine." OFF)
+option(ROMOCC_BUILD_TESTS "Build tests." ON)
+option(ROMOCC_BUILD_EXAMPLES "Build examples." ON)
 
 #### Set build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -64,6 +64,7 @@ endif()
 
 #### Add all subdirs
 romocc_add_subdirectories(source/romocc)
+romocc_add_subdirectories(examples)
 
 message("-- ROMOCC SOURCE FILES: ${ROMOCC_SOURCE_FILES}")
 message("-- ROMOCC INCLUDE DIRS: ${ROMOCC_INCLUDE_DIRS}")
