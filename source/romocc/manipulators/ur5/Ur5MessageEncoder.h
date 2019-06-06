@@ -20,14 +20,16 @@ class ROMOCC_EXPORT Ur5MessageEncoder : public MessageEncoder
 
     public:
         virtual std::string moveCommand(MotionType type, Eigen::RowVectorXd targetConfiguration, double acc, double vel, double t, double rad);
+        virtual std::string moveCommand(MotionType type, Eigen::Affine3d targetPose, double acc, double vel, double t, double rad);
+        virtual std::string moveCommand(MotionType type, double targetConfig[6], double acc, double vel, double t, double rad);
+
         virtual std::string stopCommand(MotionType typeOfStop, double acc);
         virtual std::string shutdownCommand();
-
-        std::string moveCommand(MotionType type, Eigen::Affine3d targetPose, double acc, double vel, double t, double rad);
 
     private:
         std::string movej(Eigen::RowVectorXd jointConfig, double a, double v, double t, double r);
         std::string movep(Eigen::RowVectorXd operationalConfig, double a, double v, double t, double r);
+        std::string movep(double operationalConfig[6], double a, double v, double t, double r);
 
         std::string speedj(Eigen::RowVectorXd jointVelocity, double a, double t);
         std::string speedl(Eigen::RowVectorXd operationalVelocity, double a, double t);

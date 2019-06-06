@@ -29,6 +29,19 @@ std::string Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::Aff
     return moveCommand(MotionType::movep, vector, acc, vel, t, radius);
 }
 
+std::string Ur5MessageEncoder::moveCommand(MotionType typeOfMovement, double targetConfig[6], double acc, double vel, double t, double rad)
+{
+    acc = acc/1000; // mm -> m
+    vel = vel/1000;
+    rad = rad/1000;
+
+    targetConfig[0] = targetConfig[0]/1000;
+    targetConfig[1] = targetConfig[1]/1000;
+    targetConfig[2] = targetConfig[2]/1000;
+
+    return movep(targetConfig,acc,vel,t,rad);
+}
+
 std::string Ur5MessageEncoder::stopCommand(MotionType typeOfStop, double acc)
 {
     acc = acc/1000;
@@ -51,6 +64,11 @@ std::string Ur5MessageEncoder::movej(Eigen::RowVectorXd q, double a, double v,do
 std::string Ur5MessageEncoder::movep(Eigen::RowVectorXd op,double a, double v,double t,double r)
 {
     return format("movej(p[%f,%f,%f,%f,%f,%f],a=%f,v=%f,r=%f)", op(0), op(1), op(2), op(3), op(4), op(5), a, v, r);
+}
+
+std::string Ur5MessageEncoder::movep(double op[6],double a, double v,double t,double r)
+{
+    return format("movej(p[%f,%f,%f,%f,%f,%f],a=%f,v=%f,r=%f)", op[0], op[1], op[2], op[3], op[4], op[5], a, v, r);
 }
 
 std::string Ur5MessageEncoder::speedj(Eigen::RowVectorXd jv, double a, double t)
