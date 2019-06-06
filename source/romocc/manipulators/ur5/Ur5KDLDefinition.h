@@ -1,6 +1,9 @@
 #ifndef ROMOCC_UR5KDLDEFINITION_H
 #define ROMOCC_UR5KDLDEFINITION_H
 
+#include <math.h>
+#include <kdl/chain.hpp>
+
 namespace romocc
 {
 
