@@ -3,7 +3,7 @@ libromocc
 
 libromocc is a lightweight C++ library for robot modelling, control and communication
 
-## Setup and build
+### Setup and build
 
 ```bash
 git clone https://github.com/androst/libromocc.git
@@ -14,7 +14,7 @@ cmake ..
 make -j8
 ```
 
-## Usage
+### Usage
 
 If you use libromocc in your research and would like to cite the library, we suggest you cite the following conference paper:
 
@@ -33,4 +33,8 @@ use under a BSD-2 license. See included licence for more information.
 
 The code base is currently undergoing large changes, thus there is no guarantee that internal interfaces will be stable.
 
+
+### Contributors
+
+libromocc is developed at [SINTEF Digital](http://www.sintef.no).
 This work has been partially funded by the Research Council of Norway under grant number 270941.
