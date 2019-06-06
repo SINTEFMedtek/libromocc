@@ -8,6 +8,7 @@
 #include "romocc/core/Object.h"
 #include "romocc/robotics/RobotState.h"
 #include "romocc/robotics/RobotMotion.h"
+#include "romocc/robotics/RobotCoordinateSystem.h"
 #include "romocc/communication/CommunicationInterface.h"
 
 namespace romocc
@@ -18,17 +19,16 @@ class ROMOCC_EXPORT Robot : public Object
     ROMOCC_OBJECT(Robot)
 
     public:
-        Robot();
-        ~Robot();
-
         void configure(Manipulator manipulator, const std::string& ip_address, const int& port);
 
         bool start();
         bool disconnectFromRobot();
-        void shutdown();
         bool isConnected() const;
 
+        void shutdown();
+
         RobotState getCurrentState() const;
+        void addUpdateSubscription(std::function<void()> updateFunction);
 
         template <class Target>
         void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0);
@@ -37,25 +37,21 @@ class ROMOCC_EXPORT Robot : public Object
         void runMotionQueue(MotionQueue queue);
         void stopRunMotionQueue();
 
-        void updateSubscription(std::function<void()> updateSignal);
+        RobotCoordinateSystem::pointer getCoordinateSystem(){ return mCoordinateSystem;};
 
-
-    Transform3d get_rMt();
-        Transform3d get_rMb();
-        Transform3d get_eeMt();
-        void set_eeMt(Eigen::Affine3d eeMt);
-        void set_rMb(Eigen::Affine3d rMb);
+        Robot();
+        ~Robot();
 
     private:
         void update() override;
         void waitForMove();
 
         SharedPointer<CommunicationInterface> mCommunicationInterface;
-        void newSubscription(std::function<void()> updateSignal);
+        void startSubscription(std::function<void()> updateSignal);
 
+        SharedPointer<RobotCoordinateSystem> mCoordinateSystem;
         RobotState mCurrentState;
         MotionQueue mMotionQueue;
-        Transform3d eeMt, rMb;
 };
 
 template <class Target>
@@ -63,6 +59,8 @@ void Robot::move(MotionType type, Target target, double acc, double vel, double 
 {
     mCommunicationInterface->move(type, target, acc, vel, t, rad);
 };
+
+
 
 } // namespace romocc
 

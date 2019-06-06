@@ -8,9 +8,7 @@ namespace romocc
 
 Robot::Robot()
 {
-    rMb = Eigen::Affine3d::Identity();
-    eeMt = Eigen::Affine3d::Identity();
-
+    mCoordinateSystem = RobotCoordinateSystem::New();
     mCommunicationInterface = CommunicationInterface::New();
     mCommunicationInterface->registerObserver(this);
 }
@@ -73,7 +71,8 @@ void Robot::waitForMove()
 {
     auto target = mMotionQueue.front();
 
-    double remainingDistance = ((mCurrentState.bMee*eeMt).translation()-target.targetPose.translation()).norm();
+    double remainingDistance = ((mCurrentState.bMee*mCoordinateSystem->get_eeMt()).translation()
+                                -target.targetPose.translation()).norm();
 
     if(remainingDistance<=target.blendRadius)
     {
@@ -84,7 +83,7 @@ void Robot::waitForMove()
     if(target.motionType == MotionType::speedj)
     {
         auto targetJointVelocity = RobotMotionUtils::calcJointVelocity(target.targetPose,
-                mCurrentState.bMee*eeMt, mCurrentState.getJacobian(), target.velocity);
+                mCurrentState.bMee*mCoordinateSystem->get_eeMt(), mCurrentState.getJacobian(), target.velocity);
         this->move(target.motionType, targetJointVelocity, target.acceleration, 0.0, 5.0, 0.0); // vel and r not used
     }
 
@@ -101,38 +100,13 @@ void Robot::stopMove(MotionType type, double acc)
 };
 
 
-void Robot::set_eeMt(Eigen::Affine3d eeMt)
+void Robot::addUpdateSubscription(std::function<void()> updateSignal)
 {
-    this->eeMt = eeMt;
-}
-
-void Robot::set_rMb(Eigen::Affine3d rMb)
-{
-    this->rMb = rMb;
-}
-
-Transform3d Robot::get_rMt()
-{
-    return rMb*getCurrentState().bMee*eeMt;
-}
-
-Transform3d Robot::get_rMb()
-{
-    return rMb;
-}
-
-Transform3d Robot::get_eeMt()
-{
-    return eeMt;
-}
-
-void Robot::updateSubscription(std::function<void()> updateSignal)
-{
-    std::thread thread_(std::bind(&Robot::newSubscription, this, updateSignal));
+    std::thread thread_(std::bind(&Robot::startSubscription, this, updateSignal));
     thread_.detach();
 }
 
-void Robot::newSubscription(std::function<void()> updateSignal)
+void Robot::startSubscription(std::function<void()> updateSignal)
 {
     void *subscriber = zmq_socket(ZMQUtils::getContext(), ZMQ_SUB);
     std::string msg_buffer;
