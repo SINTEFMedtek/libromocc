@@ -11,7 +11,7 @@
 namespace romocc
 {
 
-class RobotCoordinateSystem
+class RobotCoordinateSystem : public Object
 {
     ROMOCC_OBJECT(RobotCoordinateSystem)
 
@@ -31,7 +31,6 @@ class RobotCoordinateSystem
 
     private:
         Transform3d eeMt, rMb;
-        std::weak_ptr<RobotCoordinateSystem> mPtr;
 };
 
 }

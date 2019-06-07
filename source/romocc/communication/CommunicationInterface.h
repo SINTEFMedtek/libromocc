@@ -1,8 +1,8 @@
 #ifndef ROMOCC_COMMUNICATIONINTERFACE_H
 #define ROMOCC_COMMUNICATIONINTERFACE_H
 
-#include <romocc/utilities/ZMQUtils.h>
 #include "romocc/core/Object.h"
+#include <romocc/utilities/ZMQUtils.h>
 #include "romocc/robotics/RobotState.h"
 
 #include "Client.h"
@@ -12,7 +12,7 @@
 namespace romocc
 {
 
-class ROMOCC_EXPORT CommunicationInterface
+class ROMOCC_EXPORT CommunicationInterface : public Object
 {
     ROMOCC_OBJECT(CommunicationInterface)
 
@@ -50,7 +50,6 @@ private:
 
         void decodeReceivedPackages();
 
-        std::weak_ptr<CommunicationInterface> mPtr;
 };
 
 template <class TargetConfiguration>

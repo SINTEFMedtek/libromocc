@@ -3,14 +3,14 @@
 
 #include <string>
 
-#include "romocc/core/SmartPointers.h"
+#include "romocc/core/Object.h"
 #include "zmq.h"
 #include "romoccExport.hpp"
 
 namespace romocc
 {
 
-class ROMOCC_EXPORT Client
+class ROMOCC_EXPORT Client : public Object
 {
     ROMOCC_OBJECT(Client)
 
@@ -38,10 +38,7 @@ class ROMOCC_EXPORT Client
         int mCurrentTimestamp;
 
         void* mStreamer;
-
         void start();
-
-        std::weak_ptr<Client> mPtr;
 };
 
 }

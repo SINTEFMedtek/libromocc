@@ -3,14 +3,13 @@
 
 #include <Eigen/Dense>
 
-#include "romocc/core/SmartPointers.h"
-#include "romocc/core/ForwardDeclarations.h"
+#include "romocc/core/Object.h"
 
 namespace romocc
 {
 
-class ROMOCC_EXPORT MessageEncoder {
-
+class ROMOCC_EXPORT MessageEncoder : public Object
+{
     public:
         virtual std::string moveCommand(MotionType type, Eigen::RowVectorXd jointConfig, double acc, double vel, double t, double rad) = 0;
         virtual std::string moveCommand(MotionType type, Eigen::Affine3d pose, double acc, double vel, double t, double rad) = 0;
@@ -20,7 +19,6 @@ class ROMOCC_EXPORT MessageEncoder {
 
     protected:
         std::string format(const std::string& format, ...);
-        std::weak_ptr<MessageEncoder> mPtr;
 };
 
 }

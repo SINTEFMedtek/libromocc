@@ -16,7 +16,7 @@
 namespace romocc
 {
 
-class ROMOCC_EXPORT Robot
+class ROMOCC_EXPORT Robot : public Object
 {
     ROMOCC_OBJECT(Robot)
 
@@ -54,7 +54,6 @@ class ROMOCC_EXPORT Robot
         MotionQueue mMotionQueue;
 
         mutable std::mutex mMutex;
-        std::weak_ptr<Robot> mPtr;
 };
 
 template <class Target>
