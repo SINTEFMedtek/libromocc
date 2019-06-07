@@ -84,7 +84,39 @@ class ZMQUpdateSubscriber
 };
 
 
+template<typename T>
+static T toLittleEndian(T *big_endian_number)
+{
+    T little_endian_number;
+    char *big_endian_data    = reinterpret_cast<char*>(big_endian_number);
+    char *little_endian_data = reinterpret_cast<char*>(&little_endian_number);
 
+    size_t length = sizeof(T);
+    for (size_t i = 0; i < length; ++i)
+    {
+        little_endian_data[i] = big_endian_data[length - i - 1];
+    }
+    return little_endian_number;
 }
+
+static int packageSize(unsigned char* buffer)
+{
+    std::stringstream ss;
+    unsigned int x;
+    for(int i=0; i<sizeof(int); i++)
+        ss << std::hex << (int)buffer[i];
+    ss >> x;
+
+    return static_cast<int>(x);
+}
+
+static double* arrayToLittleEndian(double* array, unsigned int N = 6)
+{
+    for(unsigned int i = 0; i < N; i++)
+        array[i] = toLittleEndian(&array[i]);
+    return array;
+}
+
+} // namespace romocc
 
 #endif //ROMOCC_ZMQUTILS_H
