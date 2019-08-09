@@ -1,0 +1,12 @@
+## ROMOCC Use cmake file
+
+# Enable C++ 14
+set(CMAKE_CXX_STANDARD 14)
+
+# Position independent code
+if(${CMAKE_COMPILER_IS_GNUCXX})
+    add_definitions("-fPIC")
+endif()
+
+include_directories(${ROMOCC_INCLUDE_DIRS})
+link_directories (${ROMOCC_LIBRARY_DIRS})
