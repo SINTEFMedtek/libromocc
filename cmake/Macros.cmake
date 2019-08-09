@@ -23,6 +23,7 @@ macro (romocc_add_subdirectories)
         # propagate to parent directory
         set (ROMOCC_TEST_SOURCE_FILES ${ROMOCC_TEST_SOURCE_FILES} PARENT_SCOPE)
         set (ROMOCC_SOURCE_FILES ${ROMOCC_SOURCE_FILES} PARENT_SCOPE)
+        set (ROMOCC_EXAMPLES ${ROMOCC_EXAMPLES} PARENT_SCOPE)
     endif()
 endmacro()
 
@@ -47,7 +48,7 @@ macro (romocc_add_example NAME)
         add_executable(${NAME} ${ARGN})
         target_link_libraries(${NAME} romocc)
         install(TARGETS ${NAME}
-                DESTINATION romocc/bin
+                DESTINATION libromocc/bin
                 )
         if(WIN32)
             file(APPEND ${PROJECT_BINARY_DIR}/runAllExamples.bat "bin\\${NAME}.exe\r\n")
