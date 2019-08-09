@@ -63,6 +63,14 @@ if(hasParent)
     set(ROMOCC_INCLUDE_DIRS ${ROMOCC_INCLUDE_DIRS} PARENT_SCOPE)
 endif()
 
+# Set up RPATH with relative path so that binaries will find libraries in the lib folder
+if(APPLE)
+    set(CMAKE_MACOSX_RPATH ON)
+    set(CMAKE_INSTALL_RPATH "@loader_path/../lib")
+else()
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+endif()
+
 #### Add all subdirs
 romocc_add_subdirectories(source/romocc)
 
@@ -75,8 +83,8 @@ include(GenerateExportHeader)
 generate_export_header(romocc EXPORT_FILE_NAME romoccExport.hpp)
 
 #### Link everything
-message("-- ROMOCC LIBS: ${LIBRARIES} ${ROMOCC_SYSTEM_LIBRARIES}")
-target_link_libraries(romocc PUBLIC ${LIBRARIES} ${ROMOCC_SYSTEM_LIBRARIES} pthread)
+message("-- ROMOCC LIBS: ${LIBRARIES}")
+target_link_libraries(romocc PUBLIC ${LIBRARIES})
 
 ## Build examples
 if(ROMOCC_BUILD_EXAMPLES)
@@ -88,5 +96,17 @@ if(ROMOCC_BUILD_TESTS)
     add_executable(testROMOCC ${ROMOCC_TEST_SOURCE_FILES})
     target_link_libraries(testROMOCC romocc)
 endif()
+
+# Create config and use file
+configure_file(
+        "${PROJECT_SOURCE_DIR}/cmake/RomoccConfig.cmake.in"
+        "${PROJECT_BINARY_DIR}/RomoccConfig.cmake"
+        @ONLY
+)
+configure_file(
+        "${PROJECT_SOURCE_DIR}/cmake/RomoccUse.cmake.in"
+        "${PROJECT_BINARY_DIR}/RomoccUse.cmake"
+        @ONLY
+)
 
 include(cmake/InstallRomocc.cmake)
