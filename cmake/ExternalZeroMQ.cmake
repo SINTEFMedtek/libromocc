@@ -6,7 +6,7 @@ ExternalProject_Add(zeromq
         PREFIX ${ROMOCC_EXTERNAL_BUILD_DIR}/zeromq
         BINARY_DIR ${ROMOCC_EXTERNAL_BUILD_DIR}/zeromq
         GIT_REPOSITORY "https://github.com/zeromq/libzmq.git"
-        GIT_TAG "master"
+        GIT_TAG "v4.3.2"
         UPDATE_COMMAND ""
         CMAKE_ARGS
             -DCMAKE_BUILD_TYPE:STRING=Release
