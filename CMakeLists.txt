@@ -14,6 +14,7 @@ include(cmake/Macros.cmake)
 option(ROMOCC_BUILD_TESTS "Build tests." ON)
 option(ROMOCC_BUILD_EXAMPLES "Build examples." ON)
 option(ROMOCC_BUILD_URSIMULATOR "Download and install UR Simulator" ON)
+option(ROMOCC_BUILD_PYTHON "Build Python SWIG module" OFF)
 
 #### Set build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -73,6 +74,7 @@ endif()
 
 #### Add all subdirs
 romocc_add_subdirectories(source/romocc)
+romocc_add_subdirectories(source/python)
 
 message("-- ROMOCC DEPENDENCIES: ${ROMOCC_EXTERNAL_DEPENDENCIES}")
 
