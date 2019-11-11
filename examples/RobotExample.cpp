@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     };
 
     auto ur5 = Robot::New();
-    ur5->configure(UR5, "localhost", 30003);
+    ur5->configure(UR5, "192.168.153.129", 30003);
     ur5->start();
     ur5->addUpdateSubscription(print_message);
 
