@@ -13,7 +13,7 @@ include(cmake/Macros.cmake)
 #### Options
 option(ROMOCC_BUILD_TESTS "Build tests." ON)
 option(ROMOCC_BUILD_EXAMPLES "Build examples." ON)
-option(ROMOCC_BUILD_URSIMULATOR "Download and install UR Simulator" ON)
+option(ROMOCC_BUILD_URSIMULATOR "Download and install UR Simulator" OFF)
 option(ROMOCC_BUILD_PYTHON "Build Python SWIG module" OFF)
 
 #### Set build type
@@ -85,8 +85,8 @@ include(GenerateExportHeader)
 generate_export_header(romocc EXPORT_FILE_NAME romoccExport.hpp)
 
 #### Link everything
-message("-- ROMOCC LIBS: ${LIBRARIES}")
-target_link_libraries(romocc PUBLIC ${LIBRARIES})
+message("-- ROMOCC LIBS: ${LIBRARIES} ${SYSTEM_LIBRARIES}")
+target_link_libraries(romocc PUBLIC ${LIBRARIES} ${SYSTEM_LIBRARIES})
 
 ## Build examples
 if(ROMOCC_BUILD_EXAMPLES)
