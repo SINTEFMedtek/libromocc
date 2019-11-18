@@ -29,7 +29,7 @@ class ROMOCC_EXPORT Ur5MessageDecoder : public MessageDecoder
         struct __attribute__((packed)) raw_ur5_state
         {
             int32_t message_size_;
-            double time_;
+            uint64_t time_;
             double target_positions_[NUMBER_OF_JOINTS];
             double target_velocities_[NUMBER_OF_JOINTS];
             double target_accelerations_[NUMBER_OF_JOINTS];
