@@ -3,28 +3,30 @@
 #include <thread>
 #include <functional>
 
+
 namespace romocc
 {
 
 Robot::Robot()
 {
     mCoordinateSystem = RobotCoordinateSystem::New();
-    mCurrentState = RobotState::New();
     mCommunicationInterface = CommunicationInterface::New();
+    mCurrentState = RobotState::New();
 }
 
 
 void Robot::configure(Manipulator manipulator, const std::string& host, const int& port)
 {
-    mCurrentState->setKDLchain(manipulator);
-    mCommunicationInterface->set_communication_protocol(manipulator);
-    mCommunicationInterface->config_connection(host, port);
-    mCommunicationInterface->setRobotState(mCurrentState);
+    mCommunicationInterface->configConnection(host, port);
+    mCommunicationInterface->setManipulator(manipulator);
+    mCurrentState = mCommunicationInterface->getRobotState();
 }
 
 bool Robot::start()
 {
-    return mCommunicationInterface->connectToRobot();
+    bool connected = mCommunicationInterface->connectToRobot();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    return connected;
 }
 
 bool Robot::isConnected() const
@@ -44,7 +46,6 @@ void Robot::shutdown()
 
 RobotState::pointer Robot::getCurrentState() const
 {
-    std::lock_guard<std::mutex> lock(mMutex);
     return mCurrentState;
 }
 

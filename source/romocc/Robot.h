@@ -5,8 +5,6 @@
 #ifndef ROMOCC_ROBOT_H
 #define ROMOCC_ROBOT_H
 
-#include <mutex>
-
 #include "romocc/core/Object.h"
 #include "romocc/robotics/RobotState.h"
 #include "romocc/robotics/RobotMotion.h"
@@ -25,7 +23,6 @@ class ROMOCC_EXPORT Robot : public Object
         bool start();
         bool disconnectFromRobot();
         bool isConnected() const;
-
         void shutdown();
 
         RobotState::pointer getCurrentState() const;
@@ -52,8 +49,6 @@ class ROMOCC_EXPORT Robot : public Object
         SharedPointer<RobotCoordinateSystem> mCoordinateSystem;
         SharedPointer<RobotState> mCurrentState;
         MotionQueue mMotionQueue;
-
-        mutable std::mutex mMutex;
 };
 
 template <class Target>
