@@ -2,6 +2,7 @@
 #define ROMOCC_CLIENT_H
 
 #include <string>
+#include <thread>
 
 #include "romocc/core/Object.h"
 #include "zmq.h"
@@ -35,7 +36,9 @@ class ROMOCC_EXPORT Client : public Object
         int getMessageSize(unsigned char* buffer);
 
         ConnectionInfo mConnectionInfo;
-        int mCurrentTimestamp;
+        std::unique_ptr<std::thread> mThread;
+        bool mStopThread = false;
+        bool mConnected = false;
 
         void* mStreamer;
         void start();

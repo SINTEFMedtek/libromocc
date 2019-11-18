@@ -1,7 +1,6 @@
 #include "Client.h"
 
 #include <sstream>
-#include <thread>
 #include <iostream>
 #include <cstring>
 #include <assert.h>
@@ -20,8 +19,7 @@ Client::Client()
 
 bool Client::isConnected()
 {
-    // Not implemented
-    return false;
+    return mConnected;
 }
 
 bool Client::requestConnect(std::string host, int port)
@@ -36,14 +34,18 @@ bool Client::requestConnect(std::string host, int port)
     size_t  id_size = 256;
     zmq_getsockopt(mStreamer, ZMQ_IDENTITY, &id, &id_size);
 
-    std::thread thread_(std::bind(&Client::start, this));
-    thread_.detach();
+    mThread = std::make_unique<std::thread>(std::bind(&Client::start, this));
+    mConnected = true;
+
     return isConnected();
 }
 
 bool Client::requestDisconnect()
 {
-    // Not implemented
+    mStopThread = true;
+    mThread->join();
+    mConnected = false;
+
     return true;
 }
 
@@ -78,23 +80,17 @@ void Client::start()
     size_t  id_size = 256;
     zmq_getsockopt(streamer, ZMQ_IDENTITY, &id, &id_size);
 
-    byte buffer[1044];
+    uint8_t buffer[2048];
     auto publisher = zmq_socket(ZMQUtils::getContext(), ZMQ_PUB);
     rc = zmq_bind(publisher, "inproc://raw_buffer");
     assert(rc == 0);
 
-    try{
-        while(true){
-            zmq_recv(streamer, buffer, 1044, 0);
-            auto packetLength = getMessageSize(buffer);
-
-            if(packetLength == 1044)
-            {
-                zmq_send(publisher, buffer, 1044, 0);
-            }
-        }
+    while(!mStopThread){
+        zmq_recv(streamer, buffer, 2048, 0);
+        auto packetLength = getMessageSize(buffer);
+        if(packetLength>0 && packetLength<2048)
+            zmq_send(publisher, buffer, packetLength, 0);
     }
-    catch (std::exception &error){}
 }
 
 }
