@@ -1,12 +1,12 @@
-#include <thread>
 #include <string>
 #include <iostream>
-#include <romocc/utilities/ZMQUtils.h>
 
 #include "CommunicationInterface.h"
 
 #include "romocc/manipulators/ur5/Ur5MessageEncoder.h"
 #include "romocc/manipulators/ur5/Ur5MessageDecoder.h"
+#include <romocc/utilities/ZMQUtils.h>
+
 
 namespace romocc
 {
@@ -23,8 +23,7 @@ CommunicationInterface::~CommunicationInterface()
 
 bool CommunicationInterface::connectToRobot() {
     bool connected = mClient->requestConnect(mHost, mPort);
-    std::thread thread_(std::bind(&CommunicationInterface::decodeReceivedPackages, this));
-    thread_.detach();
+    mThread = std::make_unique<std::thread>(std::bind(&CommunicationInterface::decodeReceivedPackages, this));
     return connected;
 }
 
@@ -37,14 +36,16 @@ void CommunicationInterface::decodeReceivedPackages()
 
     auto notifier = ZMQUpdateNotifier("state_update_notifier");
 
-    unsigned char buffer[1044];
+    const uint16_t bufferSize = 2048;
+    uint8_t buffer[bufferSize];
+    bzero(buffer, bufferSize);
 
-    while(true)
+    while(!mStopThread)
     {
-        rc = zmq_recv(subscriber, buffer, 1044, 0);
+        rc = zmq_recv(subscriber, buffer, bufferSize, 0);
         if(rc == 1044)
         {
-            updateState(buffer);
+            mCurrentState->unpack(buffer);
             notifier.broadcastUpdate("state_updated");
         }
     }
@@ -59,6 +60,8 @@ bool CommunicationInterface::isConnected()
 
 bool CommunicationInterface::disconnectFromRobot()
 {
+    mStopThread = true;
+    mThread->join();
     return mClient->requestDisconnect();
 }
 
@@ -73,30 +76,24 @@ bool CommunicationInterface::sendMessage(std::string message)
     return mClient->sendPackage(message);
 }
 
-void CommunicationInterface::config_connection(std::string host, int port)
+void CommunicationInterface::configConnection(std::string host, int port)
 {
     mHost = host;
     mPort = port;
 }
 
-void CommunicationInterface::set_communication_protocol(Manipulator manipulator)
+void CommunicationInterface::setManipulator(romocc::Manipulator manipulator)
 {
     if(manipulator==UR5)
     {
         mEncoder = Ur5MessageEncoder::New();
-        mDecoder = Ur5MessageDecoder::New();
+        mCurrentState->setManipulator(manipulator);
     }
 }
 
-void CommunicationInterface::setRobotState(romocc::RobotState::pointer robotState)
+RobotState::pointer CommunicationInterface::getRobotState()
 {
-    mCurrentState = robotState;
-}
-
-void CommunicationInterface::updateState(unsigned char* package)
-{
-    JointState jointState = mDecoder->analyzeTCPSegment(package);
-    mCurrentState->setState(jointState.jointConfiguration, jointState.jointVelocity, jointState.timestamp);
+    return mCurrentState;
 }
 
 void CommunicationInterface::stopMove(MotionType typeOfStop, double acc)
