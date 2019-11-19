@@ -19,10 +19,15 @@ CommunicationInterface::CommunicationInterface()
 
 CommunicationInterface::~CommunicationInterface()
 {
+    if(!mStopThread){
+        mStopThread = true;
+        mThread->join();
+    }
 }
 
 bool CommunicationInterface::connectToRobot() {
     bool connected = mClient->requestConnect(mHost, mPort);
+    mStopThread = false;
     mThread = std::make_unique<std::thread>(std::bind(&CommunicationInterface::decodeReceivedPackages, this));
     return connected;
 }
@@ -49,8 +54,8 @@ void CommunicationInterface::decodeReceivedPackages()
             notifier.broadcastUpdate("state_updated");
         }
     }
-    zmq_close(subscriber);
     notifier.close();
+    zmq_close(subscriber);
 }
 
 bool CommunicationInterface::isConnected()
@@ -62,7 +67,8 @@ bool CommunicationInterface::disconnectFromRobot()
 {
     mStopThread = true;
     mThread->join();
-    return mClient->requestDisconnect();
+    bool disconnected = mClient->requestDisconnect();
+    return disconnected;
 }
 
 void CommunicationInterface::shutdownRobot()
