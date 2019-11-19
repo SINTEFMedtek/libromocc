@@ -7,13 +7,14 @@
 #include "romocc/Robot.h"
 #include <iostream>
 #include <thread>
+#include <mutex>
 
 namespace romocc {
 
 TEST_CASE("Initialize robot with wrong address and check if connected", "[romocc][Robot]"){
     Robot::pointer robot = Robot::New();
     robot->configure(UR5, "dummy", 9999);
-    robot->start();
+    robot->connect();
     CHECK(robot->isConnected() == false);
 }
 
@@ -28,7 +29,7 @@ TEST_CASE("Initialize robot and add update subscription", "[romocc][Robot]") {
 
     Robot::pointer robot = Robot::New();
     robot->configure(UR5, "dummy", 9999);
-    robot->start();
+    robot->connect();
     robot->addUpdateSubscription(callback);
 
     void *subscriber = zmq_socket(ZMQUtils::getContext(), ZMQ_SUB);
@@ -47,7 +48,7 @@ TEST_CASE("Initialize robot and add update subscription", "[romocc][Robot]") {
 
 TEST_CASE("Initialize robot and test kinematics", "[romocc][Robot]") {
     Robot::pointer robot = Robot::New();
-    robot->configure(UR5, "localhost", 30003);
+    robot->configure(UR5, "192.168.140.116", 30003);
 
     std::shared_ptr<FKSolver> fk_solver = robot->getCurrentState()->getFKSolver();
     std::shared_ptr<IKSolver> ik_solver = robot->getCurrentState()->getIKSolver();
@@ -68,13 +69,12 @@ TEST_CASE("Initialize robot and test kinematics", "[romocc][Robot]") {
 
 TEST_CASE("Initialize robot and listen for new states", "[romocc][Robot]") {
     Robot::pointer robot = Robot::New();
-    robot->configure(UR5, "localhost", 30003);
-    robot->start();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    robot->configure(UR5, "192.168.153.129", 30003);
+    robot->connect();
 
-    for(int i = 0; i<1000; i++)
+    for(int i = 0; i<100; i++)
     {
-        std::cout << robot->getCurrentState()->getJointConfig() << std::endl;
+        std::cout << robot->getCurrentState()->getJointConfig().transpose() << std::endl;
     }
 }
 
