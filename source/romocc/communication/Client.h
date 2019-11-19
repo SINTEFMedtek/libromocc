@@ -19,6 +19,7 @@ class ROMOCC_EXPORT Client : public Object
         typedef unsigned char byte;
 
         explicit Client();
+        ~Client();
 
         bool requestConnect(std::string ip_address, int port);
         bool requestDisconnect();

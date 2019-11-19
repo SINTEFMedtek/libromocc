@@ -17,6 +17,14 @@ Client::Client()
     ZMQUtils::createContext();
 }
 
+Client::~Client()
+{
+    if(!mStopThread){
+        mStopThread = true;
+        mThread->join();
+    }
+}
+
 bool Client::isConnected()
 {
     return mConnected;
@@ -28,12 +36,13 @@ bool Client::requestConnect(std::string host, int port)
     mConnectionInfo.port = port;
 
     mStreamer = zmq_socket(ZMQUtils::getContext(), ZMQ_STREAM);
-    zmq_connect(mStreamer, ("tcp://" + host + ":" + std::to_string(port)).c_str());
+    zmq_connect(mStreamer, ("tcp://" + mConnectionInfo.host + ":" + std::to_string(mConnectionInfo.port)).c_str());
 
     uint8_t id [256];
     size_t  id_size = 256;
     zmq_getsockopt(mStreamer, ZMQ_IDENTITY, &id, &id_size);
 
+    mStopThread = false;
     mThread = std::make_unique<std::thread>(std::bind(&Client::start, this));
     mConnected = true;
 
@@ -42,10 +51,10 @@ bool Client::requestConnect(std::string host, int port)
 
 bool Client::requestDisconnect()
 {
+    zmq_disconnect(mStreamer, ("tcp://" + mConnectionInfo.host + ":" + std::to_string(mConnectionInfo.port)).c_str());
     mStopThread = true;
     mThread->join();
     mConnected = false;
-
     return true;
 }
 
@@ -91,6 +100,9 @@ void Client::start()
         if(packetLength>0 && packetLength<2048)
             zmq_send(publisher, buffer, packetLength, 0);
     }
+
+    zmq_close(publisher);
+    zmq_close(streamer);
 }
 
 }
