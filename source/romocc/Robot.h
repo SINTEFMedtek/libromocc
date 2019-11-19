@@ -5,6 +5,8 @@
 #ifndef ROMOCC_ROBOT_H
 #define ROMOCC_ROBOT_H
 
+#include <thread>
+
 #include "romocc/core/Object.h"
 #include "romocc/robotics/RobotState.h"
 #include "romocc/robotics/RobotMotion.h"
@@ -20,8 +22,8 @@ class ROMOCC_EXPORT Robot : public Object
 
     public:
         void configure(Manipulator manipulator, const std::string& ip_address, const int& port);
-        bool start();
-        bool disconnectFromRobot();
+        bool connect();
+        bool disconnect();
         bool isConnected() const;
         void shutdown();
 
@@ -49,6 +51,8 @@ class ROMOCC_EXPORT Robot : public Object
         SharedPointer<RobotCoordinateSystem> mCoordinateSystem;
         SharedPointer<RobotState> mCurrentState;
         MotionQueue mMotionQueue;
+        std::unique_ptr<std::thread> mThread;
+        bool mActiveSubscription = false;
 };
 
 template <class Target>

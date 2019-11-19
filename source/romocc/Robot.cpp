@@ -22,7 +22,7 @@ void Robot::configure(Manipulator manipulator, const std::string& host, const in
     mCurrentState = mCommunicationInterface->getRobotState();
 }
 
-bool Robot::start()
+bool Robot::connect()
 {
     bool connected = mCommunicationInterface->connectToRobot();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -34,8 +34,12 @@ bool Robot::isConnected() const
     return mCommunicationInterface->isConnected();
 }
 
-bool Robot::disconnectFromRobot()
+bool Robot::disconnect()
 {
+    if(mActiveSubscription){
+        mActiveSubscription = false;
+        mThread->join();
+    }
     return mCommunicationInterface->disconnectFromRobot();
 }
 
@@ -97,8 +101,8 @@ void Robot::stopMove(MotionType type, double acc)
 
 void Robot::addUpdateSubscription(std::function<void()> updateSignal)
 {
-    std::thread thread_(std::bind(&Robot::startSubscription, this, updateSignal));
-    thread_.detach();
+    mActiveSubscription = true;
+    mThread = std::make_unique<std::thread>(std::bind(&Robot::startSubscription, this, updateSignal));
 }
 
 void Robot::startSubscription(std::function<void()> updateSignal)
@@ -110,7 +114,7 @@ void Robot::startSubscription(std::function<void()> updateSignal)
     zmq_msg_t message;
     zmq_msg_init(&message);
 
-    while(true)
+    while(mActiveSubscription)
     {
         int rc = zmq_recvmsg(subscriber, &message, 0);
         assert(rc == 0);
@@ -122,7 +126,10 @@ void Robot::startSubscription(std::function<void()> updateSignal)
 
 Robot::~Robot()
 {
-
+    if(mActiveSubscription){
+        mActiveSubscription = false;
+        mThread->join();
+    }
 }
 
 }
