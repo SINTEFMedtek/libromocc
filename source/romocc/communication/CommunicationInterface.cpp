@@ -48,7 +48,7 @@ void CommunicationInterface::decodeReceivedPackages()
     while(!mStopThread)
     {
         rc = zmq_recv(subscriber, buffer, bufferSize, 0);
-        if(rc == 1044)
+        if(rc == 1044 || rc == 812)
         {
             mCurrentState->unpack(buffer);
             notifier.broadcastUpdate("state_updated");
