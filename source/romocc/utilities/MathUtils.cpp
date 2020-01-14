@@ -62,6 +62,19 @@ Eigen::Matrix<double,6,1> TransformUtils::Affine::toVector6D(Eigen::Affine3d aff
     return vector;
 }
 
+Eigen::Affine3d TransformUtils::Affine::toAffine3DFromVector6D(Eigen::Matrix<double, 6, 1> vec) {
+    auto matrix = Eigen::Affine3d::Identity();
+    Eigen::Matrix3d m;
+    m = Eigen::AngleAxisd(vec(5), Eigen::Vector3f::UnitZ())*
+        Eigen::AngleAxisd(vec(3), Eigen::Vector3f::UnitX())*
+        Eigen::AngleAxisd(vec(4), Eigen::Vector3f::UnitY());
+
+    matrix.translate(Eigen::Vector3f(vec(0), vec(1), vec(2)));
+    matrix.linear() = matrix.linear()*m;
+
+    return matrix;
+}
+
 Eigen::Affine3d TransformUtils::kdl::toAffine(KDL::Frame frame)
 {
     Eigen::Affine3d affine;
