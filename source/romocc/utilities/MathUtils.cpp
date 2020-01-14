@@ -1,3 +1,4 @@
+#include <iostream>
 #include "MathUtils.h"
 
 namespace romocc
@@ -53,10 +54,8 @@ Eigen::Vector3d TransformUtils::Affine::toAxisAngle(Eigen::Affine3d affine)
 Eigen::Matrix<double,6,1> TransformUtils::Affine::toVector6D(Eigen::Affine3d affine)
 {
     Vector6d vector;
-
     Eigen::Vector3d pos = affine.translation();
-    Eigen::Vector3d rxryrz = (Eigen::AngleAxisd(affine.linear())).angle()*(Eigen::AngleAxisd(affine.linear())).axis();
-
+    Eigen::Vector3d rxryrz = affine.linear().eulerAngles(0, 1, 2);
     vector << pos(0), pos(1), pos(2), rxryrz(0), rxryrz(1), rxryrz(2);
 
     return vector;
@@ -65,9 +64,9 @@ Eigen::Matrix<double,6,1> TransformUtils::Affine::toVector6D(Eigen::Affine3d aff
 Eigen::Affine3d TransformUtils::Affine::toAffine3DFromVector6D(Eigen::Matrix<double, 6, 1> vec) {
     auto matrix = Eigen::Affine3d::Identity();
     Eigen::Matrix3d m;
-    m = Eigen::AngleAxisd(vec(5), Eigen::Vector3d::UnitZ())*
-        Eigen::AngleAxisd(vec(3), Eigen::Vector3d::UnitX())*
-        Eigen::AngleAxisd(vec(4), Eigen::Vector3d::UnitY());
+    m = Eigen::AngleAxisd(vec(3), Eigen::Vector3d::UnitX())*
+        Eigen::AngleAxisd(vec(4), Eigen::Vector3d::UnitY())*
+        Eigen::AngleAxisd(vec(5), Eigen::Vector3d::UnitZ());
 
     matrix.translate(Eigen::Vector3d(vec(0), vec(1), vec(2)));
     matrix.linear() = matrix.linear()*m;
