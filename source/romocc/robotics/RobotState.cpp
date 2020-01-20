@@ -153,8 +153,9 @@ Vector6d RobotState::getOperationalVelocity() {
 }
 
 Vector6d RobotState::operationalConfigToJointConfig(Transform3d transform) {
+    auto scaled_transform = TransformUtils::Affine::scaleTranslation(transform, 1./1000.);
     auto ik_solver = this->getIKSolver();
-    auto target_pose = TransformUtils::kdl::fromAffine(transform);
+    auto target_pose = TransformUtils::kdl::fromAffine(scaled_transform);
     auto q_current = TransformUtils::kdl::fromVector6D(this->getJointConfig());
     auto q_target = KDL::JntArray(6);
 
