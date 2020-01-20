@@ -13,6 +13,8 @@ namespace TransformUtils{
 
     namespace kdl{
         ROMOCC_EXPORT Eigen::Affine3d toAffine(KDL::Frame frame);
+        ROMOCC_EXPORT KDL::Frame fromAffine(Eigen::Affine3d affine);
+        ROMOCC_EXPORT KDL::JntArray fromVector6D(Eigen::Matrix<double,6,1> vector);
     }
 }
 
