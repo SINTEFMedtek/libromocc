@@ -11,7 +11,15 @@ namespace romocc
 {
 
 // Supported manipulators
-typedef enum {UR5} Manipulator;
+struct ROMOCC_EXPORT Manipulator{
+    enum ManipulatorType {UR5, UR10};
+    ManipulatorType manipulator;
+    std::string sw_version;
+
+    Manipulator(ManipulatorType manipulator = UR5, std::string sw_version = "3.0"){
+        this->manipulator = manipulator;
+        this->sw_version = sw_version;};
+};
 
 // Robot motion
 typedef enum {movej,movep,speedj,speedl,stopj,stopl} MotionType;
