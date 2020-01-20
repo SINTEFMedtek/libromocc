@@ -1,1 +1,1 @@
-romocc_add_subdirectories(ur5)
+romocc_add_subdirectories(ur)
