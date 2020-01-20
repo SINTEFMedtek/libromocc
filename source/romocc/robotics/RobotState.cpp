@@ -1,8 +1,9 @@
 #include <mutex>
 #include "RobotState.h"
+#include <iostream>
+#include "romocc/manipulators/ur/UrKDLDefinition.h"
+#include "romocc/manipulators/ur/UrMessageDecoder.h"
 
-#include "romocc/manipulators/ur5/Ur5KDLDefinition.h"
-#include "romocc/manipulators/ur5/Ur5MessageDecoder.h"
 
 namespace romocc {
 
@@ -23,28 +24,26 @@ void RobotState::unpack(uint8_t* buffer)
 
 void RobotState::setManipulator(romocc::Manipulator manipulator)
 {
-    if (manipulator == UR5)
-    {
-        this->setKDLchain(manipulator);
-        this->setDecoder(manipulator);
-    }
+    this->setKDLchain(manipulator);
+    this->setDecoder(manipulator);
 }
 
 
 void RobotState::setKDLchain(Manipulator manipulator) {
-    if (manipulator == UR5) {
-        mKDLChain = Ur5Chain();
-        mFKSolver = std::shared_ptr<FKSolver>(new FKSolver(mKDLChain));
-        mIKSolverVel = std::shared_ptr<IKVelSolver>(new IKVelSolver(mKDLChain));
-        mIKSolver = std::shared_ptr<IKSolver>(new IKSolver(mKDLChain, *mFKSolver, *mIKSolverVel, 100, 1e-6)); // new KDL::ChainIkSolverPos_NR(mKDLChain, mFKSolver, mIKSolverVel, 100, 1e-6);
-        mJacSolver = std::shared_ptr<JacobianSolver>(new JacobianSolver(mKDLChain));
+    if (manipulator.manipulator == Manipulator::UR5) {
+        mKDLChain = Ur5::KDLChain();
+    } else if(manipulator.manipulator == Manipulator::UR10){
+        mKDLChain = Ur10::KDLChain();
     }
+    mFKSolver = std::shared_ptr<FKSolver>(new FKSolver(mKDLChain));
+    mIKSolverVel = std::shared_ptr<IKVelSolver>(new IKVelSolver(mKDLChain));
+    mIKSolver = std::shared_ptr<IKSolver>(new IKSolver(mKDLChain, *mFKSolver, *mIKSolverVel, 100, 1e-6));
+    mJacSolver = std::shared_ptr<JacobianSolver>(new JacobianSolver(mKDLChain));
 }
 
 void RobotState::setDecoder(Manipulator manipulator){
-    if (manipulator == UR5){
-        mDecoder = Ur5MessageDecoder::New();
-    }
+    if(manipulator.manipulator == Manipulator::UR5 || manipulator.manipulator == Manipulator::UR10)
+        mDecoder = UrMessageDecoder::New();
 }
 
 void RobotState::setState(RowVector6d jointConfig, RowVector6d jointVel, double timestamp) {
