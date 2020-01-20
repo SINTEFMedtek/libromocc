@@ -3,8 +3,8 @@
 
 #include "CommunicationInterface.h"
 
-#include "romocc/manipulators/ur5/Ur5MessageEncoder.h"
-#include "romocc/manipulators/ur5/Ur5MessageDecoder.h"
+#include "romocc/manipulators/ur/UrMessageEncoder.h"
+#include "romocc/manipulators/ur/UrMessageDecoder.h"
 #include <romocc/utilities/ZMQUtils.h>
 
 
@@ -48,7 +48,7 @@ void CommunicationInterface::decodeReceivedPackages()
     while(!mStopThread)
     {
         rc = zmq_recv(subscriber, buffer, bufferSize, 0);
-        if(rc == 1044 || rc == 812)
+        if(rc>=764 || rc <=1116)
         {
             mCurrentState->unpack(buffer);
             notifier.broadcastUpdate("state_updated");
@@ -90,11 +90,11 @@ void CommunicationInterface::configConnection(std::string host, int port)
 
 void CommunicationInterface::setManipulator(romocc::Manipulator manipulator)
 {
-    if(manipulator==UR5)
-    {
-        mEncoder = Ur5MessageEncoder::New();
-        mCurrentState->setManipulator(manipulator);
-    }
+    auto encoder = UrMessageEncoder::New();
+    encoder->setSoftwareVersion(manipulator.sw_version);
+
+    mEncoder = encoder;
+    mCurrentState->setManipulator(manipulator);
 }
 
 RobotState::pointer CommunicationInterface::getRobotState()
