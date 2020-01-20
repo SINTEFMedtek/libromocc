@@ -59,7 +59,7 @@ template <class Target>
 void Robot::move(MotionType type, Target target, double acc, double vel, double t, double rad)
 {
     mCommunicationInterface->move(type, target, acc, vel, t, rad);
-};
+}
 
 
 
