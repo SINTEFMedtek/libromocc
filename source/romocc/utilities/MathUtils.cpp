@@ -3,31 +3,6 @@
 namespace romocc
 {
 
-//
-//Eigen::Affine3d scaleTranslationAffine(Eigen::Affine3d affine, double scale)
-//{
-//    affine.translation() = affine.translation()*scale;
-//    return affine;
-//}
-//
-//Vector6d affineToVector6d(Eigen::Affine3d affine)
-//{
-//    Vector6d vector;
-//
-//    Eigen::Vector3d pos = affine.translation();
-//    Eigen::Vector3d rxryrz = (Eigen::AngleAxisd(affine.linear())).angle()*(Eigen::AngleAxisd(affine.linear())).axis();
-//
-//    vector << pos(0), pos(1), pos(2), rxryrz(0), rxryrz(1), rxryrz(2);
-//
-//    return vector;
-//}
-//
-//Eigen::Vector3d affineToAxisAngle(Eigen::Affine3d affine)
-//{
-//
-//    return (Eigen::AngleAxisd(affine.linear())).angle()*(Eigen::AngleAxisd(affine.linear())).axis();
-//}
-
 Eigen::Affine3d TransformUtils::Affine::scaleTranslation(Eigen::Affine3d affine, double scale)
 {
     affine.translation() = affine.translation()*scale;
