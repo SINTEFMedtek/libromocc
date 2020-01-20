@@ -2,18 +2,18 @@
 // Created by androst on 05.06.19.
 //
 
-#include <romocc/manipulators/ur5/Ur5KDLDefinition.h>
 #include "catch.hpp"
 #include "romocc/Robot.h"
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <romocc/manipulators/ur/UrKDLDefinition.h>
 
 namespace romocc {
 
 TEST_CASE("Initialize robot with wrong address and check if connected", "[romocc][Robot]"){
     Robot::pointer robot = Robot::New();
-    robot->configure(UR5, "dummy", 9999);
+    robot->configure(Manipulator(), "dummy", 9999);
     robot->connect();
     CHECK(robot->isConnected() == false);
 }
@@ -28,7 +28,7 @@ TEST_CASE("Initialize robot and add update subscription", "[romocc][Robot]") {
     auto callback = [](){};
 
     Robot::pointer robot = Robot::New();
-    robot->configure(UR5, "dummy", 9999);
+    robot->configure(Manipulator(), "dummy", 9999);
     robot->connect();
     robot->addUpdateSubscription(callback);
 
@@ -48,13 +48,13 @@ TEST_CASE("Initialize robot and add update subscription", "[romocc][Robot]") {
 
 TEST_CASE("Initialize robot and test kinematics", "[romocc][Robot]") {
     Robot::pointer robot = Robot::New();
-    robot->configure(UR5, "192.168.140.116", 30003);
+    robot->configure(Manipulator(), "192.168.140.116", 30003);
 
     std::shared_ptr<FKSolver> fk_solver = robot->getCurrentState()->getFKSolver();
     std::shared_ptr<IKSolver> ik_solver = robot->getCurrentState()->getIKSolver();
 
     KDL::JntArray q_home = KDL::JntArray(6);
-    for (unsigned int i = 0; i < 6; i++) {q_home(i)=dh_home[i];}
+    for (unsigned int i = 0; i < 6; i++) {q_home(i)=Ur5::dh_home[i];}
 
     KDL::Frame target_pose = KDL::Frame::Identity();
     fk_solver->JntToCart(q_home, target_pose);
@@ -69,7 +69,7 @@ TEST_CASE("Initialize robot and test kinematics", "[romocc][Robot]") {
 
 TEST_CASE("Initialize robot and listen for new states", "[romocc][Robot]") {
     Robot::pointer robot = Robot::New();
-    robot->configure(UR5, "192.168.153.129", 30003);
+    robot->configure(Manipulator(Manipulator::UR10), "192.168.153.131", 30003);
     robot->connect();
 
     for(int i = 0; i<100; i++)
