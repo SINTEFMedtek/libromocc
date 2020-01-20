@@ -117,6 +117,14 @@ static double* arrayToLittleEndian(double* array, unsigned int N = 6)
     return array;
 }
 
+static double ntohd(uint64_t nf) {
+    double x;
+    nf = be64toh(nf);
+    memcpy(&x, &nf, sizeof(x));
+    return x;
+}
+
+
 } // namespace romocc
 
 #endif //ROMOCC_ZMQUTILS_H
