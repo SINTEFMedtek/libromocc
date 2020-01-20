@@ -1,5 +1,5 @@
-#ifndef UR5RECEIVE_H
-#define UR5RECEIVE_H
+#ifndef URRECEIVE_H
+#define URRECEIVE_H
 
 #include <romocc/core/SmartPointers.h>
 #include "romocc/robotics/RobotState.h"
@@ -9,16 +9,16 @@ namespace romocc
 {
 
 /**
- * Class that handles UR5 robot recieved messages.
+ * Class that handles UR robot recieved messages.
  *
  * \author Andreas Østvik
  *
  */
 
 
-class ROMOCC_EXPORT Ur5MessageDecoder : public MessageDecoder
+class ROMOCC_EXPORT UrMessageDecoder : public MessageDecoder
 {
-    ROMOCC_OBJECT(Ur5MessageDecoder)
+    ROMOCC_OBJECT(UrMessageDecoder)
 
     public:
         virtual JointState analyzeTCPSegment(unsigned char* packet);
@@ -26,7 +26,7 @@ class ROMOCC_EXPORT Ur5MessageDecoder : public MessageDecoder
     private:
         static const int NUMBER_OF_JOINTS = 6;
 
-        struct __attribute__((packed)) raw_ur5_state
+        struct __attribute__((packed)) raw_ur_state
         {
             int32_t message_size_;
             uint64_t time_;
@@ -68,4 +68,4 @@ class ROMOCC_EXPORT Ur5MessageDecoder : public MessageDecoder
 
 }
 
-#endif // UR5RECEIVE_H
+#endif // URRECEIVE_H

@@ -1,5 +1,5 @@
-#ifndef UR5MESSAGEENCODER_H
-#define UR5MESSAGEENCODER_H
+#ifndef URMESSAGEENCODER_H
+#define URMESSAGEENCODER_H
 
 #include "romocc/communication/MessageEncoder.h"
 #include "romocc/robotics/RobotState.h"
@@ -8,15 +8,15 @@ namespace romocc
 {
 
 /**
- * Class that handles encoding of UR5 messages.
+ * Class that handles encoding of UR messages.
  *
  * \author Andreas Østvik
  *
  */
 
-class ROMOCC_EXPORT Ur5MessageEncoder : public MessageEncoder
+class ROMOCC_EXPORT UrMessageEncoder : public MessageEncoder
 {
-    ROMOCC_OBJECT(Ur5MessageEncoder)
+    ROMOCC_OBJECT(UrMessageEncoder)
 
     public:
         virtual std::string moveCommand(MotionType type, Eigen::RowVectorXd targetConfiguration, double acc, double vel, double t, double rad);
@@ -26,7 +26,9 @@ class ROMOCC_EXPORT Ur5MessageEncoder : public MessageEncoder
         virtual std::string stopCommand(MotionType typeOfStop, double acc);
         virtual std::string shutdownCommand();
 
-    private:
+        void setSoftwareVersion(std::string version);
+
+private:
         std::string movej(Eigen::RowVectorXd jointConfig, double a, double v, double t, double r);
         std::string movep(Eigen::RowVectorXd operationalConfig, double a, double v, double t, double r);
         std::string movep(double operationalConfig[6], double a, double v, double t, double r);
@@ -42,8 +44,12 @@ class ROMOCC_EXPORT Ur5MessageEncoder : public MessageEncoder
 
         std::string powerdown();
 
+        std::string mURSoftwareVersion = "3.0";
+        std::string mUrSeries = "CB-series";
+        bool mNewSWVersion = false;
+        bool compareVersions(std::string version_0, std::string version_1);
 };
 
 }
 
-#endif // UR5MESSAGEENCODER_H
+#endif // URMESSAGEENCODER_H
