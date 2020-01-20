@@ -35,7 +35,7 @@ typedef Eigen::Matrix<double,6,6> Matrix6d;
 // KDL
 typedef KDL::Chain RobotChain;
 typedef KDL::ChainFkSolverPos_recursive FKSolver;
-typedef KDL::ChainIkSolverPos_NR IKSolver;
+typedef KDL::ChainIkSolverPos_NR_JL IKSolver;
 typedef KDL::ChainIkSolverVel_pinv IKVelSolver;
 typedef KDL::ChainJntToJacSolver JacobianSolver;
 
