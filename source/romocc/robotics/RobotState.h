@@ -37,6 +37,7 @@ class ROMOCC_EXPORT RobotState : public Object
         Vector6d getJointVelocity();
         Vector6d getOperationalConfig();
         Vector6d getOperationalVelocity();
+        Vector6d operationalConfigToJointConfig(Transform3d transform);
 
         std::shared_ptr<FKSolver> getFKSolver();
         std::shared_ptr<IKSolver> getIKSolver();
