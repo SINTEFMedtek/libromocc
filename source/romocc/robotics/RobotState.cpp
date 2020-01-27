@@ -36,13 +36,13 @@ void RobotState::setKDLchain(Manipulator manipulator) {
 
     KDL::JntArray q_min(mKDLChain.getNrOfJoints()), q_max(mKDLChain.getNrOfJoints());
     for (int i = 0; i < mKDLChain.getNrOfJoints(); i++) {
-        q_min(i) = -2 * M_PI;
-        q_max(i) = 2 * M_PI;
+        q_min(i) = mJointMinimum[i];
+        q_max(i) = mJointMaximum[i];
     }
 
     mFKSolver = std::shared_ptr<FKSolver>(new FKSolver(mKDLChain));
     mIKSolverVel = std::shared_ptr<IKVelSolver>(new IKVelSolver(mKDLChain));
-    mIKSolver = std::shared_ptr<IKSolver>(new IKSolver(mKDLChain, q_min, q_max, *mFKSolver, *mIKSolverVel, 100, 1e-6));
+    mIKSolver = std::shared_ptr<IKSolver>(new IKSolver(mKDLChain, q_min, q_max, *mFKSolver, *mIKSolverVel, 1000, 1e-6));
     mJacSolver = std::shared_ptr<JacobianSolver>(new JacobianSolver(mKDLChain));
 }
 
@@ -153,14 +153,25 @@ Vector6d RobotState::getOperationalVelocity() {
 }
 
 Vector6d RobotState::operationalConfigToJointConfig(Transform3d transform) {
-    auto scaled_transform = TransformUtils::Affine::scaleTranslation(transform, 1./1000.);
-    auto ik_solver = this->getIKSolver();
-    auto target_pose = TransformUtils::kdl::fromAffine(scaled_transform);
-    auto q_current = TransformUtils::kdl::fromVector6D(this->getJointConfig());
+    auto target_pose = TransformUtils::kdl::fromAffine(transform);
+    auto q_init = TransformUtils::kdl::fromVector6D(this->getJointConfig());
     auto q_target = KDL::JntArray(6);
+    auto target_affine = TransformUtils::kdl::toAffine(target_pose);
 
-    int status = ik_solver->CartToJnt(q_current, target_pose, q_target);
-    return Vector6d(q_target.data);
+    int status = mIKSolver->CartToJnt(q_init, target_pose, q_target);
+    if(status == 0){
+        return Vector6d(q_target.data);
+    } else{
+        if(status == -5)
+            std::cout << "Bad config. Max iterations exceeded." << std::endl;
+        else
+            std::cout << "Bad config." << std::endl;
+        return Vector6d(q_target.data);
+    }
+}
+
+Transform3d RobotState::jointConfigToOperationalConfig(romocc::Vector6d jointConfig) {
+    return transform_to_joint(jointConfig);
 }
 
 }

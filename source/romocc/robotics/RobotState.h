@@ -38,6 +38,7 @@ class ROMOCC_EXPORT RobotState : public Object
         Vector6d getOperationalConfig();
         Vector6d getOperationalVelocity();
         Vector6d operationalConfigToJointConfig(Transform3d transform);
+        Transform3d jointConfigToOperationalConfig(Vector6d jointConfig);
 
         std::shared_ptr<FKSolver> getFKSolver();
         std::shared_ptr<IKSolver> getIKSolver();
@@ -61,6 +62,10 @@ class ROMOCC_EXPORT RobotState : public Object
         std::shared_ptr<IKSolver> mIKSolver;
         std::shared_ptr<IKVelSolver> mIKSolverVel;
         std::shared_ptr<JacobianSolver> mJacSolver;
+
+        double mJointMinimum[6] = {-2*M_PI, -2*M_PI, -2*M_PI , -2*M_PI, -2*M_PI, -2*M_PI};
+        double mJointMaximum[6] = {2*M_PI, 2*M_PI, 2*M_PI , 2*M_PI, 2*M_PI, 2*M_PI};
+        double mJointInit[6] = {M_PI_4-0.1, -M_PI_2+0.1, M_PI_2+0.1, -M_PI_2-0.1, M_PI_2+0.1, 0.1+M_PI/4};
 
         Transform3d transform_to_joint(RowVector6d jointConfig, int jointNr = -1);
 };
