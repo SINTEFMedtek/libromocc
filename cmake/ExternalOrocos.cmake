@@ -18,6 +18,8 @@ ExternalProject_Add(orocos
             -DBUILD_TESTING:BOOL=OFF
         )
 
+add_dependencies(orocos eigen)
+
 list(APPEND ROMOCC_INCLUDE_DIRS ${ROMOCC_EXTERNAL_INSTALL_DIR}/include/)
 list(APPEND LIBRARIES orocos-kdl)
 list(APPEND ROMOCC_EXTERNAL_DEPENDENCIES orocos)
