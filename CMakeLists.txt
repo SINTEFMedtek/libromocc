@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.1)
+﻿cmake_minimum_required(VERSION 3.11)
 
 project(romocc)
 
@@ -14,7 +14,7 @@ include(cmake/Macros.cmake)
 option(ROMOCC_BUILD_TESTS "Build tests." ON)
 option(ROMOCC_BUILD_EXAMPLES "Build examples." ON)
 option(ROMOCC_BUILD_URSIMULATOR "Download and install UR Simulator" OFF)
-option(ROMOCC_BUILD_PYTHON "Build Python SWIG module" OFF)
+option(ROMOCC_BUILD_PYTHON "Build Python module" OFF)
 
 #### Set build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
