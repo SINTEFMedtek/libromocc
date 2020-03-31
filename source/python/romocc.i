@@ -1,9 +1,0 @@
-%module romocc
-
-#define ROMOCC_EXPORT
-
-%{
-${PYROMOCC_HEADER_INCLUDES}
-%}
-
-${PYROMOCC_INTERFACE_INCLUDES}
