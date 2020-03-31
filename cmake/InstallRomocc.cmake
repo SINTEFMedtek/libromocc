@@ -93,13 +93,13 @@ install(FILES ${ROMOCC_EXTERNAL_BUILD_DIR}/orocos/src/orocos/orocos_kdl/COPYING
 
 # Install Python wrapper
 if(ROMOCC_BUILD_PYTHON)
-	install(TARGETS _romocc
-			DESTINATION libromocc/python/romocc
-			)
-	install(FILES ${PROJECT_BINARY_DIR}/python/romocc/romocc.py
-			DESTINATION libromocc/python/romocc
-			)
-	install(FILES ${PROJECT_BINARY_DIR}/lib/romocc/__init__.py
-			DESTINATION libromocc/python/romocc
-			)
+#	install(TARGETS _romocc
+#			DESTINATION libromocc/python/romocc
+#			)
+#	install(FILES ${PROJECT_BINARY_DIR}/python/romocc/romocc.py
+#			DESTINATION libromocc/python/romocc
+#			)
+#	install(FILES ${PROJECT_BINARY_DIR}/lib/romocc/setup.py
+#			DESTINATION libromocc/python/romocc
+#			)
 endif()
