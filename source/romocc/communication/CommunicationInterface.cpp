@@ -27,8 +27,11 @@ CommunicationInterface::~CommunicationInterface()
 
 bool CommunicationInterface::connectToRobot() {
     bool connected = mClient->requestConnect(mHost, mPort);
-    mStopThread = false;
-    mThread = std::make_unique<std::thread>(std::bind(&CommunicationInterface::decodeReceivedPackages, this));
+    if(connected)
+    {
+        mStopThread = false;
+        mThread = std::make_unique<std::thread>(std::bind(&CommunicationInterface::decodeReceivedPackages, this));
+    }
     return connected;
 }
 
