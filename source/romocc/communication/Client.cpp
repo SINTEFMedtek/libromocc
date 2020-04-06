@@ -21,7 +21,7 @@ Client::Client()
 
 Client::~Client()
 {
-    if(!mStopThread){
+    if(!mStopThread && mConnected){
         mStopThread = true;
         mThread->join();
     }

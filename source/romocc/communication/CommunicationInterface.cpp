@@ -19,7 +19,7 @@ CommunicationInterface::CommunicationInterface()
 
 CommunicationInterface::~CommunicationInterface()
 {
-    if(!mStopThread){
+    if(!mStopThread && this->isConnected()){
         mStopThread = true;
         mThread->join();
     }
