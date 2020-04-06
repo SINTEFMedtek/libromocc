@@ -25,7 +25,9 @@ void Robot::configure(Manipulator manipulator, const std::string& host, const in
 bool Robot::connect()
 {
     bool connected = mCommunicationInterface->connectToRobot();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    if(!connected)
+        std::cout << "Robot not connected. Please check address." << std::endl;
+
     return connected;
 }
 
