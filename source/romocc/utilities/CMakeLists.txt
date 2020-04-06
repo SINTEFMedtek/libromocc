@@ -4,5 +4,3 @@ romocc_add_sources(
         ZMQUtils.cpp
         ZMQUtils.h
 )
-
-romocc_add_subdirectories(tests)

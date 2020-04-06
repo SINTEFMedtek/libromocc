@@ -98,6 +98,7 @@ endif()
 
 ## Build test executable
 if(ROMOCC_BUILD_TESTS)
+    romocc_add_subdirectories(tests)
     add_executable(testROMOCC ${ROMOCC_TEST_SOURCE_FILES})
     target_link_libraries(testROMOCC romocc)
 endif()
