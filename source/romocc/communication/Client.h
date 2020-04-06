@@ -43,6 +43,7 @@ class ROMOCC_EXPORT Client : public Object
 
         void* mStreamer;
         void start();
+        bool requestReply();
 };
 
 }

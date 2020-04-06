@@ -4,6 +4,8 @@
 #include <iostream>
 #include <cstring>
 #include <assert.h>
+#include <chrono>
+#include <condition_variable>
 
 #include "romocc/utilities/ZMQUtils.h"
 
@@ -36,17 +38,23 @@ bool Client::requestConnect(std::string host, int port)
     mConnectionInfo.port = port;
 
     mStreamer = zmq_socket(ZMQUtils::getContext(), ZMQ_STREAM);
-    zmq_connect(mStreamer, ("tcp://" + mConnectionInfo.host + ":" + std::to_string(mConnectionInfo.port)).c_str());
+    assert(mStreamer);
+
+    auto ret = zmq_connect(mStreamer, ("tcp://" + mConnectionInfo.host + ":" + std::to_string(mConnectionInfo.port)).c_str());
+    assert(ret == 0);
 
     uint8_t id [256];
     size_t  id_size = 256;
-    zmq_getsockopt(mStreamer, ZMQ_IDENTITY, &id, &id_size);
+    ret = zmq_getsockopt(mStreamer, ZMQ_IDENTITY, &id, &id_size);
+    assert(ret==0);
 
-    mStopThread = false;
-    mThread = std::make_unique<std::thread>(std::bind(&Client::start, this));
-    mConnected = true;
+    mConnected = requestReply();
 
-    return isConnected();
+    if(mConnected){
+        mStopThread = false;
+        mThread = std::make_unique<std::thread>(std::bind(&Client::start, this));
+    }
+    return mConnected;
 }
 
 bool Client::requestDisconnect()
@@ -103,6 +111,37 @@ void Client::start()
 
     zmq_close(publisher);
     zmq_close(streamer);
+}
+
+bool Client::requestReply()
+{
+    std::condition_variable cv;
+    bool connected = true;
+    bool close_thread = false;
+
+    std::thread processing_thread([&](){
+        uint8_t buffer[2048];
+        auto recv_ret = -1;
+        while(recv_ret != 0 && !close_thread)
+        {
+            recv_ret = zmq_recv(mStreamer, buffer, 2048, ZMQ_NOBLOCK);
+        }
+
+        if(!close_thread)
+            cv.notify_one();
+    });
+
+    std::mutex mtx;
+    std::unique_lock<std::mutex> lck(mtx);
+    auto status = cv.wait_for(lck,std::chrono::milliseconds(500));
+    if(status == std::cv_status::timeout){
+        std::cout << "Connection timeout... " << std::endl;
+        close_thread = true;
+        connected = false;
+    }
+    processing_thread.join();
+
+    return connected;
 }
 
 }
