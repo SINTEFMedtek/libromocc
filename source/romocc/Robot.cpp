@@ -98,8 +98,7 @@ void Robot::waitForMove()
 void Robot::stopMove(MotionType type, double acc)
 {
     mCommunicationInterface->stopMove(type, acc);
-};
-
+}
 
 void Robot::addUpdateSubscription(std::function<void()> updateSignal)
 {
