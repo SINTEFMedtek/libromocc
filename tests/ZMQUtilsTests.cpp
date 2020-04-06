@@ -2,8 +2,9 @@
 // Created by androst on 06.06.19.
 //
 
+#include "catch/catch.hpp"
+
 #include <cstring>
-#include "romocc/tests/catch.hpp"
 #include "romocc/utilities/ZMQUtils.h"
 
 namespace romocc

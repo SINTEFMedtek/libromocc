@@ -1,4 +1,4 @@
-#include "romocc/tests/catch.hpp"
+#include "catch/catch.hpp"
 #include <iostream>
 
 #include "romocc/core/ForwardDeclarations.h"
