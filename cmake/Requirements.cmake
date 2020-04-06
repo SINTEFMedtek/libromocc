@@ -12,11 +12,8 @@ if(ROMOCC_BUILD_URSIMULATOR)
     include(cmake/ExternalURSimulator.cmake)
 endif()
 
-if(ROMOCC_BUILD_PYTHON)
+if(ROMOCC_BUILD_PYTHON_BINDINGS)
     find_package(Python 3 REQUIRED)
-    list(APPEND ROMOCC_INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS})
-    list(APPEND LIBRARIES ${PYTHON_LIBRARIES})
-
     include(cmake/ExternalPybind.cmake)
 endif()
 

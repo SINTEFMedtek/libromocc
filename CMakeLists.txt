@@ -14,7 +14,7 @@ include(cmake/Macros.cmake)
 option(ROMOCC_BUILD_TESTS "Build tests." ON)
 option(ROMOCC_BUILD_EXAMPLES "Build examples." ON)
 option(ROMOCC_BUILD_URSIMULATOR "Download and install UR Simulator" OFF)
-option(ROMOCC_BUILD_PYTHON "Build Python module" OFF)
+option(ROMOCC_BUILD_PYTHON_BINDINGS "Build Python bindings" OFF)
 
 #### Set build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -74,7 +74,6 @@ endif()
 
 #### Add all subdirs
 romocc_add_subdirectories(source/romocc)
-romocc_add_subdirectories(source/python)
 
 message("-- ROMOCC DEPENDENCIES: ${ROMOCC_EXTERNAL_DEPENDENCIES}")
 
@@ -87,6 +86,10 @@ generate_export_header(romocc EXPORT_FILE_NAME romoccExport.hpp)
 #### Link everything
 message("-- ROMOCC LIBS: ${LIBRARIES} ${SYSTEM_LIBRARIES}")
 target_link_libraries(romocc PUBLIC ${LIBRARIES} ${SYSTEM_LIBRARIES})
+
+if(ROMOCC_BUILD_PYTHON_BINDINGS)
+    romocc_add_subdirectories(source/python)
+endif()
 
 ## Build examples
 if(ROMOCC_BUILD_EXAMPLES)
@@ -105,6 +108,7 @@ configure_file(
         "${PROJECT_BINARY_DIR}/RomoccConfig.cmake"
         @ONLY
 )
+
 configure_file(
         "${PROJECT_SOURCE_DIR}/cmake/RomoccUse.cmake.in"
         "${PROJECT_BINARY_DIR}/RomoccUse.cmake"
