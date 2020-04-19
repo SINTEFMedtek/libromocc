@@ -13,8 +13,7 @@ if(ROMOCC_BUILD_URSIMULATOR)
 endif()
 
 if(ROMOCC_BUILD_PYTHON_BINDINGS)
-    find_package(Python 3 REQUIRED)
-    include(cmake/ExternalPybind.cmake)
+    find_package(PythonLibs 3 REQUIRED)
 endif()
 
 # Make sure project can find external includes and libaries
