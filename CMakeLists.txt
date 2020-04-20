@@ -88,7 +88,7 @@ message("-- ROMOCC LIBS: ${LIBRARIES} ${SYSTEM_LIBRARIES}")
 target_link_libraries(romocc PUBLIC ${LIBRARIES} ${SYSTEM_LIBRARIES})
 
 if(ROMOCC_BUILD_PYTHON_BINDINGS)
-    romocc_add_subdirectories(source/python)
+    romocc_add_subdirectories(source/pyromocc)
 endif()
 
 ## Build examples
