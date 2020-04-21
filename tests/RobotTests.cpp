@@ -28,7 +28,7 @@ TEST_CASE("Initialize robot and check coordinate system", "[romocc][Robot]") {
 
 TEST_CASE("Initialize robot and test kinematics", "[romocc][Robot]") {
     Robot::pointer robot = Robot::New();
-    robot->configure(Manipulator(Manipulator::UR10), "192.168.153.131", 30003);
+    robot->configure(Manipulator(ManipulatorType::UR10), "192.168.153.131", 30003);
     robot->connect();
 
     std::shared_ptr<FKSolver> fk_solver = robot->getCurrentState()->getFKSolver();
@@ -50,7 +50,7 @@ TEST_CASE("Initialize robot and test kinematics", "[romocc][Robot]") {
 
 TEST_CASE("Initialize robot and listen for new states", "[romocc][Robot]") {
     Robot::pointer robot = Robot::New();
-    robot->configure(Manipulator(Manipulator::UR10), "192.168.153.131", 30003);
+    robot->configure(Manipulator(ManipulatorType::UR10), "192.168.153.131", 30003);
     robot->connect();
 
     for(int i = 0; i<100; i++)
@@ -66,7 +66,7 @@ TEST_CASE("Kinematics test", "[romocc][Robot]"){
     auto affine = TransformUtils::Affine::toAffine3DFromVector6D(current);
 
     auto robot = Robot::New();
-    robot->configure(Manipulator(Manipulator::UR10), "192.168.153.131", 30003);
+    robot->configure(Manipulator(ManipulatorType::UR10), "192.168.153.131", 30003);
     robot->connect();
 
     std::shared_ptr<FKSolver> fk_solver = robot->getCurrentState()->getFKSolver();
