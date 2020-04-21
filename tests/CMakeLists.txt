@@ -1,7 +1,7 @@
+romocc_add_subdirectories(catch)
+
 romocc_add_test_sources(
-    catch/catch.hpp
-    catch/CatchMain.cpp
-    RobotTests.cpp
-    MathUtilsTests.cpp
-    ZMQUtilsTests.cpp
+        RobotTests.cpp
+        MathUtilsTests.cpp
+        ZMQUtilsTests.cpp
 )
