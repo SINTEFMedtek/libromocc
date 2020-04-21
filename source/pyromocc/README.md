@@ -30,3 +30,13 @@ cmake .. -DROMOCC_BUILD_PYTHON_BINDINGS:bool=TRUE
 ```
 pip install -e .
 ```
+
+## Example usage
+```python
+from pyromocc import Robot
+robot = Robot(ip="192.168.153.131", port=30003, manipulator="UR10")
+robot.connect()
+
+robot.movej([0, -1.57, -1.57, -1.57, 0, 0])
+print(robot.joint_config)
+```
