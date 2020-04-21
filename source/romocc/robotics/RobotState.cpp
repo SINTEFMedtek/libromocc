@@ -28,9 +28,9 @@ void RobotState::setManipulator(romocc::Manipulator manipulator) {
 
 
 void RobotState::setKDLchain(Manipulator manipulator) {
-    if (manipulator.manipulator == Manipulator::UR5) {
+    if (manipulator.manipulator == ManipulatorType::UR5) {
         mKDLChain = Ur5::KDLChain();
-    } else if (manipulator.manipulator == Manipulator::UR10) {
+    } else if (manipulator.manipulator == ManipulatorType::UR10) {
         mKDLChain = Ur10::KDLChain();
     }
 
@@ -47,7 +47,7 @@ void RobotState::setKDLchain(Manipulator manipulator) {
 }
 
 void RobotState::setDecoder(Manipulator manipulator) {
-    if (manipulator.manipulator == Manipulator::UR5 || manipulator.manipulator == Manipulator::UR10)
+    if (manipulator.manipulator == ManipulatorType::UR5 || manipulator.manipulator == ManipulatorType::UR10)
         mDecoder = UrMessageDecoder::New();
 }
 
