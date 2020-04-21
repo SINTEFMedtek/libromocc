@@ -1,15 +1,17 @@
-from pyromocc import Robot, Manipulator
+from pyromocc import Robot
 import numpy as np
-import time
+from time import sleep
 
-manipulator = Manipulator(Manipulator.ManipulatorType.UR10, "5.3")
-
-robot = Robot(manipulator, "192.168.153.131", 30003)
+robot = Robot(ip="192.168.153.131", port=30003, manipulator="UR10")
 robot.connect()
 
+sleep(1.0)
 print(robot.joint_config)
-time.sleep(0.5)
+
+sleep(1.0)
 print(robot.joint_config)
-time.sleep(0.5)
 
 robot.movej([0.0, -np.pi/2, -np.pi/2, -np.pi/2, 0, 0], 50, 100)
+
+sleep(1.0)
+print(robot.joint_config)
