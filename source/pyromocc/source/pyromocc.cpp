@@ -18,12 +18,11 @@ PYBIND11_MODULE(pyromocc, m) {
     pybind11::class_<Robot> robot(m, "RobotBase");
     robot.def(py::init<>())
         .def("configure", &Robot::configure)
-        .def("connect", &Robot::connect)
+        .def("connect", &Robot::connect, "Connects to the robot.")
         .def("get_state", &Robot::getCurrentState)
         .def("stop_move", &Robot::stopMove);
 
     robot.def("movej", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target,double acc, double vel){
-            py::print(target);
             self.move(romocc::MotionType::movej, target, acc, vel);
     });
 
@@ -33,13 +32,14 @@ PYBIND11_MODULE(pyromocc, m) {
 
     py::class_<Manipulator> manipulator(m, "Manipulator");
 
-    manipulator.def(py::init<Manipulator::ManipulatorType, std::string>())
+    manipulator.def(py::init<ManipulatorType, std::string>(),
+                    py::arg("manipulator_type"), py::arg("sw_version"))
             .def_readwrite("manipulator", &Manipulator::manipulator)
             .def_readwrite("sw_version", &Manipulator::sw_version);
 
-    py::enum_<Manipulator::ManipulatorType>(manipulator, "ManipulatorType")
-        .value("UR5", Manipulator::ManipulatorType::UR5)
-        .value("UR10", Manipulator::ManipulatorType::UR10);
+    py::enum_<ManipulatorType>(m, "ManipulatorType")
+        .value("UR5", ManipulatorType::UR5)
+        .value("UR10", ManipulatorType::UR10);
 
     py::enum_<MotionType>(m, "MotionType")
         .value("movej", MotionType::movej)
