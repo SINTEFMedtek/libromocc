@@ -11,6 +11,7 @@ else:
 
 setup(name=package_name,
       version='0.0.2',
+      author="Andreas Østvik",
       packages=find_packages(exclude=['third_party', 'examples']),
       install_requires=['numpy'],
       include_package_data=True,
