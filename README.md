@@ -6,7 +6,7 @@ libromocc is a lightweight C++ library for robot modelling, control and communic
 ### Setup and build
 
 ```bash
-git clone https://github.com/androst/libromocc.git
+git clone https://github.com/SINTEFMedtek/libromocc.git
 cd libromocc
 mkdir build
 cd build
