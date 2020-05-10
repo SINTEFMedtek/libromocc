@@ -18,9 +18,8 @@ Eigen::Matrix<double,6,1> TransformUtils::Affine::toVector6D(Eigen::Affine3d aff
 {
     Vector6d vector;
     Eigen::Vector3d pos = affine.translation();
-    Eigen::Vector3d rxryrz = affine.linear().eulerAngles(0, 1, 2);
+    Eigen::Vector3d rxryrz = Eigen::AngleAxisd(affine.linear()).angle()*Eigen::AngleAxisd(affine.linear()).axis();
     vector << pos(0), pos(1), pos(2), rxryrz(0), rxryrz(1), rxryrz(2);
-
     return vector;
 }
 
