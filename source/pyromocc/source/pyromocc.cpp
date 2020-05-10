@@ -7,7 +7,7 @@
 #include <pybind11/stl.h>
 
 #include "romocc/Robot.h"
-
+#include "romocc/utilities/MathUtils.h"
 
 namespace py = pybind11;
 using namespace romocc;
@@ -22,13 +22,22 @@ PYBIND11_MODULE(pyromocc, m) {
         .def("get_state", &Robot::getCurrentState)
         .def("stop_move", &Robot::stopMove);
 
-    robot.def("movej", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target,double acc, double vel){
+    robot.def("movej", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double vel){
             self.move(romocc::MotionType::movej, target, acc, vel);
     });
 
-    pybind11::class_<RobotState, std::shared_ptr<RobotState>>(m, "RobotState")
-        .def("get_joint_config", &RobotState::getJointConfig)
-        .def("get_pose", &RobotState::get_bMee);
+    robot.def("movep", [](Robot& self, Eigen::Ref<const Eigen::MatrixXd> pose, double acc, double vel){
+            Eigen::Affine3d transform;
+            transform.matrix() = pose;
+            self.move(romocc::MotionType::movep, transform, acc, vel);
+    });
+
+    pybind11::class_<RobotState, std::shared_ptr<RobotState>> robotState(m, "RobotState");
+    robotState.def("get_joint_config", &RobotState::getJointConfig);
+
+    robotState.def("get_pose", [](RobotState& self){
+        return self.get_bMee().matrix();
+    });
 
     py::class_<Manipulator> manipulator(m, "Manipulator");
 
@@ -48,5 +57,11 @@ PYBIND11_MODULE(pyromocc, m) {
         .value("speedl", MotionType::speedl)
         .value("stopj", MotionType::stopj)
         .value("stopl", MotionType::stopl);
+
+    m.def("pose_to_vector", [](Eigen::Ref<const Eigen::MatrixXd> pose){
+        Eigen::Affine3d transform;
+        transform.matrix() = pose;
+        return TransformUtils::Affine::toVector6D(transform);
+    });
 
 }
