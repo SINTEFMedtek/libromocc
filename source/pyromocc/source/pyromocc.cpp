@@ -27,9 +27,13 @@ PYBIND11_MODULE(pyromocc, m) {
     });
 
     robot.def("movep", [](Robot& self, Eigen::Ref<const Eigen::MatrixXd> pose, double acc, double vel){
+        if(pose.rows() == 4 && pose.cols() == 4){
             Eigen::Affine3d transform;
             transform.matrix() = pose;
             self.move(romocc::MotionType::movep, transform, acc, vel);
+        } else{
+            self.move(romocc::MotionType::movep, pose.transpose(), acc, vel);
+        }
     });
 
     pybind11::class_<RobotState, std::shared_ptr<RobotState>> robotState(m, "RobotState");
