@@ -38,3 +38,68 @@ class Robot(RobotBase):
     @property
     def pose(self):
         return self.get_state().get_pose()
+
+    @property
+    def pose_aa(self):
+        pose = self.get_state().get_pose()
+        return pose_to_vector(pose)
+
+    @property
+    def x(self):
+        return self.pose[0, 3]
+
+    @x.setter
+    def x(self, val):
+        p = self.pose
+        p[0, 3] = val
+        self.movep(p, 50, 100)
+
+    @property
+    def y(self):
+        return self.pose[1, 3]
+
+    @y.setter
+    def y(self, val):
+        p = self.pose
+        p[1, 3] = val
+        self.movep(p, 50, 100)
+
+    @property
+    def z(self):
+        return self.pose[2, 3]
+
+    @z.setter
+    def z(self, val):
+        p = self.pose
+        p[2, 3] = val
+        self.movep(p, 50, 100)
+
+    @property
+    def rx(self):
+        return self.pose_aa[3]
+
+    @rx.setter
+    def rx(self, val):
+        p = self.pose_aa
+        p[3] = val
+        self.movep(p, 50, 100)
+
+    @property
+    def ry(self):
+        return self.pose_aa[4]
+
+    @ry.setter
+    def ry(self, val):
+        p = self.pose_aa
+        p[4] = val
+        self.movep(p, 50, 100)
+
+    @property
+    def rz(self):
+        return self.pose_aa[5]
+
+    @rz.setter
+    def rz(self, val):
+        p = self.pose_aa
+        p[5] = val
+        self.movep(p, 50, 100)
