@@ -2,9 +2,9 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, develop ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, develop ]
 
 jobs:
   build:
@@ -12,8 +12,10 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v1
     - name: configure
-      run: ./cmake ..
+      run: mkdir build && cd build && cmake ..
     - name: make
       run: make
+    - name: test
+      run: cd bin && testROMOCC
