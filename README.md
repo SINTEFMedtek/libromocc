@@ -1,7 +1,8 @@
 libromocc
 =========
 
-libromocc is a lightweight C++ library for robot modelling, control and communication
+libromocc is a lightweight C++ library for **ro**bot **mo**delling, **c**ontrol and **c**ommunication. It
+also contains Python wrappers with a corresponding PyPI distribution.
 
 ### Setup and build
 
