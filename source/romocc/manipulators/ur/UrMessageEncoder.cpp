@@ -15,8 +15,10 @@ std::string UrMessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowV
 
     if(typeOfMovement==MotionType::movej)
         return movej(targetConfiguration,acc,vel,t,rad);
-    else if(typeOfMovement==MotionType::movep)
+    else if(typeOfMovement==MotionType::movep){
+        targetConfiguration(Eigen::seq(0, 2)) = targetConfiguration(Eigen::seq(0, 2))/1000;
         return movep(targetConfiguration,acc,vel,t,rad);
+    }
     else if(typeOfMovement==MotionType::speedl)
         return speedl(targetConfiguration,acc,t);
     else if(typeOfMovement == MotionType::speedj)
@@ -27,22 +29,15 @@ std::string UrMessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowV
 
 std::string UrMessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::Affine3d pose, double acc, double vel, double t, double radius)
 {
-    pose.translation() = pose.translation()/1000;
     Vector6d vector = TransformUtils::Affine::toVector6D(pose);
     return moveCommand(MotionType::movep, vector, acc, vel, t, radius);
 }
 
 std::string UrMessageEncoder::moveCommand(MotionType typeOfMovement, double targetConfig[6], double acc, double vel, double t, double rad)
 {
-    acc = acc/1000; // mm -> m
-    vel = vel/1000;
-    rad = rad/1000;
-
-    targetConfig[0] = targetConfig[0]/1000;
-    targetConfig[1] = targetConfig[1]/1000;
-    targetConfig[2] = targetConfig[2]/1000;
-
-    return movep(targetConfig,acc,vel,t,rad);
+    Eigen::RowVectorXd vector(6, 1);
+    vector << targetConfig[0], targetConfig[1], targetConfig[2], targetConfig[3], targetConfig[4], targetConfig[5];
+    return moveCommand(typeOfMovement, vector, acc, vel, t, rad);
 }
 
 std::string UrMessageEncoder::stopCommand(MotionType typeOfStop, double acc)
