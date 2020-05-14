@@ -103,3 +103,15 @@ class Robot(RobotBase):
         p = self.pose_aa
         p[5] = val
         self.movep(p, 50, 100)
+
+    def forward_kinematics(self, joint_config, format="homogeneous"):
+        pose = self.get_state().joint_to_pose(joint_config)
+        if format == "axis_angle":
+            return pose_to_vector(pose)
+        return pose
+
+    def jacobian(self):
+        return self.get_state().get_jacobian()
+
+    def inverse_jacobian(self):
+        return self.get_state().get_inverse_jacobian()
