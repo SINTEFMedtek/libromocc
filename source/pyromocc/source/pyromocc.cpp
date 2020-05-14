@@ -8,6 +8,7 @@
 
 #include "romocc/Robot.h"
 #include "romocc/utilities/MathUtils.h"
+#include "romocc/robotics/RobotMotion.h"
 
 namespace py = pybind11;
 using namespace romocc;
@@ -36,11 +37,25 @@ PYBIND11_MODULE(pyromocc, m) {
         }
     });
 
-    pybind11::class_<RobotState, std::shared_ptr<RobotState>> robotState(m, "RobotState");
-    robotState.def("get_joint_config", &RobotState::getJointConfig);
+    robot.def("speedj", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double time=5){
+        self.move(romocc::MotionType::speedj, target, acc, 0, time);
+    });
 
+    robot.def("stopj", [](Robot& self, double acc){
+        self.stopMove(romocc::MotionType::stopj, acc);
+    });
+
+    pybind11::class_<RobotState, std::shared_ptr<RobotState>> robotState(m, "RobotState");
+    robotState.def("get_joint_config", &RobotState::getJointConfig)
+        .def("get_jacobian", &RobotState::getJacobian);
+    robotState.def("joint_to_pose", [](RobotState& self, Eigen::Ref<const Eigen::RowVectorXd> joint_config){
+        return self.jointConfigToOperationalConfig(joint_config).matrix();
+    });
     robotState.def("get_pose", [](RobotState& self){
         return self.get_bMee().matrix();
+    });
+    robotState.def("get_inverse_jacobian", [](RobotState& self){
+        return self.getJacobian().inverse();
     });
 
     py::class_<Manipulator> manipulator(m, "Manipulator");
@@ -68,4 +83,22 @@ PYBIND11_MODULE(pyromocc, m) {
         return TransformUtils::Affine::toVector6D(transform);
     });
 
+    py::class_<RobotMotionQueue> motion_queue(m, "MotionQueue");
+    motion_queue.def(py::init<>())
+        .def("get_queue", &RobotMotionQueue::getQueue);
+    motion_queue.def("add", [](RobotMotionQueue& self, Eigen::Ref<const Eigen::MatrixXd> pose, double acc, double vel,
+            double time = 0, double blendRadius = 0){
+        if(pose.rows() == 4 && pose.cols() == 4){
+            Eigen::Affine3d transform;
+            transform.matrix() = pose;
+            self.add(transform, MotionType::movep, acc, vel, time, blendRadius) ;
+        } else{
+            std::cout << "Pose should be 4x4." << std::endl;
+        }
+    });
+
+    py::class_<RobotMotion> robot_motion(m, "RobotMotion");
+    robot_motion.def("target_pose", [](RobotMotion& self){
+        return self.targetPose.matrix();
+    });
 }
