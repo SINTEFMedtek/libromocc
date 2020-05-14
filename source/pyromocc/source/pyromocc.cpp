@@ -46,8 +46,7 @@ PYBIND11_MODULE(pyromocc, m) {
     });
 
     pybind11::class_<RobotState, std::shared_ptr<RobotState>> robotState(m, "RobotState");
-    robotState.def("get_joint_config", &RobotState::getJointConfig)
-        .def("get_jacobian", &RobotState::getJacobian);
+    robotState.def("get_joint_config", &RobotState::getJointConfig);
     robotState.def("joint_to_pose", [](RobotState& self, Eigen::Ref<const Eigen::RowVectorXd> joint_config){
         return self.jointConfigToOperationalConfig(joint_config).matrix();
     });
@@ -57,7 +56,9 @@ PYBIND11_MODULE(pyromocc, m) {
     robotState.def("get_inverse_jacobian", [](RobotState& self){
         return self.getJacobian().inverse();
     });
-
+    robotState.def("get_jacobian", [](RobotState& self){
+        return self.getJacobian().matrix();
+    });
     py::class_<Manipulator> manipulator(m, "Manipulator");
 
     manipulator.def(py::init<ManipulatorType, std::string>(),
