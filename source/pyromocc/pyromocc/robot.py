@@ -36,6 +36,10 @@ class Robot(RobotBase):
         return self.get_state().get_joint_config()
 
     @property
+    def joint_velocity(self):
+        return self.get_state().get_joint_velocity()
+
+    @property
     def pose(self):
         return self.get_state().get_pose()
 
