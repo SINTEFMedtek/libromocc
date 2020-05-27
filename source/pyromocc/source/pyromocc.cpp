@@ -47,6 +47,7 @@ PYBIND11_MODULE(pyromocc, m) {
 
     pybind11::class_<RobotState, std::shared_ptr<RobotState>> robotState(m, "RobotState");
     robotState.def("get_joint_config", &RobotState::getJointConfig);
+    robotState.def("get_joint_velocity", &RobotState::getJointVelocity);
     robotState.def("joint_to_pose", [](RobotState& self, Eigen::Ref<const Eigen::RowVectorXd> joint_config){
         return self.jointConfigToOperationalConfig(joint_config).matrix();
     });
