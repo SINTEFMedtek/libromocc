@@ -25,13 +25,13 @@ TEST_CASE("Dummy test Shah calibration", "[romocc][Calibration]") {
 }
 
 TEST_CASE("Load calibration file", "[romocc][Calibration]"){
-    std::string filename = "/home/androst/dev/SINTEF/libromocc/tests/assets/calibration/cal_file.cal";
+    std::string filename = "tests/assets/calibration/cal_file.cal";
     auto cal_mat = load_calibration_file(filename);
     std::cout << cal_mat.matrix() << std::endl;
 }
 
 TEST_CASE("Save calibration files.", "[EchoBot][Utilities]") {
-    auto path = "/home/androst/dev/SINTEF/libromocc/tests/assets/calibration/test.cal";
+    auto path = "tests/assets/calibration/test.cal";
 
     auto calMat = Eigen::Affine3d::Identity();
     calMat(0,3) = 30.3;
