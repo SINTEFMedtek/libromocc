@@ -54,6 +54,13 @@ PYBIND11_MODULE(pyromocc, m) {
     robotState.def("joint_to_pose", [](RobotState& self, Eigen::Ref<const Eigen::RowVectorXd> joint_config){
         return self.jointConfigToOperationalConfig(joint_config).matrix();
     });
+
+    robotState.def("pose_to_joint", [](RobotState& self, Eigen::Ref<const Eigen::MatrixXd> pose){
+        Eigen::Affine3d transform;
+        transform.matrix() = pose;
+        return self.operationalConfigToJointConfig(transform);
+    });
+
     robotState.def("get_pose", [](RobotState& self){
         return self.get_bMee().matrix();
     });
