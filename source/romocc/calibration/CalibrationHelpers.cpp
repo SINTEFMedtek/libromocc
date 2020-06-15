@@ -1,5 +1,10 @@
 #include "CalibrationHelpers.h"
 
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <Eigen/Dense>
+
 namespace romocc
 {
 
@@ -52,6 +57,36 @@ std::vector<double> compute_linspace(double a, double b, int n)
 double sgn(double val)
 {
     return (double(0) < val) - (val < double(0));
+}
+
+Transform3d load_calibration_file(std::string filepath){
+    auto calMat = Eigen::Affine3d::Identity();
+    std::ifstream inFile;
+    inFile.open(filepath);
+
+    if(inFile.is_open())
+    {
+        for(int row = 0; row < calMat.rows(); row++){
+            for(int col = 0; col < calMat.cols(); col++)
+            {
+                double item = 0;
+                inFile >> item;
+                calMat(row, col) = item;
+            }
+        }
+        inFile.close();
+    }
+    return calMat;
+}
+
+void save_calibration_file(std::string path, Eigen::Affine3d calMat) {
+    std::ofstream outFile;
+    outFile.open(path);
+
+    if(outFile.is_open()){
+        outFile << calMat.matrix();
+        outFile.close();
+    }
 }
 
 }
