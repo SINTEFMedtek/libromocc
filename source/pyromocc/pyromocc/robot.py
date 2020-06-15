@@ -114,6 +114,10 @@ class Robot(RobotBase):
             return pose_to_vector(pose)
         return pose
 
+    def inverse_kinematics(self, pose):
+        joint_config = self.get_state().pose_to_joint(pose)
+        return joint_config
+
     def jacobian(self):
         return self.get_state().get_jacobian()
 
