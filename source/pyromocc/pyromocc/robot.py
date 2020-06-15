@@ -115,6 +115,7 @@ class Robot(RobotBase):
         return pose
 
     def inverse_kinematics(self, pose):
+        pose[:, 3][:3] = pose[:, 3][:3] / 1000
         joint_config = self.get_state().pose_to_joint(pose)
         return joint_config
 
