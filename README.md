@@ -1,6 +1,8 @@
 libromocc
 =========
 
+[![Build badge](https://github.com/SINTEFMedtek/libromocc/workflows/cmake_build.yml/badge.svg?branch=master&event=push)](https://github.com/SINTEFMedtek/libromocc/actions)
+
 libromocc is a lightweight C++ library for **ro**bot **mo**delling, **c**ontrol and **c**ommunication. It
 also contains Python wrappers with a corresponding PyPI distribution.
 
