@@ -17,6 +17,7 @@
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/chainiksolverpos_nr.hpp>
 #include <kdl/chainiksolverpos_nr_jl.hpp>
+#include <kdl/chainiksolverpos_lma.hpp>
 #include <kdl/chainiksolvervel_pinv.hpp>
 
 // romocc utilities
