@@ -66,8 +66,10 @@ TEST_CASE("Kinematics test", "[romocc][Robot]"){
     auto affine = TransformUtils::Affine::toAffine3DFromVector6D(current);
 
     auto robot = Robot::New();
-    robot->configure(Manipulator(ManipulatorType::UR10), "192.168.153.131", 30003);
+    robot->configure(Manipulator(ManipulatorType::UR5), "192.168.153.128", 30003);
     robot->connect();
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     std::shared_ptr<FKSolver> fk_solver = robot->getCurrentState()->getFKSolver();
     std::shared_ptr<IKSolver> ik_solver = robot->getCurrentState()->getIKSolver();
@@ -88,5 +90,17 @@ TEST_CASE("Kinematics test", "[romocc][Robot]"){
     std::cout << status << std::endl;
     std::cout << q_target.data.transpose() << std::endl;
 }
+
+TEST_CASE("Jacobian tests", "[romocc][Robot]"){
+    auto robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "192.168.153.128", 30003);
+    robot->connect();
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    auto numeric_jacobian = robot->getCurrentState()->getJacobian();
+    auto analytical_jacobian = Ur5::analytic_jacobian(robot->getCurrentState()->getJointConfig());
+    CHECK(numeric_jacobian.isApprox(analytical_jacobian));
+}
+
 
 }
