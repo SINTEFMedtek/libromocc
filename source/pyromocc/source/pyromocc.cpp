@@ -43,7 +43,9 @@ PYBIND11_MODULE(pyromocc, m) {
     robot.def("speedj", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double time=5){
         self.move(romocc::MotionType::speedj, target, acc, 0, time);
     });
-
+    robot.def("speedl", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double time=5){
+        self.move(romocc::MotionType::speedl, target, acc, 0, time);
+    });
     robot.def("stopj", [](Robot& self, double acc){
         self.stopMove(romocc::MotionType::stopj, acc);
     });
