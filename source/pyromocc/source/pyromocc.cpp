@@ -72,7 +72,7 @@ PYBIND11_MODULE(pyromocc, m) {
         return self.getJacobian().inverse();
     });
     robotState.def("get_jacobian", [](RobotState& self){
-        return self.getJacobian().matrix();
+        return self.getJacobian();
     });
     py::class_<Manipulator> manipulator(m, "Manipulator");
 

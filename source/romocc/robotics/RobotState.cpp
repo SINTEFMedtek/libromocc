@@ -42,7 +42,8 @@ void RobotState::setKDLchain(Manipulator manipulator) {
 
     mFKSolver = std::shared_ptr<FKSolver>(new FKSolver(mKDLChain));
     mIKSolverVel = std::shared_ptr<IKVelSolver>(new IKVelSolver(mKDLChain));
-    mIKSolver = std::shared_ptr<IKSolver>(new IKSolver(mKDLChain, q_min, q_max, *mFKSolver, *mIKSolverVel, 1000, 1e-6));
+    //mIKSolver = std::shared_ptr<IKSolver>(new IKSolver(mKDLChain, q_min, q_max, *mFKSolver, *mIKSolverVel, 5000, 1e-5));
+    mIKSolver = std::shared_ptr<IKSolver>(new IKSolver(mKDLChain, 1e-5 * 1e3, 500, 1e-15 * 1e3));
     mJacSolver = std::shared_ptr<JacobianSolver>(new JacobianSolver(mKDLChain));
 }
 
