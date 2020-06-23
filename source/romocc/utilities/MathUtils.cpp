@@ -24,14 +24,16 @@ Eigen::Matrix<double,6,1> TransformUtils::Affine::toVector6D(Eigen::Affine3d aff
 }
 
 Eigen::Affine3d TransformUtils::Affine::toAffine3DFromVector6D(Eigen::Matrix<double, 6, 1> vec) {
+    Eigen::Vector3d aa_vec{vec(3), vec(4), vec(5)};
+
+    auto angle = aa_vec.norm();
+    auto norm_aa_vec = aa_vec/aa_vec.norm();
+    auto aa_obj = Eigen::AngleAxisd(angle, norm_aa_vec);
+
     auto matrix = Eigen::Affine3d::Identity();
-    Eigen::Matrix3d m;
-    m = Eigen::AngleAxisd(vec(3), Eigen::Vector3d::UnitX())*
-        Eigen::AngleAxisd(vec(4), Eigen::Vector3d::UnitY())*
-        Eigen::AngleAxisd(vec(5), Eigen::Vector3d::UnitZ());
 
     matrix.translate(Eigen::Vector3d(vec(0), vec(1), vec(2)));
-    matrix.linear() = matrix.linear()*m;
+    matrix.linear() = aa_obj.toRotationMatrix();
     return matrix;
 }
 
