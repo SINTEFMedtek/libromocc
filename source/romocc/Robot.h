@@ -33,6 +33,7 @@ class ROMOCC_EXPORT Robot : public Object
         template <class Target>
         void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0);
         void stopMove(MotionType type, double acc);
+        void sendProgram(std::string program);
 
         void runMotionQueue(MotionQueue queue);
         void stopRunMotionQueue();
