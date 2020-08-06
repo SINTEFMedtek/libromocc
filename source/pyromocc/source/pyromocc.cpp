@@ -50,6 +50,8 @@ PYBIND11_MODULE(pyromocc, m) {
         self.stopMove(romocc::MotionType::stopj, acc);
     });
 
+    robot.def("_send_program", &Robot::sendProgram);
+
     pybind11::class_<RobotState, std::shared_ptr<RobotState>> robotState(m, "RobotState");
     robotState.def("get_joint_config", &RobotState::getJointConfig);
     robotState.def("get_joint_velocity", &RobotState::getJointVelocity);
