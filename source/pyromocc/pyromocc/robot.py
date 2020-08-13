@@ -1,4 +1,5 @@
 from .pyromocc import *
+from typing import Union
 
 
 class Robot(RobotBase):
@@ -124,3 +125,12 @@ class Robot(RobotBase):
 
     def inverse_jacobian(self):
         return self.get_state().get_inverse_jacobian()
+
+    def send_program(self, program: Union[str, bytes]):
+        """
+        Sends program to the robot in URScript format.
+        """
+        program.strip()
+        if not isinstance(program, bytes):
+            program = program.encode()
+        self._send_program(program)

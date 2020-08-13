@@ -100,6 +100,11 @@ void Robot::stopMove(MotionType type, double acc)
     mCommunicationInterface->stopMove(type, acc);
 }
 
+void Robot::sendProgram(std::string program)
+{
+    mCommunicationInterface->sendMessage(program);
+}
+
 void Robot::addUpdateSubscription(std::function<void()> updateSignal)
 {
     mActiveSubscription = true;
