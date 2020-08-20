@@ -1,4 +1,5 @@
 #include "MathUtils.h"
+#include "iostream"
 
 namespace romocc
 {
@@ -18,7 +19,8 @@ Eigen::Matrix<double,6,1> TransformUtils::Affine::toVector6D(Eigen::Affine3d aff
 {
     Vector6d vector;
     Eigen::Vector3d pos = affine.translation();
-    Eigen::Vector3d rxryrz = Eigen::AngleAxisd(affine.linear()).angle()*Eigen::AngleAxisd(affine.linear()).axis();
+    auto angle = Eigen::AngleAxisd(affine.linear()).angle();
+    Eigen::Vector3d rxryrz = angle*Eigen::AngleAxisd(affine.linear()).axis();
     vector << pos(0), pos(1), pos(2), rxryrz(0), rxryrz(1), rxryrz(2);
     return vector;
 }
@@ -35,6 +37,26 @@ Eigen::Affine3d TransformUtils::Affine::toAffine3DFromVector6D(Eigen::Matrix<dou
     matrix.translate(Eigen::Vector3d(vec(0), vec(1), vec(2)));
     matrix.linear() = aa_obj.toRotationMatrix();
     return matrix;
+}
+
+double TransformUtils::norm(Vector6d a, Vector6d b){
+    return (a-b).norm();
+}
+
+double TransformUtils::norm(Transform3d a, Transform3d b){
+    return (a.matrix()-b.matrix()).norm();
+}
+
+double TransformUtils::norm(Transform3d a, Vector6d b){
+        return (a.matrix()-TransformUtils::Affine::toAffine3DFromVector6D(b).matrix()).norm();
+}
+
+double TransformUtils::norm(Transform3d a, double b[6]){
+    std::cout << a.matrix() << std::endl;
+    Eigen::RowVectorXd vector(6, 1);
+    vector << b[0], b[1], b[2], b[3], b[4], b[5];
+    std::cout << vector.matrix() << std::endl;
+    return (a.matrix()-TransformUtils::Affine::toAffine3DFromVector6D(vector).matrix()).norm();
 }
 
 Eigen::Affine3d TransformUtils::kdl::toAffine(KDL::Frame frame)
