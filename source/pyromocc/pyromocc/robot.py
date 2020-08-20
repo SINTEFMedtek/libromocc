@@ -1,4 +1,5 @@
 from .pyromocc import *
+from typing import Union
 
 
 class Robot(RobotBase):
@@ -34,6 +35,10 @@ class Robot(RobotBase):
     @property
     def joint_config(self):
         return self.get_state().get_joint_config()
+
+    @property
+    def joint_velocity(self):
+        return self.get_state().get_joint_velocity()
 
     @property
     def pose(self):
@@ -103,3 +108,29 @@ class Robot(RobotBase):
         p = self.pose_aa
         p[5] = val
         self.movep(p, 50, 100)
+
+    def forward_kinematics(self, joint_config, format="homogeneous"):
+        pose = self.get_state().joint_to_pose(joint_config)
+        if format == "axis_angle":
+            return pose_to_vector(pose)
+        return pose
+
+    def inverse_kinematics(self, pose):
+        pose[:, 3][:3] = pose[:, 3][:3] / 1000
+        joint_config = self.get_state().pose_to_joint(pose)
+        return joint_config
+
+    def jacobian(self):
+        return self.get_state().get_jacobian()
+
+    def inverse_jacobian(self):
+        return self.get_state().get_inverse_jacobian()
+
+    def send_program(self, program: Union[str, bytes]):
+        """
+        Sends program to the robot in URScript format.
+        """
+        program.strip()
+        if not isinstance(program, bytes):
+            program = program.encode()
+        self._send_program(program)

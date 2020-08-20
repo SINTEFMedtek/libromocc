@@ -31,6 +31,8 @@ std::vector<double> compute_linspace(double start, double end, int steps);
 double compute_average(std::vector<double> const &v);
 double compute_variance(std::vector<double> const &v, double mean);
 double sgn(double val);
+Transform3d load_calibration_file(std::string filepath);
+void save_calibration_file(std::string filepath, Transform3d calibration_matrix);
 
 }
 

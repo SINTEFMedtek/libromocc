@@ -11,8 +11,9 @@ else:
 
 setup(name=package_name,
       version='0.0.3',
-      author="Andreas Østvik",
+      author="Andreas Oestvik",
       packages=find_packages(exclude=['third_party', 'examples']),
       install_requires=['numpy'],
+      extras_require={'examples': ["matplotlib"]},
       include_package_data=True,
       package_data=package_data)

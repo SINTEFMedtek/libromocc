@@ -31,8 +31,9 @@ class ROMOCC_EXPORT Robot : public Object
         void addUpdateSubscription(std::function<void()> updateFunction);
 
         template <class Target>
-        void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0);
+        void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0, bool wait=false);
         void stopMove(MotionType type, double acc);
+        void sendProgram(std::string program);
 
         void runMotionQueue(MotionQueue queue);
         void stopRunMotionQueue();
@@ -56,9 +57,16 @@ class ROMOCC_EXPORT Robot : public Object
 };
 
 template <class Target>
-void Robot::move(MotionType type, Target target, double acc, double vel, double t, double rad)
+void Robot::move(MotionType type, Target target, double acc, double vel, double t, double rad, bool wait)
 {
     mCommunicationInterface->move(type, target, acc, vel, t, rad);
+    if(wait == true)
+    {
+        auto remainingDistance = TransformUtils::norm(mCurrentState->get_bMee(), target);
+        while(remainingDistance > 0.005 || isnan(remainingDistance)){
+            remainingDistance = TransformUtils::norm(mCurrentState->get_bMee(), target);
+        }
+    }
 }
 
 
