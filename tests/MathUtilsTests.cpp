@@ -26,4 +26,16 @@ TEST_CASE("Convert from Vector6D to Affine to Vector6D", "[romocc][MathUtils]") 
     CHECK((affine*affine.inverse()).matrix().isIdentity(1e-6));
 }
 
+TEST_CASE("Convert from Vector6D of zeros to Affine", "[romocc][MathUtils]") {
+    romocc::Vector6d vec;
+    vec << 0, 0, 0, 0, 0, 0;
+    std::cout << vec << std::endl;
+
+    auto affine = TransformUtils::Affine::toAffine3DFromVector6D(vec);
+    std::cout << affine.matrix() << std::endl;
+
+    CHECK(affine.matrix().isIdentity(1e-6));
+}
+
+
 }
