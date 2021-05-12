@@ -49,15 +49,12 @@ PYBIND11_MODULE(pyromocc, m) {
     robot.def("stopj", [](Robot& self, double acc){
         self.stopMove(romocc::MotionType::stopj, acc);
     });
-<<<<<<< HEAD
     robot.def("stopl", [](Robot& self, double acc){
         self.stopMove(romocc::MotionType::stopl, acc);
     });
-=======
 
     robot.def("_send_program", &Robot::sendProgram);
 
->>>>>>> c7385172fef2283bab3e67e4733b0021e41d02aa
     pybind11::class_<RobotState, std::shared_ptr<RobotState>> robotState(m, "RobotState");
     robotState.def("get_joint_config", &RobotState::getJointConfig);
     robotState.def("get_joint_velocity", &RobotState::getJointVelocity);
@@ -70,7 +67,6 @@ PYBIND11_MODULE(pyromocc, m) {
         transform.matrix() = pose;
         return self.operationalConfigToJointConfig(transform);
     });
-
     robotState.def("get_pose", [](RobotState& self){
         return self.get_bMee().matrix();
     });
@@ -79,6 +75,9 @@ PYBIND11_MODULE(pyromocc, m) {
     });
     robotState.def("get_jacobian", [](RobotState& self){
         return self.getJacobian();
+    });
+    robotState.def("get_transform_to_joint", [](RobotState& self, int jointNr){
+        return self.getTransformToJoint(jointNr).matrix();
     });
     py::class_<Manipulator> manipulator(m, "Manipulator");
 
@@ -103,6 +102,10 @@ PYBIND11_MODULE(pyromocc, m) {
         Eigen::Affine3d transform;
         transform.matrix() = pose;
         return TransformUtils::Affine::toVector6D(transform);
+    });
+
+    m.def("vector_to_pose", [](Eigen::Matrix<double, 6, 1> vector){
+        return TransformUtils::Affine::toAffine3DFromVector6D(vector).matrix();
     });
 
     py::class_<RobotMotionQueue> motion_queue(m, "MotionQueue");
