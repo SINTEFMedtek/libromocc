@@ -102,5 +102,16 @@ TEST_CASE("Jacobian tests", "[romocc][Robot]"){
     CHECK(numeric_jacobian.isApprox(analytical_jacobian));
 }
 
+TEST_CASE("Move with wait", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "192.168.153.131", 30003);
+    robot->connect();
 
+    std::cout << robot->getCurrentState()->getOperationalConfig() << std::endl;
+    Vector6d target_a, target_b;
+    target_a << -87.783, 574.295, 516.137, 3.035, -0.813, -0.;
+    target_b << -87.783, 574.295, 200.137, 3.035, -0.813, -0.;
+    robot->move(MotionType::movep, target_a, 500, 500, 0, 0, true);
+    robot->move(MotionType::movep, target_b, 500, 500);
+    }
 }
