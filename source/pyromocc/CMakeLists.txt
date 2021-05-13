@@ -4,9 +4,22 @@ project(pyromocc)
 
 set(DEPENDENCIES romocc)
 
-add_subdirectory(third_party/pybind11)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/ExternalPybind.cmake ${CMAKE_BINARY_DIR}/external/pybind11/CMakeLists.txt)
 
-pybind11_add_module(pyromocc source/pyromocc.cpp)
+execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/external/pybind11"
+        )
+
+execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/external/pybind11"
+        )
+
+# Add pybind11 makefile
+add_subdirectory(${CMAKE_BINARY_DIR}/third-party/pybind11 ${CMAKE_BINARY_DIR}/third-party/pybind11 EXCLUDE_FROM_ALL)
+
+include_directories(${CMAKE_BINARY_DIR}/third-party/pybind11/include)
+
+pybind11_add_module(pyromocc SHARED source/pyromocc.cpp)
 target_link_libraries(pyromocc PRIVATE ${DEPENDENCIES})
 set_target_properties(pyromocc PROPERTIES VERSION ${VERSION}
         SOVERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
