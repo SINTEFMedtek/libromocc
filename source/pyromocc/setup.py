@@ -10,7 +10,7 @@ else:
     package_data[package_name] = ['*.pyd', '*.dll']
 
 setup(name=package_name,
-      version='0.0.3',
+      version='0.0.4',
       author="Andreas Oestvik",
       packages=find_packages(exclude=['third_party', 'examples']),
       install_requires=['numpy'],
