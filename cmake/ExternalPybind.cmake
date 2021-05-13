@@ -1,21 +1,19 @@
-# Download and set up ZeroMQ
+# Download pybind11
 
-include(cmake/Externals.cmake)
+cmake_minimum_required(VERSION 3.1.0)
 
-include(FetchContent)
-set(FETCHCONTENT_BASE_DIR ${ROMOCC_EXTERNAL_BUILD_DIR}/pybind11)
+project(pybind11-download NONE)
 
-FetchContent_Declare(pybind11
+include(ExternalProject)
+
+ExternalProject_Add(
+        pybind11
+        PREFIX .
         GIT_REPOSITORY "https://github.com/pybind/pybind11.git"
-        GIT_TAG "v2.4.3"
-        )
-
-FetchContent_GetProperties(pybind11)
-message(${pybind11_SOURCE_DIR} " " ${pybind11_BINARY_DIR})
-
-if(NOT pybind11_POPULATED)
-    FetchContent_Populate(pybind11)
-endif()
-
-romocc_add_subdirectories(${pybind11_SOURCE_DIR})
-list(APPEND ROMOCC_INCLUDE_DIRS ${pybind11_SOURCE_DIR}/include/)
+        GIT_TAG "v2.6.2" # v2.6.2
+        SOURCE_DIR "${CMAKE_BINARY_DIR}/third-party/pybind11"
+        # Override default steps with no action, we just want the clone step.
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
+)
