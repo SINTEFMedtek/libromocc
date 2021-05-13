@@ -29,13 +29,18 @@ Eigen::Affine3d TransformUtils::Affine::toAffine3DFromVector6D(Eigen::Matrix<dou
     Eigen::Vector3d aa_vec{vec(3), vec(4), vec(5)};
 
     auto angle = aa_vec.norm();
-    auto norm_aa_vec = aa_vec/aa_vec.norm();
-    auto aa_obj = Eigen::AngleAxisd(angle, norm_aa_vec);
+    auto rot_mat = Eigen::AngleAxisd::Identity().toRotationMatrix();
+
+    if(angle != 0){
+        auto norm_aa_vec = aa_vec/aa_vec.norm();
+        auto aa_obj = Eigen::AngleAxisd(angle, norm_aa_vec);
+        rot_mat = aa_obj.toRotationMatrix();
+    }
 
     auto matrix = Eigen::Affine3d::Identity();
-
     matrix.translate(Eigen::Vector3d(vec(0), vec(1), vec(2)));
-    matrix.linear() = aa_obj.toRotationMatrix();
+    matrix.linear() = rot_mat;
+
     return matrix;
 }
 

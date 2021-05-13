@@ -11,7 +11,7 @@ namespace romocc
 {
 
 // Supported manipulators
-typedef enum {UR5, UR10} ManipulatorType;
+typedef enum {UR5, UR10, UR10e} ManipulatorType;
 struct ROMOCC_EXPORT Manipulator{
     ManipulatorType manipulator;
     std::string sw_version;
