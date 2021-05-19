@@ -10,9 +10,9 @@ else:
     package_data[package_name] = ['*.pyd', '*.dll']
 
 setup(name=package_name,
-      version='0.0.5',
+      version='0.0.6',
       author="Andreas Oestvik",
-      packages=find_packages(exclude=['third_party', 'examples']),
+      packages=find_packages(exclude=['examples']),
       install_requires=['numpy'],
       setup_requires=['wheel'],
       extras_require={'examples': ["matplotlib"]},
