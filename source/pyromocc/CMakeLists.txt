@@ -19,8 +19,8 @@ add_subdirectory(${CMAKE_BINARY_DIR}/third-party/pybind11 ${CMAKE_BINARY_DIR}/th
 
 include_directories(${CMAKE_BINARY_DIR}/third-party/pybind11/include)
 
-pybind11_add_module(pyromocc SHARED source/pyromocc.cpp)
-target_link_libraries(pyromocc PRIVATE ${DEPENDENCIES})
+pybind11_add_module(pyromocc source/pyromocc.cpp)
+target_link_libraries(pyromocc PRIVATE pybind11::module ${DEPENDENCIES})
 set_target_properties(pyromocc PROPERTIES VERSION ${VERSION}
         SOVERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 set_target_properties(pyromocc PROPERTIES PREFIX "" LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/pyromocc)
