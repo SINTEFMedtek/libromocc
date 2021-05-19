@@ -6,19 +6,21 @@
 namespace romocc
 {
 
-CalibrationMatrices CalibrationMethods::Shah(std::vector<Transform3d> prMt, std::vector<Transform3d> bMee)
+CalibrationMatrices CalibrationMethods::Shah(std::vector<Transform3d> A, std::vector<Transform3d> B)
 {
     // Inspired by Shah method
+    // M. Shah 2013, Solving the Robot-World/Hand-Eye Calibration Problem Using the Kronecker Product
+
     CalibrationMatrices cMatrices;
 
-    size_t nMatrices = prMt.size();
+    size_t nMatrices = A.size();
 
     Eigen::MatrixXd K = Eigen::MatrixXd::Zero(9,9);
 
     for(int i = 0; i<nMatrices; i++)
     {
-        Eigen::MatrixXd Ra = bMee.at(i).rotation().inverse();
-        Eigen::MatrixXd Rb = prMt.at(i).rotation().inverse();
+        Eigen::MatrixXd Ra = B.at(i).rotation().inverse();
+        Eigen::MatrixXd Rb = A.at(i).rotation().inverse();
         K = K+Eigen::kroneckerProduct(Rb,Ra);
     }
 
@@ -42,16 +44,11 @@ CalibrationMatrices CalibrationMethods::Shah(std::vector<Transform3d> prMt, std:
     Eigen::MatrixXd AA = Eigen::MatrixXd::Zero(3*nMatrices, 6);
     Eigen::MatrixXd b = Eigen::MatrixXd::Zero(3*nMatrices, 1);
 
-    //Ry.resize(9,1);
     for(int i = 0; i<nMatrices; i++)
     {
-//        AA.block<3,3>(3*i,0) = -(bMee.at(i).rotation()).inverse();
-//        AA.block<3,3>(3*i,3) = Eigen::MatrixXd::Identity(3,3);
-//        b.block<3,1>(3*i,0) = (bMee.at(i).inverse()).translation()-
-//                                (Eigen::kroneckerProduct((prMt.at(i).inverse()).translation().transpose(), Eigen::MatrixXd::Identity(3,3)))*(Ry);
-        AA.block<3,3>(3*i,0) = (bMee.at(i).rotation()).inverse();
+        AA.block<3,3>(3*i,0) = (B.at(i).rotation()).inverse();
         AA.block<3,3>(3*i,3) = -Eigen::MatrixXd::Identity(3,3);
-        b.block<3,1>(3*i,0) = Ry*(prMt.at(i).inverse().translation())-(bMee.at(i).inverse()).translation();
+        b.block<3,1>(3*i,0) = Ry*(A.at(i).inverse().translation())-(B.at(i).inverse()).translation();
     }
 
     Eigen::JacobiSVD<Eigen::MatrixXd> svdA(AA,Eigen::ComputeThinU | Eigen::ComputeThinV);
@@ -66,40 +63,43 @@ CalibrationMatrices CalibrationMethods::Shah(std::vector<Transform3d> prMt, std:
     eMt.block<3,3>(0,0) = Ry;
     eMt.block<3,1>(0,3) = t.block<3,1>(3,0);
 
-    cMatrices.prMb = Transform3d(bMpr).inverse();
-    cMatrices.eeMt = Transform3d(eMt);
+    cMatrices.X = Transform3d(eMt).inverse();
+    cMatrices.Y = Transform3d(bMpr).inverse();
 
     return cMatrices;
 }
 
-CalibrationMatrices CalibrationMethods::Li(std::vector<Transform3d> prMt, std::vector<Transform3d> bMee)
+CalibrationMatrices CalibrationMethods::Li(std::vector<Transform3d> A, std::vector<Transform3d> B)
 {
     // Inspired by Li method
+    // A. Li, L.Wang and D. Wu, 2010
+    // Simultaneous robot-world and hand-eye calibration using dual-quaternions and Kronecker product
+
     CalibrationMatrices cMatrices;
 
-    size_t nMatrices = prMt.size();
+    size_t nMatrices = A.size();
 
-    Eigen::MatrixXd A = Eigen::MatrixXd::Zero(12*nMatrices, 24);
+    Eigen::MatrixXd AA = Eigen::MatrixXd::Zero(12*nMatrices, 24);
     Eigen::MatrixXd b = Eigen::MatrixXd::Zero(12*nMatrices,1);
 
     for(int i = 0; i<nMatrices; i++)
     {
-        Eigen::MatrixXd Ra = bMee.at(i).rotation().inverse();
-        Eigen::Vector3d ta = bMee.at(i).inverse().translation();
+        Eigen::MatrixXd Ra = B.at(i).rotation().inverse();
+        Eigen::Vector3d ta = B.at(i).inverse().translation();
 
-        Eigen::MatrixXd Rb = prMt.at(i).rotation().inverse();
-        Eigen::Vector3d tb = prMt.at(i).inverse().translation();
+        Eigen::MatrixXd Rb = A.at(i).rotation().inverse();
+        Eigen::Vector3d tb = A.at(i).inverse().translation();
 
-        A.block<9,9>(12*i,0) = Eigen::kroneckerProduct(Eigen::MatrixXd::Identity(3,3),Ra);
-        A.block<9,9>(12*i,9) = -Eigen::kroneckerProduct(Rb.transpose(),Eigen::MatrixXd::Identity(3,3));
-        A.block<3,9>(12*i+9,9) = Eigen::kroneckerProduct(tb.transpose(),Eigen::MatrixXd::Identity(3,3));
-        A.block<3,3>(12*i+9,18) = -Ra;
-        A.block<3,3>(12*i+9,21) = Eigen::MatrixXd::Identity(3,3);
+        AA.block<9,9>(12*i,0) = Eigen::kroneckerProduct(Eigen::MatrixXd::Identity(3,3),Ra);
+        AA.block<9,9>(12*i,9) = -Eigen::kroneckerProduct(Rb.transpose(),Eigen::MatrixXd::Identity(3,3));
+        AA.block<3,9>(12*i+9,9) = Eigen::kroneckerProduct(tb.transpose(),Eigen::MatrixXd::Identity(3,3));
+        AA.block<3,3>(12*i+9,18) = -Ra;
+        AA.block<3,3>(12*i+9,21) = Eigen::MatrixXd::Identity(3,3);
 
         b.block<3,1>(12*i+9,0) = ta;
     }
 
-    Eigen::JacobiSVD<Eigen::MatrixXd> svd(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(AA, Eigen::ComputeThinU | Eigen::ComputeThinV);
     Eigen::MatrixXd x = svd.solve(b);
 
     Eigen::MatrixXd X = x.block<9,1>(0,0);
@@ -128,30 +128,32 @@ CalibrationMatrices CalibrationMethods::Li(std::vector<Transform3d> prMt, std::v
     eMt.block<3,3>(0,0) = Ry;
     eMt.block<3,1>(0,3) = x.block<3,1>(21,0);
 
-    cMatrices.prMb = Transform3d(bMpr).inverse();
-    cMatrices.eeMt = Transform3d(eMt);
+    cMatrices.X = Transform3d(eMt).inverse();
+    cMatrices.Y = Transform3d(bMpr).inverse();
 
     return cMatrices;
 }
 
-CalibrationMatrices CalibrationMethods::Park(std::vector<Transform3d> prMt, std::vector<Transform3d> bMee)
+CalibrationMatrices CalibrationMethods::Park(std::vector<Transform3d> A, std::vector<Transform3d> B)
 {
     // Inspired by Park method
-    int nMatrices = int(prMt.size());
+    // Park and Martin, 1994, Robot sensor calibration: solving AX=XB on the Euclidean group
 
-    std::vector<Transform3d> A, B, AA, BB;
+    int nMatrices = int(A.size());
 
-    std::vector<Transform3d> eMb = invert_matrices(bMee);
-    std::vector<Transform3d> tMpr = invert_matrices(prMt);
+    std::vector<Transform3d> A_pairs, B_pairs, A_inv_pairs, B_inv_pairs;
+
+    std::vector<Transform3d> A_inv = invert_matrices(A);
+    std::vector<Transform3d> B_inv = invert_matrices(B);
 
     for(int i = 0; i<nMatrices; i++)
     {
         for(int j=i+1; j<nMatrices; j++)
         {
-            A.push_back(prMt.at(j)*prMt.at(i).inverse());
-            B.push_back(bMee.at(j)*bMee.at(i).inverse());
-            AA.push_back(eMb.at(j)*eMb.at(i).inverse());
-            BB.push_back(tMpr.at(j)*tMpr.at(i).inverse());
+            A_pairs.push_back(A.at(j)*A.at(i).inverse());
+            B_pairs.push_back(B.at(j)*B.at(i).inverse());
+            A_inv_pairs.push_back(A_inv.at(j)*A_inv.at(i).inverse());
+            B_inv_pairs.push_back(B_inv.at(j)*B_inv.at(i).inverse());
         }
     }
 
@@ -167,15 +169,16 @@ CalibrationMatrices CalibrationMethods::Park(std::vector<Transform3d> prMt, std:
 
     Eigen::Vector3d a, b, aa, bb;
 
-    for(int i = 0; i<A.size(); i++)
+    for(int i = 0; i< A_pairs.size(); i++)
     {
 
-        if(TransformUtils::Affine::toAxisAngle(A.at(i)).norm()!=0 && TransformUtils::Affine::toAxisAngle(B.at(i)).norm()!=0)
+        if(TransformUtils::Affine::toAxisAngle(A_pairs.at(i)).norm()!=0 &&
+        TransformUtils::Affine::toAxisAngle(B_pairs.at(i)).norm()!=0)
         {
-            a = TransformUtils::Affine::toAxisAngle(A.at(i));
-            b = TransformUtils::Affine::toAxisAngle(B.at(i));
-            aa = TransformUtils::Affine::toAxisAngle(AA.at(i));
-            bb = TransformUtils::Affine::toAxisAngle(BB.at(i));
+            a = TransformUtils::Affine::toAxisAngle(A_pairs.at(i));
+            b = TransformUtils::Affine::toAxisAngle(B_pairs.at(i));
+            aa = TransformUtils::Affine::toAxisAngle(B_inv_pairs.at(i));
+            bb = TransformUtils::Affine::toAxisAngle(A_inv_pairs.at(i));
         }
         else
         {
@@ -191,18 +194,18 @@ CalibrationMatrices CalibrationMethods::Park(std::vector<Transform3d> prMt, std:
     iMk.block<3,3>(0,0) = ((M.transpose()*M).sqrt()).inverse()*M.transpose();
     lMj.block<3,3>(0,0) = ((MM.transpose()*MM).sqrt()).inverse()*MM.transpose();
 
-    Eigen::MatrixXd C(A.size()*3,3);
-    Eigen::MatrixXd d(A.size()*3,1);
-    Eigen::MatrixXd CC(A.size()*3,3);
-    Eigen::MatrixXd dd(A.size()*3,1);
+    Eigen::MatrixXd C(A_pairs.size()*3,3);
+    Eigen::MatrixXd d(A_pairs.size()*3,1);
+    Eigen::MatrixXd CC(A_pairs.size()*3,3);
+    Eigen::MatrixXd dd(A_pairs.size()*3,1);
 
     int j = 0;
-    for(int i = 0; i < (A.size()*3); i=i+3)
+    for(int i = 0; i < (A_pairs.size()*3); i=i+3)
     {
-        C.block<3,3>(i,0) = I.rotation()-A.at(j).rotation();
-        d.block<3,1>(i,0) = A.at(j).translation()-iMk.block<3,3>(0,0)*B.at(j).translation();
-        CC.block<3,3>(i,0) = I.rotation()-AA.at(j).rotation();
-        dd.block<3,1>(i,0) = AA.at(j).translation()-lMj.block<3,3>(0,0)*BB.at(j).translation();
+        C.block<3,3>(i,0) = I.rotation()-A_pairs.at(j).rotation();
+        d.block<3,1>(i,0) = A_pairs.at(j).translation()-iMk.block<3,3>(0,0)*B_pairs.at(j).translation();
+        CC.block<3,3>(i,0) = I.rotation()-B_inv_pairs.at(j).rotation();
+        dd.block<3,1>(i,0) = B_inv_pairs.at(j).translation()-lMj.block<3,3>(0,0)*A_inv_pairs.at(j).translation();
         j++;
     }
 
@@ -211,26 +214,26 @@ CalibrationMatrices CalibrationMethods::Park(std::vector<Transform3d> prMt, std:
     Transform3d jMl = Transform3d(lMj).inverse();
 
     CalibrationMatrices calibMatrices;
-    calibMatrices.prMb = Transform3d(iMk);
-    calibMatrices.eeMt = Transform3d(lMj);
+    calibMatrices.X = Transform3d(jMl);
+    calibMatrices.Y = Transform3d(iMk);
 
     return calibMatrices;
 }
 
-CalibrationError CalibrationMethods::estimateCalibrationError(Transform3d prMb, Transform3d eeMt, std::vector<Transform3d> bMee, std::vector<Transform3d> prMt)
+CalibrationError CalibrationMethods::estimateCalibrationError(Transform3d X, Transform3d Y, std::vector<Transform3d> A, std::vector<Transform3d> B)
 {
     CalibrationError calibrationError;
 
-    int nMatrices = int(bMee.size());
+    int nMatrices = int(A.size());
 
     std::vector<double> rotError, transError;
 
     for(int i = 0; i < nMatrices; i++)
     {
-        Transform3d errorMatrix = prMb*bMee.at(i)*eeMt*prMt.at(i).inverse();
+        Transform3d errorMatrix = A.at(i)*X*(Y*B.at(i)).inverse();
         rotError.push_back(TransformUtils::Affine::toAxisAngle(errorMatrix).norm());
 
-        Vector3d translError = bMee.at(i).linear()*eeMt.translation()+bMee.at(i).translation()-prMb.linear().inverse()*prMt.at(i).translation()-prMb.inverse().translation();
+        Vector3d translError = A.at(i).linear()*X.translation()+A.at(i).translation()-Y.linear()*B.at(i).translation()-Y.translation();
         transError.push_back(translError.norm());
     }
 

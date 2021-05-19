@@ -22,8 +22,8 @@ struct ROMOCC_EXPORT CalibrationError{
 };
 
 struct ROMOCC_EXPORT CalibrationMatrices{
-    Transform3d prMb;
-    Transform3d eeMt;
+    Transform3d X;
+    Transform3d Y;
 };
 
 std::vector<Transform3d> invert_matrices(std::vector<Transform3d> matrices);

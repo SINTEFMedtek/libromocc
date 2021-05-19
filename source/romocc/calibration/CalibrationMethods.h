@@ -12,14 +12,12 @@ namespace romocc
 
 class ROMOCC_EXPORT CalibrationMethods {
     public:
-        static CalibrationMatrices Shah(std::vector<Transform3d> prMt, std::vector<Transform3d> bMee);
-        static CalibrationMatrices Li(std::vector<Transform3d> prMt, std::vector<Transform3d> bMee);
-        static CalibrationMatrices Park(std::vector<Transform3d> prMt, std::vector<Transform3d> bMee);
+        static CalibrationMatrices Shah(std::vector<Transform3d> A, std::vector<Transform3d> B);
+        static CalibrationMatrices Li(std::vector<Transform3d> A, std::vector<Transform3d> B);
+        static CalibrationMatrices Park(std::vector<Transform3d> A, std::vector<Transform3d> B);
 
-        static CalibrationError estimateCalibrationError(   Transform3d prMb,
-                                                            Transform3d eeMt,
-                                                            std::vector<Transform3d> bMee,
-                                                            std::vector<Transform3d> prMt);
+        static CalibrationError estimateCalibrationError(Transform3d A, Transform3d B,
+                std::vector<Transform3d> X, std::vector<Transform3d> Y);
 };
 
 }

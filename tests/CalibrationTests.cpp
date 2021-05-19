@@ -21,7 +21,7 @@ TEST_CASE("Dummy test Shah calibration", "[romocc][Calibration]") {
     matStack.push_back(affine);
 
     auto calibMatrices = CalibrationMethods::Shah(matStack, matStack);
-    std::cout << calibMatrices.eeMt.matrix() << std::endl;
+    std::cout << calibMatrices.X.matrix() << std::endl;
 }
 
 TEST_CASE("Load calibration file", "[romocc][Calibration]"){
