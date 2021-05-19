@@ -129,15 +129,17 @@ PYBIND11_MODULE(pyromocc, m) {
 
     py::class_<CalibrationMatrices> calibration_matrices(m, "CalibrationMatrices");
     calibration_matrices.def_property_readonly("pose_x", [](CalibrationMatrices& self){
-        return self.prMb.matrix();
+        return self.X.matrix();
     });
     calibration_matrices.def_property_readonly("pose_y", [](CalibrationMatrices& self){
-        return self.eeMt.matrix();
+        return self.Y.matrix();
     });
 
     py::class_<CalibrationError> calibration_error(m, "CalibrationError");
     calibration_error.def_readonly("translation_error", &CalibrationError::translationError);
     calibration_error.def_readonly("rotation_error", &CalibrationError::rotationError);
+    calibration_error.def_readonly("translation_std", &CalibrationError::transStd);
+    calibration_error.def_readonly("rotation_std", &CalibrationError::rotStd);
 
     m.def("load_calibration_file", [](std::string filepath){
         auto cal_affine = romocc::load_calibration_file(filepath);
@@ -168,6 +170,45 @@ PYBIND11_MODULE(pyromocc, m) {
             poses_b_affine.push_back(transform);
         }
         return CalibrationMethods::Shah(poses_a_affine, poses_b_affine);;
+    });
+
+    calibration_methods.def("calibration_li", [](std::vector<Eigen::Ref<const Eigen::MatrixXd>> poses_a,
+                                                   std::vector<Eigen::Ref<const Eigen::MatrixXd>> poses_b){
+        std::vector<Eigen::Affine3d> poses_a_affine;
+        std::vector<Eigen::Affine3d> poses_b_affine;
+
+        for(auto const& pose: poses_a) {
+            Eigen::Affine3d transform;
+            transform.matrix() = pose;
+            poses_a_affine.push_back(transform);
+        }
+
+        for(auto const& pose: poses_b) {
+            Eigen::Affine3d transform;
+            transform.matrix() = pose;
+            poses_b_affine.push_back(transform);
+        }
+        return CalibrationMethods::Li(poses_a_affine, poses_b_affine);;
+    });
+
+
+    calibration_methods.def("calibration_park", [](std::vector<Eigen::Ref<const Eigen::MatrixXd>> poses_a,
+                                                 std::vector<Eigen::Ref<const Eigen::MatrixXd>> poses_b){
+        std::vector<Eigen::Affine3d> poses_a_affine;
+        std::vector<Eigen::Affine3d> poses_b_affine;
+
+        for(auto const& pose: poses_a) {
+            Eigen::Affine3d transform;
+            transform.matrix() = pose;
+            poses_a_affine.push_back(transform);
+        }
+
+        for(auto const& pose: poses_b) {
+            Eigen::Affine3d transform;
+            transform.matrix() = pose;
+            poses_b_affine.push_back(transform);
+        }
+        return CalibrationMethods::Park(poses_a_affine, poses_b_affine);
     });
 
     calibration_methods.def("estimate_calibration_error", [](Eigen::Ref<const Eigen::MatrixXd> pose_x,
