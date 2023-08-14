@@ -1,7 +1,10 @@
 #ifndef ROBOTSTATE_H
 #define ROBOTSTATE_H
+#define _USE_MATH_DEFINES
 
 #include <mutex>
+#include <math.h>
+
 #include "romocc/core/Object.h"
 #include "romocc/utilities/MathUtils.h"
 
