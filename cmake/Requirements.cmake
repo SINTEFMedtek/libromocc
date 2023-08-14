@@ -1,7 +1,9 @@
 # Setup all dependencies, both internal (have to be installed on the system)
 # and external (downloaded and built automatically)
 
-list(APPEND SYSTEM_LIBRARIES pthread)
+if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+    list(APPEND SYSTEM_LIBRARIES pthread)
+endif()
 
 ## External depedencies
 include(cmake/ExternalEigen.cmake)
