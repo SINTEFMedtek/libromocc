@@ -7,7 +7,9 @@
 
 #include <zmq.h>
 #include <assert.h>
+
 #include "romocc/core/Object.h"
+#include "romocc/core/PortableEndian.h"
 
 namespace romocc
 {
