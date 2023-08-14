@@ -1,5 +1,6 @@
 #ifndef ROMOCC_MESSAGEENCODER_H
 #define ROMOCC_MESSAGEENCODER_H
+#define _CRT_NO_VA_START_VALIDATION
 
 #include <Eigen/Dense>
 
