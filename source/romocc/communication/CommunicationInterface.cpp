@@ -46,7 +46,7 @@ void CommunicationInterface::decodeReceivedPackages()
 
     const uint16_t bufferSize = 2048;
     uint8_t buffer[bufferSize];
-    bzero(buffer, bufferSize);
+    memset(buffer, 0, bufferSize);
 
     while(!mStopThread)
     {
