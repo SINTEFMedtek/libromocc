@@ -77,6 +77,23 @@ class Robot(RobotBase):
         else:
             raise NotImplemented("Unit {} not supported.".format(self.units))
 
+    def translate(self, vec, acceleration, velocity):
+        """
+        Translate the end-effector by the specified vector (x, y, z).
+
+        Parameters
+        ----------
+        vec: ndarray, sequence (list, tuple)
+            Translate with the relative vector (x, y, z)
+        acceleration: float
+            Acceleration to velocity value
+        velocity: float
+            Velocity of motion
+        """
+        pose = self.pose
+        pose[:3, 3] += vec
+        self.movep(pose, acceleration, velocity)
+
     @property
     def joint_config(self):
         return self.get_state().get_joint_config()
