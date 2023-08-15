@@ -5,66 +5,99 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <unistd.h>
 
 #include "romocc/Robot.h"
 
 using namespace romocc;
 
+void printUsage(const char* programName) {
+    std::cout << "Usage: " << programName << " --ip <IP address> --manipulator <Manipulator type> --sw_version <version>\n";
+}
+
 int main(int argc, char *argv[])
 {
-    auto print_message = []()
+    const char* programName = argv[0];
+    const char* ip = "192.168.231.129";
+    const char* manipulator = "UR5";
+    const char* sw_version = "3.15";
+
+    int opt;
+    optind = 1;  // Reset the index for getopt
+    while ((opt = getopt(argc, argv, "h-:")) != -1) {
+        switch (opt) {
+            case 'h':
+                printUsage(programName);
+                return 1;
+            case '-':
+                if (std::strcmp(optarg, "ip") == 0) {
+                    if (optind < argc) {
+                        ip = argv[optind++];
+                    }
+                } else if (std::strcmp(optarg, "manipulator") == 0) {
+                    if (optind < argc) {
+                        manipulator = argv[optind++];
+                    }
+                } else if (std::strcmp(optarg, "sw_version") == 0) {
+                    if (optind < argc) {
+                        sw_version = argv[optind++];
+                    }
+                } else {
+                    printUsage(programName);
+                    return 1;
+                }
+                break;
+            default:
+                printUsage(programName);
+                return 1;
+        }
+    }
+
+    std::cout << "Connecting to " << manipulator << " -- IP: " << ip << " -- SW: " << sw_version << std::endl;
+    auto robot = Robot::New();
+    robot->configure(Manipulator(manipulator, sw_version), ip, 30003);
+
+    if(robot->connect())
     {
-        std::cout << "State updated" << "\n";
-    };
-
-    auto ur5 = Robot::New();
-    ur5->configure(Manipulator(), "192.168.153.131", 30003);
-
-    if(ur5->connect())
-    {
-        ur5->addUpdateSubscription(print_message);
-
-        auto initialJointConfig = ur5->getCurrentState()->getJointConfig();
+        auto initialJointConfig = robot->getCurrentState()->getJointConfig();
         std::cout << initialJointConfig.transpose() << std::endl;
 
         double previousTime = 0;
         bool stop = false;
         std::thread processing_thread([&](){
             while(!stop){
-                Vector6d jointConfig = ur5->getCurrentState()->getJointConfig();
-                double currentTime = ur5->getCurrentState()->getTimestamp();
-                Transform3d m_bM1 = ur5->getCurrentState()->getTransformToJoint(1);
-                Transform3d m_bM2 = ur5->getCurrentState()->getTransformToJoint(2);
-                Transform3d m_bM3 = ur5->getCurrentState()->getTransformToJoint(3);
-                Transform3d m_bM4 = ur5->getCurrentState()->getTransformToJoint(4);
-                Transform3d m_bM5 = ur5->getCurrentState()->getTransformToJoint(5);
-                Transform3d m_bM6 = ur5->getCurrentState()->getTransformToJoint(6);
+                Vector6d jointConfig = robot->getCurrentState()->getJointConfig();
+                Vector6d operationalConfig = robot->getCurrentState()->getOperationalConfig();
+
+                double currentTime = robot->getCurrentState()->getTimestamp();
 
                 if(currentTime > previousTime)
                 {
-                    std::cout << jointConfig.transpose() << std::endl;
-                    previousTime = ur5->getCurrentState()->getTimestamp();
+                    std::cout << "Joint config: " << TransformUtils::radToDeg(jointConfig).transpose() << std::endl;
+                    std::cout << "Operational config: " << operationalConfig.transpose() << "\n" << std::endl;
+                    previousTime = robot->getCurrentState()->getTimestamp();
                 }
             }
         });
 
         double targetConfig[] = {190,-400, 150, 1.0,-3.0, 0};
-        ur5->move(romocc::MotionType::movep, targetConfig, 100, 50);
+        robot->move(romocc::MotionType::movep, targetConfig, 100, 50);
         std::this_thread::sleep_for(std::chrono::seconds(3));
 
-        std::cout << ur5->getCurrentState()->getJointConfig().transpose() << std::endl;
-        ur5->move(romocc::MotionType::movej, initialJointConfig, 50, 25);
+        std::cout << robot->getCurrentState()->getJointConfig().transpose() << std::endl;
+        robot->move(romocc::MotionType::movej, initialJointConfig, 50, 25);
         std::this_thread::sleep_for(std::chrono::seconds(3));
 
-        std::cout << ur5->getCurrentState()->getJointConfig().transpose() << std::endl;
+        std::cout << robot->getCurrentState()->getJointConfig().transpose() << std::endl;
         stop = true;
         processing_thread.join();
-        ur5->disconnect();
+
+        robot->stopMove(MotionType::stopj, 50);
+        robot->disconnect();
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        ur5->connect();
-        ur5->addUpdateSubscription(print_message);
+        robot->connect();
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        ur5->disconnect();
+        robot->disconnect();
     }
 }
