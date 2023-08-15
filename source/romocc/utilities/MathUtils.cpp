@@ -98,4 +98,11 @@ KDL::JntArray TransformUtils::kdl::fromVector6D(Eigen::Matrix<double, 6, 1> vect
     return jnt_array;
 }
 
+Vector6d TransformUtils::radToDeg(Vector6d vector) {
+    Vector6d degVector;
+    for(int i = 0; i < 6; ++i)
+        degVector[i] = vector[i]*180/M_PI;
+    return degVector;
+}
+
 }
