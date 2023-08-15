@@ -60,11 +60,24 @@ template <class Target>
 void Robot::move(MotionType type, Target target, double acc, double vel, double t, double rad, bool wait)
 {
     mCommunicationInterface->move(type, target, acc, vel, t, rad);
-    if(wait == true)
+    if(wait)
     {
         auto remainingDistance = TransformUtils::norm(mCurrentState->get_bMee(), target);
-        while(remainingDistance > 0.005 || isnan(remainingDistance)){
+
+        const double distanceThreshold = 0.005;
+        const int timeoutInSeconds = 10; // Set your desired timeout in seconds
+        const auto startTime = std::chrono::steady_clock::now();
+
+        while(remainingDistance > distanceThreshold || isnan(remainingDistance))
+        {
             remainingDistance = TransformUtils::norm(mCurrentState->get_bMee(), target);
+
+            const auto currentTime = std::chrono::steady_clock::now();
+            const auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+            if (elapsedTime > timeoutInSeconds)
+            {
+                break;
+            }
         }
     }
 }
