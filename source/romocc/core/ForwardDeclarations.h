@@ -16,9 +16,27 @@ struct ROMOCC_EXPORT Manipulator{
     ManipulatorType manipulator;
     std::string sw_version;
 
+    ManipulatorType manipulatorTypeFromString(const std::string& manipulator) {
+        if (manipulator == "UR5") {
+            return UR5;
+        } else if (manipulator == "UR10") {
+            return UR10;
+        } else if (manipulator == "UR10e") {
+            return UR10e;
+        } else {
+            throw std::runtime_error("Invalid manipulator type string");
+        }
+    }
+
     Manipulator(ManipulatorType manipulator = UR5, std::string sw_version = "3.0"){
         this->manipulator = manipulator;
-        this->sw_version = sw_version;};
+        this->sw_version = sw_version;
+    }
+
+    Manipulator(const std::string& manipulator, std::string sw_version = "3.0"){
+        this->manipulator = manipulatorTypeFromString(manipulator);
+        this->sw_version = sw_version;
+    }
 };
 
 // Robot motion
