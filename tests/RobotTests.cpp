@@ -2,12 +2,13 @@
 // Created by androst on 05.06.19.
 //
 
+#include <iostream>
+#include <chrono>
+#include <thread>
+
 #include "catch/catch.hpp"
 #include "romocc/Robot.h"
-#include <iostream>
-#include <thread>
-#include <mutex>
-#include <romocc/manipulators/ur/UrKDLDefinition.h>
+#include "romocc/manipulators/ur/UrKDLDefinition.h"
 
 
 
@@ -113,5 +114,33 @@ TEST_CASE("Move with wait", "[romocc][Robot]"){
     target_b << -87.783, 574.295, 200.137, 3.035, -0.813, -0.;
     robot->move(MotionType::movep, target_a, 500, 500, 0, 0, true);
     robot->move(MotionType::movep, target_b, 500, 500);
+    }
+
+TEST_CASE("Add update subscription", "[romocc][Robot]"){
+    auto robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "192.168.231.129", 30003);
+    robot->connect();
+
+    auto print_message = []()
+    {
+        std::cout << "State updated" << "\n";
+    };
+
+    robot->addUpdateSubscription(print_message);
+    }
+
+TEST_CASE("Transform to all joints", "[romocc][Robot]"){
+    auto robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "192.168.231.129", 30003);
+    robot->connect();
+
+    Transform3d m_bM1 = robot->getCurrentState()->getTransformToJoint(1);
+    Transform3d m_bM2 = robot->getCurrentState()->getTransformToJoint(2);
+    Transform3d m_bM3 = robot->getCurrentState()->getTransformToJoint(3);
+    Transform3d m_bM4 = robot->getCurrentState()->getTransformToJoint(4);
+    Transform3d m_bM5 = robot->getCurrentState()->getTransformToJoint(5);
+    Transform3d m_bM6 = robot->getCurrentState()->getTransformToJoint(6);
+
+    std::cout << m_bM2.matrix() << std::endl;
     }
 }
