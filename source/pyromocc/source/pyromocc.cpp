@@ -58,6 +58,8 @@ PYBIND11_MODULE(pyromocc, m) {
     pybind11::class_<RobotState, std::shared_ptr<RobotState>> robotState(m, "RobotState");
     robotState.def("get_joint_config", &RobotState::getJointConfig);
     robotState.def("get_joint_velocity", &RobotState::getJointVelocity);
+    robotState.def("get_operational_config", &RobotState::getOperationalConfig);
+    robotState.def("get_operational_velocity", &RobotState::getOperationalVelocity);
     robotState.def("joint_to_pose", [](RobotState& self, Eigen::Ref<const Eigen::RowVectorXd> joint_config){
         return self.jointConfigToOperationalConfig(joint_config).matrix();
     });
@@ -87,8 +89,12 @@ PYBIND11_MODULE(pyromocc, m) {
             .def_readwrite("sw_version", &Manipulator::sw_version);
 
     py::enum_<ManipulatorType>(m, "ManipulatorType")
+        .value("UR3", ManipulatorType::UR3)
+        .value("UR3e", ManipulatorType::UR3e)
         .value("UR5", ManipulatorType::UR5)
-        .value("UR10", ManipulatorType::UR10);
+        .value("UR5e", ManipulatorType::UR5e)
+        .value("UR10", ManipulatorType::UR10)
+        .value("UR10e", ManipulatorType::UR10e);
 
     py::enum_<MotionType>(m, "MotionType")
         .value("movej", MotionType::movej)
