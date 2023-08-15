@@ -24,21 +24,35 @@ class Robot(RobotBase):
         A list of 6 values representing the axis-angle representation and translation of the end-effector wrt base
     """
 
-    def __init__(self, ip: str, port: int = 30003, manipulator: str = None, units="mm", **kwargs):
+    def __init__(self, ip: str, port: int = 30003, manipulator: str = None, units="mm", sw_version="3.15"):
         RobotBase.__init__(self)
         self.ip = ip
         self.port = port
-        self.sw_version = kwargs.get("sw_version", "5.3")
+        self.sw_version = sw_version
         self.units = units  # default unit is mm (millimetre)
 
-        if manipulator is None or manipulator == 'UR5':
-            self.manipulator = Manipulator(ManipulatorType.UR5, self.sw_version)
-        elif manipulator == 'UR10':
-            self.manipulator = Manipulator(ManipulatorType.UR10, self.sw_version)
-        else:
-            raise ValueError("Manipulator of type {} not supported.".format(manipulator))
+        if manipulator is None:
+            manipulator = "UR5"
 
+        manipulator_type = self._string_to_manipulator_type(manipulator)
+
+        self.manipulator = Manipulator(manipulator_type, self.sw_version)
         self.configure(self.manipulator, self.ip, self.port)
+
+    @staticmethod
+    def _string_to_manipulator_type(manipulator):
+        if manipulator == 'UR3':
+            return ManipulatorType.UR3
+        elif manipulator == 'UR3e':
+            return ManipulatorType.UR3e
+        elif manipulator == 'UR5':
+            return ManipulatorType.UR5
+        elif manipulator == 'UR5e':
+            return ManipulatorType.UR5e
+        elif manipulator == 'UR10':
+            return ManipulatorType.UR10
+        elif manipulator == 'UR10e':
+            return ManipulatorType.UR10e
 
     def move_to_pose(self, pose, acceleration, velocity):
         """
@@ -70,6 +84,14 @@ class Robot(RobotBase):
     @property
     def joint_velocity(self):
         return self.get_state().get_joint_velocity()
+
+    @property
+    def operational_config(self):
+        return self.get_state().get_operational_config()
+
+    @property
+    def operational_velocity(self):
+        return self.get_state().get_operational_config()
 
     @property
     def pose(self):
