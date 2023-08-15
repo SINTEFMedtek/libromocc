@@ -28,11 +28,7 @@ void RobotState::setManipulator(romocc::Manipulator manipulator) {
 
 
 void RobotState::setKDLchain(Manipulator manipulator) {
-    if (manipulator.manipulator == ManipulatorType::UR5) {
-        mKDLChain = Ur5::KDLChain();
-    } else if (manipulator.manipulator == ManipulatorType::UR10) {
-        mKDLChain = Ur10::KDLChain();
-    }
+    mKDLChain = setupKDLChain(manipulator);
 
     KDL::JntArray q_min(mKDLChain.getNrOfJoints()), q_max(mKDLChain.getNrOfJoints());
     for (int i = 0; i < mKDLChain.getNrOfJoints(); i++) {
@@ -48,8 +44,7 @@ void RobotState::setKDLchain(Manipulator manipulator) {
 }
 
 void RobotState::setDecoder(Manipulator manipulator) {
-    if (manipulator.manipulator == ManipulatorType::UR5 || manipulator.manipulator == ManipulatorType::UR10)
-        mDecoder = UrMessageDecoder::New();
+    mDecoder = UrMessageDecoder::New();
 }
 
 void RobotState::setState(RowVector6d jointConfig, RowVector6d jointVel, double timestamp) {

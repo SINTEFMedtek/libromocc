@@ -11,14 +11,20 @@ namespace romocc
 {
 
 // Supported manipulators
-typedef enum {UR5, UR10, UR10e} ManipulatorType;
+typedef enum {UR3, UR3e, UR5, UR5e, UR10, UR10e} ManipulatorType;
 struct ROMOCC_EXPORT Manipulator{
     ManipulatorType manipulator;
     std::string sw_version;
 
     ManipulatorType manipulatorTypeFromString(const std::string& manipulator) {
-        if (manipulator == "UR5") {
+        if (manipulator == "UR3") {
+            return UR3;
+        } else if (manipulator == "UR3e"){
+            return UR3e;
+        } else if (manipulator == "UR5") {
             return UR5;
+        } else if (manipulator == "UR5e") {
+            return UR5e;
         } else if (manipulator == "UR10") {
             return UR10;
         } else if (manipulator == "UR10e") {
