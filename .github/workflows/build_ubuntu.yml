@@ -1,0 +1,55 @@
+name: Build Ubuntu
+
+on:
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            libeigen3-dev \
+            python3 \
+            libpython3-dev \
+            python3-pip \
+            python3-setuptools
+          sudo pip3 install --upgrade pip
+          sudo pip3 install auditwheel
+
+      - name: Configure CMake
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -DROMOCC_BUILD_TESTS=ON \
+            -DROMOCC_BUILD_EXAMPLES=ON \
+            -DROMOCC_BUILD_PYTHON_BINDINGS=ON \
+
+      - name: Build libromocc
+        run: cmake --build build --config ${{env.BUILD_TYPE}} -j 4
+
+      - name: Build pyromocc python wheel
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+        run: |
+          python source/pyromocc/setup.py bdist_wheel
+
+      - name: Upload Python wheel
+        uses: actions/upload-artifact@v3
+        with:
+          name: Python wheel
+          path: ${{github.workspace}}/dist/pyromocc-*.whl
+          if-no-files-found: error
