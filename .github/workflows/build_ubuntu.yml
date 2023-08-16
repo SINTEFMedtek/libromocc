@@ -50,11 +50,12 @@ jobs:
 
       - name: Build pyromocc python wheel
         run: |
-          python source/pyromocc/setup.py bdist_wheel
+          cd source/pyromocc
+          python setup.py bdist_wheel
 
       - name: Upload Python wheel
         uses: actions/upload-artifact@v3
         with:
           name: Python wheel
-          path: ${{github.workspace}}/dist/pyromocc-*.whl
+          path: ${{github.workspace}}/source/pyromocc/dist/pyromocc-*.whl
           if-no-files-found: error
