@@ -10,3 +10,24 @@ endif()
 
 include_directories(${ROMOCC_INCLUDE_DIRS})
 link_directories (${ROMOCC_LIBRARY_DIRS})
+
+if(WIN32)
+    # Copy all DLLs from ROMOCC to current binary folder
+    file(GLOB DLLs ${ROMOCC_BINARY_DIR}*.dll)
+
+    add_custom_target(romocc_copy
+        COMMAND ${CMAKE_COMMAND} -E copy ${DLLs} ${PROJECT_BINARY_DIR}/Release/ COMMAND ${CMAKE_COMMAND} -E echo "ROMOCC DLLs copied (Release)."
+        COMMAND ${CMAKE_COMMAND} -E copy ${DLLs} ${PROJECT_BINARY_DIR}/Debug/ COMMAND ${CMAKE_COMMAND} -E echo "ROMOCC DLLs copied (Debug)."
+    )
+
+    # Create romocc config file, windows needs this because the DLLs are copied,
+    # so we can't get base path from the DLL path
+    set(FILE_CONTENT "
+    DocumentationPath = ${ROMOCC_BINARY_DIR}../doc/
+    LibraryPath = ${ROMOCC_BINARY_DIR}../bin/
+    file(WRITE ${PROJECT_BINARY_DIR}/Release/romocc_configuration.txt ${FILE_CONTENT})
+    file(WRITE ${PROJECT_BINARY_DIR}/Debug/romocc_configuration.txt ${FILE_CONTENT})
+else()
+    # NoOp command
+    add_custom_target(romocc_copy COMMENT "noop")
+endif()
