@@ -1,8 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-#include <cstring>
-#include <unistd.h>
+#include <cxxopts.hpp>
 
 #include "romocc/Robot.h"
 #include "romocc/utilities/MathUtils.h"
@@ -15,41 +14,24 @@ void printUsage(const char* programName) {
 
 int main(int argc, char *argv[])
 {
-    const char* programName = argv[0];
-    const char* ip = "192.168.231.131";
-    const char* manipulator = "UR5";
-    const char* sw_version = "3.15";
+    cxxopts::Options options("Robot listener", "Example of listening to robot states");
 
-    int opt;
-    optind = 1;  // Reset the index for getopt
-    while ((opt = getopt(argc, argv, "h-:")) != -1) {
-        switch (opt) {
-            case 'h':
-                printUsage(programName);
-                return 1;
-            case '-':
-                if (std::strcmp(optarg, "ip") == 0) {
-                    if (optind < argc) {
-                        ip = argv[optind++];
-                    }
-                } else if (std::strcmp(optarg, "manipulator") == 0) {
-                    if (optind < argc) {
-                        manipulator = argv[optind++];
-                    }
-                } else if (std::strcmp(optarg, "sw_version") == 0) {
-                    if (optind < argc) {
-                        sw_version = argv[optind++];
-                    }
-                } else {
-                    printUsage(programName);
-                    return 1;
-                }
-                break;
-            default:
-                printUsage(programName);
-                return 1;
-        }
+    options.add_options()
+            ("ip", "IP address", cxxopts::value<std::string>()->default_value("192.168.231.131"))
+            ("manipulator", "Manipulator type", cxxopts::value<std::string>()->default_value("UR5"))
+            ("sw_version", "Software version", cxxopts::value<std::string>()->default_value("3.15"))
+            ("h,help", "Print usage");
+
+    auto result = options.parse(argc, argv);
+
+    if (result.count("help")) {
+        std::cout << options.help() << std::endl;
+        return 0;
     }
+
+    std::string ip = result["ip"].as<std::string>();
+    std::string manipulator = result["manipulator"].as<std::string>();
+    std::string sw_version = result["sw_version"].as<std::string>();
 
     std::cout << "Connecting to " << manipulator << " -- IP: " << ip << " -- SW: " << sw_version << std::endl;
     auto robot = Robot::New();
