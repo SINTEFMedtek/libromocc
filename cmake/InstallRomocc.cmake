@@ -3,20 +3,25 @@
 # Install romocc library
 if(WIN32)
 # DLL should be in binary folder
-install(TARGETS romocc
-	DESTINATION libromocc/bin
-)
+	install(TARGETS romocc
+		DESTINATION libromocc/bin
+			COMPONENT romocc
+	)
+	set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION libromocc/bin)
+	include(InstallRequiredSystemLibraries) # Install vcruntime dlls
 else()
-install(TARGETS romocc
-	DESTINATION libromocc/lib
-)
+	install(TARGETS romocc
+		DESTINATION libromocc/lib
+			COMPONENT romocc
+	)
 endif()
 
 if(ROMOCC_BUILD_TESTS)
 	# Install test executable
 	install(TARGETS testROMOCC
 			DESTINATION libromocc/bin
-			)
+			COMPONENT romocc
+	)
 endif()
 
 # Examples are installed in the macro project_add_example
@@ -24,17 +29,18 @@ endif()
 # Install dependency libraries
 install(FILES ${PROJECT_BINARY_DIR}/romoccExport.hpp
     DESTINATION libromocc/include
+		COMPONENT romocc
 )
 
 if(WIN32)
-	file(GLOB DLLs ${PROJECT_BINARY_DIR}/bin/*.dll)
-	install(FILES ${DLLs}
-		DESTINATION libromocc/bin
-	)
-	file(GLOB DLLs ${PROJECT_BINARY_DIR}/lib/*.lib)
-	install(FILES ${DLLs}
-		DESTINATION libromocc/lib
-	)
+	install(DIRECTORY ${PROJECT_BINARY_DIR}/bin/
+			DESTINATION libromocc/bin/
+			COMPONENT romocc
+			FILES_MATCHING PATTERN "*.dll")
+	install(DIRECTORY ${PROJECT_BINARY_DIR}/lib/
+			DESTINATION libromocc/lib/
+			COMPONENT romocc
+			FILES_MATCHING PATTERN "*.lib")
 elseif(APPLE)
 	file(GLOB SOs ${PROJECT_BINARY_DIR}/lib/*.dylib)
 	install(FILES ${SOs}
