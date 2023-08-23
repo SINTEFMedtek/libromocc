@@ -35,6 +35,11 @@ set(ROMOCC_LIBRARIES
 	zmq
 	${X11_LIBRARIES}
 )
+
+if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+    list(APPEND ROMOCC_LIBRARIES pthread)
+endif()
+
 set(ROMOCC_USE_FILE "${CMAKE_CURRENT_LIST_DIR}/RomoccUse.cmake")
 
 message("----------------------------------------")
