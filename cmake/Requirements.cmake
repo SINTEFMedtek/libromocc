@@ -9,6 +9,7 @@ endif()
 include(cmake/ExternalEigen.cmake)
 include(cmake/ExternalOrocos.cmake)
 include(cmake/ExternalZeroMQ.cmake)
+include(cmake/ExternalCxxOpts.cmake)
 
 if(ROMOCC_BUILD_URSIMULATOR)
     include(cmake/ExternalURSimulator.cmake)
