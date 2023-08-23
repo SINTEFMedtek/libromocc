@@ -11,7 +11,7 @@
 namespace romocc
 {
 
-class RobotCoordinateSystem : public Object
+class ROMOCC_EXPORT RobotCoordinateSystem : public Object
 {
     ROMOCC_OBJECT(RobotCoordinateSystem)
 

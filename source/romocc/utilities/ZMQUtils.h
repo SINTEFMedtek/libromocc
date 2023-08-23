@@ -14,7 +14,7 @@
 namespace romocc
 {
 
-class ZMQUtils {
+class ROMOCC_EXPORT ZMQUtils {
 
     public:
         static void*& getContext()
