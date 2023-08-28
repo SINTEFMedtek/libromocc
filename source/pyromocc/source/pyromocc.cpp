@@ -155,7 +155,7 @@ PYBIND11_MODULE(pyromocc, m) {
     m.def("save_calibration_file", [](std::string filepath, Eigen::Ref<const Eigen::MatrixXd> pose){
         Eigen::Affine3d transform;
         transform.matrix() = pose;
-        save_calibration_file(filepath, transform);
+        romocc::save_calibration_file(filepath, transform);
     });
 
     py::class_<CalibrationMethods> calibration_methods(m, "CalibrationMethods");
