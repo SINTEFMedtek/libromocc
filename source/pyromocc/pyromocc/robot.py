@@ -54,7 +54,7 @@ class Robot(RobotBase):
         elif manipulator == 'UR10e':
             return ManipulatorType.UR10e
 
-    def move_to_pose(self, pose, acceleration, velocity):
+    def move_to_pose(self, pose, acceleration, velocity, wait=False):
         """
         Parameters
         ----------
@@ -64,16 +64,18 @@ class Robot(RobotBase):
             Acceleration to velocity value
         velocity: float
             Velocity of motion
+        wait: bool
+            Wait for the motion to finish before returning
         """
 
         if self.units == "mm":
-            self.movep(pose, acceleration, velocity)
+            self.movep(pose, acceleration, velocity, 0, 0, wait)
         elif self.units == "m":
             # scale to mm before calling movep
             pose[:3, 3] *= 1000
             acceleration *= 1000
             velocity *= 1000
-            self.movep(pose, acceleration, velocity)
+            self.movep(pose, acceleration, velocity, 0, 0, wait)
         else:
             raise NotImplemented("Unit {} not supported.".format(self.units))
 
