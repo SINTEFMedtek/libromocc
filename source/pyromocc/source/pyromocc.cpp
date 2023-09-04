@@ -26,17 +26,19 @@ PYBIND11_MODULE(pyromocc, m) {
         .def("get_state", &Robot::getCurrentState)
         .def("stop_move", &Robot::stopMove);
 
-    robot.def("movej", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double vel){
-            self.move(romocc::MotionType::movej, target, acc, vel);
+    robot.def("movej", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double vel,
+            double time = 0, double blendRad = 0, bool wait=false){
+            self.move(romocc::MotionType::movej, target, acc, vel, time, blendRad, wait);
     });
 
-    robot.def("movep", [](Robot& self, Eigen::Ref<const Eigen::MatrixXd> pose, double acc, double vel){
+    robot.def("movep", [](Robot& self, Eigen::Ref<const Eigen::MatrixXd> pose, double acc, double vel,
+            double time = 0, double blendRad = 0, bool wait=false){
         if(pose.rows() == 4 && pose.cols() == 4){
             Eigen::Affine3d transform;
             transform.matrix() = pose;
-            self.move(romocc::MotionType::movep, transform, acc, vel);
+            self.move(romocc::MotionType::movep, transform, acc, vel, time, blendRad, wait);
         } else{
-            self.move(romocc::MotionType::movep, pose.transpose(), acc, vel);
+            self.move(romocc::MotionType::movep, pose.transpose(), acc, vel, time, blendRad, wait);
         }
     });
 
