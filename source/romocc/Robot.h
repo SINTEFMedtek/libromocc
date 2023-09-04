@@ -46,11 +46,11 @@ class ROMOCC_EXPORT Robot : public Object
     private:
         void waitForMove();
 
-        SharedPointer<CommunicationInterface> mCommunicationInterface;
+        std::shared_ptr<CommunicationInterface> mCommunicationInterface;
         void startSubscription(std::function<void()> updateSignal);
 
-        SharedPointer<RobotCoordinateSystem> mCoordinateSystem;
-        SharedPointer<RobotState> mCurrentState;
+        std::shared_ptr<RobotCoordinateSystem> mCoordinateSystem;
+        std::shared_ptr<RobotState> mCurrentState;
         MotionQueue mMotionQueue;
         std::unique_ptr<std::thread> mThread;
         bool mActiveSubscription = false;

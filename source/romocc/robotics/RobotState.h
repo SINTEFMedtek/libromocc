@@ -47,7 +47,7 @@ class ROMOCC_EXPORT RobotState : public Object
         std::shared_ptr<IKSolver> getIKSolver();
 
     private:
-        SharedPointer<MessageDecoder> mDecoder;
+        std::shared_ptr<MessageDecoder> mDecoder;
         void setKDLchain(Manipulator manipulator);
         void setDecoder(Manipulator manipulator);
         void setState(RowVector6d q, RowVector6d q_vel, double timestamp);
