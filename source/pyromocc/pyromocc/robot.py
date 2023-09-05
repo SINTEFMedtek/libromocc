@@ -79,7 +79,7 @@ class Robot(RobotBase):
         else:
             raise NotImplemented("Unit {} not supported.".format(self.units))
 
-    def translate(self, vec, acceleration, velocity):
+    def translate(self, vec, acceleration, velocity, wait=False):
         """
         Translate the end-effector by the specified vector (x, y, z).
 
@@ -91,10 +91,12 @@ class Robot(RobotBase):
             Acceleration to velocity value
         velocity: float
             Velocity of motion
+        wait: bool
+            Wait for the motion to finish before returning
         """
         pose = self.pose
         pose[:3, 3] += vec
-        self.movep(pose, acceleration, velocity)
+        self.movep(pose, acceleration, velocity, 0, 0, wait)
 
     @property
     def joint_config(self):
@@ -136,7 +138,7 @@ class Robot(RobotBase):
     def x(self, val):
         p = self.pose
         p[0, 3] = val
-        self.movep(p, 50, 100)
+        self.movep(p, 50, 100, 0, 0, False)
 
     @property
     def y(self):
@@ -146,7 +148,7 @@ class Robot(RobotBase):
     def y(self, val):
         p = self.pose
         p[1, 3] = val
-        self.movep(p, 50, 100)
+        self.movep(p, 50, 100, 0, 0, False)
 
     @property
     def z(self):
@@ -156,7 +158,7 @@ class Robot(RobotBase):
     def z(self, val):
         p = self.pose
         p[2, 3] = val
-        self.movep(p, 50, 100)
+        self.movep(p, 50, 100, 0, 0, False)
 
     @property
     def rx(self):
@@ -166,7 +168,7 @@ class Robot(RobotBase):
     def rx(self, val):
         p = self.pose_aa
         p[3] = val
-        self.movep(p, 50, 100)
+        self.movep(p, 50, 100, 0, 0, False)
 
     @property
     def ry(self):
@@ -176,7 +178,7 @@ class Robot(RobotBase):
     def ry(self, val):
         p = self.pose_aa
         p[4] = val
-        self.movep(p, 50, 100)
+        self.movep(p, 50, 100, 0, 0, False)
 
     @property
     def rz(self):
@@ -186,7 +188,7 @@ class Robot(RobotBase):
     def rz(self, val):
         p = self.pose_aa
         p[5] = val
-        self.movep(p, 50, 100)
+        self.movep(p, 50, 100, 0, 0, False)
 
     def forward_kinematics(self, joint_config, format="homogeneous"):
         pose = self.get_state().joint_to_pose(joint_config)
