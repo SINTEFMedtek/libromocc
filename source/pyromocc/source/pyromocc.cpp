@@ -2,6 +2,8 @@
 // Created by androst on 31.03.20.
 //
 
+#include <iostream>
+
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 #include <pybind11/stl.h>
