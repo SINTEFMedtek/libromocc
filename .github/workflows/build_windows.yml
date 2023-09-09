@@ -31,7 +31,7 @@ jobs:
             -DROMOCC_BUILD_PYTHON_BINDINGS=ON `
 
       - name: Build libromocc
-        run: cmake --build {{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
 
       - name: Setup Python
         uses: actions/setup-python@v2
