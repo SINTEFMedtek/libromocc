@@ -7,6 +7,7 @@
 
 #include "romocc/core/Object.h"
 #include "romocc/utilities/MathUtils.h"
+#include "romocc/communication/MessageDecoder.h"
 
 namespace romocc
 {
@@ -50,12 +51,13 @@ class ROMOCC_EXPORT RobotState : public Object
         std::shared_ptr<MessageDecoder> mDecoder;
         void setKDLchain(Manipulator manipulator);
         void setDecoder(Manipulator manipulator);
-        void setState(RowVector6d q, RowVector6d q_vel, double timestamp);
+        void setState(romocc::ConfigState configState);
 
         double mTimestamp;
         Vector6d mJointConfiguration;
         Vector6d mJointVelocity;
         Vector6d mOperationalConfiguration;
+        Vector6d mOperationalVelocity;
         Transform3d m_bMee;
 
         std::mutex mValueLock;

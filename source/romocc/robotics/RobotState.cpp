@@ -16,8 +16,8 @@ RobotState::RobotState() :
 
 void RobotState::unpack(uint8_t *buffer) {
     mValueLock.lock();
-    JointState jointState = mDecoder->analyzeTCPSegment(buffer);
-    this->setState(jointState.jointConfiguration, jointState.jointVelocity, jointState.timestamp);
+    ConfigState configState = mDecoder->analyzeTCPSegment(buffer);
+    this->setState(configState);
     mValueLock.unlock();
 }
 
@@ -43,16 +43,20 @@ void RobotState::setKDLchain(Manipulator manipulator) {
     mJacSolver = std::shared_ptr<JacobianSolver>(new JacobianSolver(mKDLChain));
 }
 
-void RobotState::setDecoder(Manipulator manipulator) {
+void RobotState::setDecoder(romocc::Manipulator manipulator) {
     mDecoder = UrMessageDecoder::New();
 }
 
-void RobotState::setState(RowVector6d jointConfig, RowVector6d jointVel, double timestamp) {
-    mTimestamp = timestamp;
-    mJointConfiguration = jointConfig;
-    mJointVelocity = jointVel;
-    m_bMee = transform_to_joint(jointConfig);
-    mOperationalConfiguration = TransformUtils::Affine::toVector6D(m_bMee);
+void RobotState::setState(romocc::ConfigState configState) {
+    mTimestamp = configState.timestamp;
+    mJointConfiguration = configState.jointConfiguration;
+    mJointVelocity = configState.jointVelocity;
+    mOperationalConfiguration = configState.operationalConfiguration;
+    mOperationalVelocity = configState.operationalVelocity;
+    m_bMee = TransformUtils::Affine::toAffine3DFromVector6D(mOperationalConfiguration);
+
+    // m_bMee = transform_to_joint(configState.jointConfiguration);
+    // mOperationalConfiguration = TransformUtils::Affine::toVector6D(m_bMee);
 }
 
 Transform3d RobotState::transform_to_joint(RowVector6d jointConfig, int jointNr) {
@@ -143,7 +147,8 @@ Vector6d RobotState::getOperationalVelocity() {
     Vector6d ret;
     Matrix6d jacobian = getJacobian();
     mValueLock.lock();
-    ret = jacobian * mJointVelocity;
+    // ret = jacobian * mJointVelocity;
+    ret = mOperationalVelocity;
     mValueLock.unlock();
     return ret;
 }
