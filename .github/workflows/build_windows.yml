@@ -1,4 +1,4 @@
-name: Build Ubuntu
+name: Build Windows
 
 on:
   push:
@@ -24,11 +24,11 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake ${{github.workspace}} -B ${{github.workspace}}/build \
-            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-            -DROMOCC_BUILD_TESTS=ON \
-            -DROMOCC_BUILD_EXAMPLES=ON \
-            -DROMOCC_BUILD_PYTHON_BINDINGS=ON \
+          cmake ${{github.workspace}} -B ${{github.workspace}}/build `
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} `
+            -DROMOCC_BUILD_TESTS=ON `
+            -DROMOCC_BUILD_EXAMPLES=ON `
+            -DROMOCC_BUILD_PYTHON_BINDINGS=ON `
 
       - name: Build libromocc
         run: cmake --build {{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
