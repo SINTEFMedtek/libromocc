@@ -28,6 +28,9 @@ namespace TransformUtils{
     ROMOCC_EXPORT double norm(Transform3d a, double b[6]);
 
     ROMOCC_EXPORT Vector6d radToDeg(Vector6d vector);
+
+    ROMOCC_EXPORT Eigen::Matrix<double,6,1> scaleTranslation(Eigen::Matrix<double,6,1> vector, double scale);
+    ROMOCC_EXPORT double* scaleTranslation(double* vector, double scale);
 }
 
 } // namespace romocc

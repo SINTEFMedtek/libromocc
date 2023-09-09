@@ -10,6 +10,23 @@ Eigen::Affine3d TransformUtils::Affine::scaleTranslation(Eigen::Affine3d affine,
     return affine;
 }
 
+Eigen::Matrix<double,6,1> TransformUtils::scaleTranslation(Eigen::Matrix<double, 6, 1> vec, double scale)
+{
+    vec[0] = vec[0]*scale;
+    vec[1] = vec[1]*scale;
+    vec[2] = vec[2]*scale;
+    return vec;
+}
+
+double* TransformUtils::scaleTranslation(double* vec, double scale)
+{
+    vec[0] = vec[0]*scale;
+    vec[1] = vec[1]*scale;
+    vec[2] = vec[2]*scale;
+    return vec;
+}
+
+
 Eigen::Vector3d TransformUtils::Affine::toAxisAngle(Eigen::Affine3d affine)
 {
     return (Eigen::AngleAxisd(affine.linear())).angle()*(Eigen::AngleAxisd(affine.linear())).axis();
