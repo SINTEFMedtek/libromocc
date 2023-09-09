@@ -1,0 +1,49 @@
+name: Build Ubuntu
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: windows-2019
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          pip3 install --upgrade pip
+
+      - name: Configure CMake
+        run: |
+          cmake ${{github.workspace}} -B ${{github.workspace}}/build \
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -DROMOCC_BUILD_TESTS=ON \
+            -DROMOCC_BUILD_EXAMPLES=ON \
+            -DROMOCC_BUILD_PYTHON_BINDINGS=ON \
+
+      - name: Build libromocc
+        run: cmake --build {{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Build pyromocc python wheel
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target create_python_wheel
+
+      - name: Upload Python wheel
+        uses: actions/upload-artifact@v3
+        with:
+          name: Python wheel
+          path: ${{github.workspace}}/build/pyromocc/dist/pyromocc-*.whl
+          if-no-files-found: error
