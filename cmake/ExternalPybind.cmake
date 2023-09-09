@@ -10,7 +10,7 @@ ExternalProject_Add(
         pybind11
         PREFIX .
         GIT_REPOSITORY "https://github.com/pybind/pybind11.git"
-        GIT_TAG "v2.6.2" # v2.6.2
+        GIT_TAG "v2.11.1" # v2.11.1
         SOURCE_DIR "${CMAKE_BINARY_DIR}/third-party/pybind11"
         # Override default steps with no action, we just want the clone step.
         CONFIGURE_COMMAND ""

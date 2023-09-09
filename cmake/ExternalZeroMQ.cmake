@@ -23,7 +23,7 @@ ExternalProject_Add(zeromq
 list(APPEND ROMOCC_INCLUDE_DIRS ${ROMOCC_EXTERNAL_INSTALL_DIR}/include/)
 
 if(WIN32)
-    set(ZMQ_LIBRARY libzmq-v142-mt-4_3_2.lib libzmq-v142-mt-s-4_3_2.lib)
+    set(ZMQ_LIBRARY libzmq-v143-mt-4_3_2.lib libzmq-v143-mt-s-4_3_2.lib)
 else(WIN32)
     set(ZMQ_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX}zmq${CMAKE_SHARED_LIBRARY_SUFFIX})
 endif(WIN32)
