@@ -1,6 +1,8 @@
 from .pyromocc import *
 from typing import Union
 
+import numpy as np
+
 
 class Robot(RobotBase):
     """ Robot class
@@ -116,7 +118,7 @@ class Robot(RobotBase):
 
     @property
     def pose(self):
-        pose = self.get_state().get_pose()
+        pose = np.copy(self.get_state().get_pose())
         if self.units == "mm":
             return pose
         elif self.units == "m":
