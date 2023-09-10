@@ -56,5 +56,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Python wheel
-          path: ${{github.workspace}}/source/pyromocc/dist/pyromocc-*.whl
+          path: ${{github.workspace}}/build/pyromocc/dist/pyromocc-*.whl
           if-no-files-found: error
