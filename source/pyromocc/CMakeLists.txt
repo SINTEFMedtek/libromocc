@@ -29,15 +29,15 @@ set_target_properties(pyromocc PROPERTIES PREFIX "" LIBRARY_OUTPUT_DIRECTORY ${P
 
 install(TARGETS pyromocc EXPORT romocc DESTINATION pyromocc)
 
-add_custom_target(create_python_package
+add_custom_target(copy_python_package
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/pyromocc ${ROMOCC_CMAKE_BINARY_DIR}/pyromocc/pyromocc
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/setup.py ${ROMOCC_CMAKE_BINARY_DIR}/pyromocc
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/README.md ${ROMOCC_CMAKE_BINARY_DIR}/pyromocc
         COMMENT "Copy python files")
 
 add_custom_target(create_python_wheel
-        COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel --py-limited-api cp38 WORKING_DIRECTORY "${ROMOCC_CMAKE_BINARY_DIR}/pyromocc/"
+        COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel WORKING_DIRECTORY "${ROMOCC_CMAKE_BINARY_DIR}/pyromocc"
         COMMENT "Create python wheel"
 )
 
-add_dependencies(create_python_wheel create_python_package)
+add_dependencies(create_python_wheel copy_python_package pyromocc)
