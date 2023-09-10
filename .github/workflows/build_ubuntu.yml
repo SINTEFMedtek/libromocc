@@ -49,9 +49,8 @@ jobs:
           python-version: '3.8'
 
       - name: Build pyromocc python wheel
-        run: |
-          cd source/pyromocc
-          python setup.py bdist_wheel
+        run: cmake --build build --config ${{env.BUILD_TYPE}} --target create_python_wheel
+
 
       - name: Upload Python wheel
         uses: actions/upload-artifact@v3
