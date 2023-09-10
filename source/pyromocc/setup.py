@@ -1,31 +1,51 @@
 import os
 import glob
 import platform
-import sys
+import shutil
 
+from setuptools.command.install import install
+from setuptools.dist import Distribution
 from setuptools import setup, find_packages
 
 package_name = "pyromocc"
 version = "0.0.6"
 
-build_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), 'build'))
+build_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 bin_path = os.path.join(build_folder, 'bin')
 library_path = os.path.join(build_folder, 'lib')
 
-if os.name == 'posix':
+if platform.system() == "Linux":
     libraries = glob.glob(os.path.join(library_path, "*.so"))
     package_data = {"pyromocc": ['*.so', *libraries]}
     platform_name = "none"
-elif os.name == 'nt':
+elif platform.system() == "Windows":
     libraries = glob.glob(os.path.join(library_path, "*.lib"))
     dlls = glob.glob(os.path.join(bin_path, "*.dll"))
     pyds = glob.glob(os.path.join(library_path, "*.pyd"))
     platform_name = f"win_{platform.machine()}"
-    package_data = {"pyromocc": ['*.pyd', '*.dll', '*.lib', *pyds, *libraries, *dlls]}
+    package_data = {"pyromocc": [*libraries, *dlls, *pyds]}
 else:
-    raise NotImplementedError(f"Platform {os.name} currently not supported")
+    raise NotImplementedError(f"Platform {platform.system()} currently not supported")
 
-python_version = f"cp{sys.version_info.major}{sys.version_info.minor}"
+
+class CustomInstallCommand(install):
+    def run(self):
+        # run the original install command
+        install.run(self)
+
+        # copy the .pyd and .dll files to site-packages
+        module_dir = self.install_lib
+
+        if platform.system() == "Windows":
+            for deps in [*dlls, *pyds, *libraries]:
+                shutil.copy(deps, os.path.join(module_dir, "pyromocc"))
+
+
+class BinaryDistribution(Distribution):
+    """Distribution which always forces a binary package with platform name"""
+    def has_ext_modules(self):
+        return True
+
 
 setup(name=package_name,
       version=version,
@@ -44,5 +64,6 @@ setup(name=package_name,
           'Programming Language :: Python :: 3.9',
       ],
       python_requires='>=3.7',
-      script_args=["bdist_wheel", "--python-tag", python_version, "--plat-name", platform_name],
-      package_data=package_data)
+      package_data=package_data,
+      cmdclass={'install': CustomInstallCommand},
+      distclass=BinaryDistribution)
