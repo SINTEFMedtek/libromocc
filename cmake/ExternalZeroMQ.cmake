@@ -23,6 +23,16 @@ ExternalProject_Add(zeromq
 list(APPEND ROMOCC_INCLUDE_DIRS ${ROMOCC_EXTERNAL_INSTALL_DIR}/include/)
 
 if(WIN32)
+    file(GLOB ITEMS_IN_FOLDER "${ROMOCC_EXTERNAL_INSTALL_DIR}/*")
+    foreach(ITEM ${ITEMS_IN_FOLDER})
+        message("${ITEM}")
+    endforeach()
+
+    file(GLOB ITEMS_IN_FOLDER "${ROMOCC_EXTERNAL_INSTALL_DIR}/lib/*")
+    foreach(ITEM ${ITEMS_IN_FOLDER})
+        message("${ITEM}")
+    endforeach()
+
     file(GLOB ZMQ_LIBRARIES ${ROMOCC_EXTERNAL_INSTALL_DIR}/lib/libzmq-*.lib)
     foreach(ZMQ_LIBRARY_PATH ${ZMQ_LIBRARIES})
         get_filename_component(ZMQ_LIBRARY_BASENAME ${ZMQ_LIBRARY_PATH} NAME_WE)
