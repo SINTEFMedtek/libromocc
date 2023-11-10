@@ -1,12 +1,13 @@
 # Download and set up ZeroMQ
 
 include(cmake/Externals.cmake)
+set(ZMQ_VERSION "4.3.2")
 
 ExternalProject_Add(zeromq
         PREFIX ${ROMOCC_EXTERNAL_BUILD_DIR}/zeromq
         BINARY_DIR ${ROMOCC_EXTERNAL_BUILD_DIR}/zeromq
         GIT_REPOSITORY "https://github.com/zeromq/libzmq.git"
-        GIT_TAG "v4.3.2"
+        GIT_TAG "v${ZMQ_VERSION}"
         UPDATE_COMMAND ""
         CMAKE_ARGS
             -DCMAKE_BUILD_TYPE:STRING=Release
@@ -23,21 +24,10 @@ ExternalProject_Add(zeromq
 list(APPEND ROMOCC_INCLUDE_DIRS ${ROMOCC_EXTERNAL_INSTALL_DIR}/include/)
 
 if(WIN32)
-    file(GLOB ITEMS_IN_FOLDER "${ROMOCC_EXTERNAL_INSTALL_DIR}/*")
-    foreach(ITEM ${ITEMS_IN_FOLDER})
-        message("${ITEM}")
-    endforeach()
-
-    file(GLOB ITEMS_IN_FOLDER "${ROMOCC_EXTERNAL_INSTALL_DIR}/lib/*")
-    foreach(ITEM ${ITEMS_IN_FOLDER})
-        message("${ITEM}")
-    endforeach()
-
-    file(GLOB ZMQ_LIBRARIES ${ROMOCC_EXTERNAL_INSTALL_DIR}/lib/libzmq-*.lib)
-    foreach(ZMQ_LIBRARY_PATH ${ZMQ_LIBRARIES})
-        get_filename_component(ZMQ_LIBRARY_BASENAME ${ZMQ_LIBRARY_PATH} NAME_WE)
-        list(APPEND ZMQ_LIBRARY ${ZMQ_LIBRARY_BASENAME})
-    endforeach()
+    string(REPLACE "." "_" ZMQ_VERSION_US ${ZMQ_VERSION})
+    set(ZMQ_LIBRARY
+            "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-${ZMQ_VERSION_US}"
+            "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-s-${ZMQ_VERSION_US}")
 else(WIN32)
     set(ZMQ_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX}zmq${CMAKE_SHARED_LIBRARY_SUFFIX})
 endif(WIN32)
