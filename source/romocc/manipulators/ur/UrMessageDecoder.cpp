@@ -18,6 +18,7 @@ ConfigState UrMessageDecoder::analyzeTCPSegment(unsigned char* packet)
         double* jointVelocity = romocc::arrayToLittleEndian(raw_state->actual_velocities_);
         double* operationalConfiguration = romocc::arrayToLittleEndian(raw_state->actual_tool_coordinates_);
         double* operationalVelocity = romocc::arrayToLittleEndian(raw_state->actual_tool_speed_);
+        double* operationalForce = romocc::arrayToLittleEndian(raw_state->generalised_tool_forces_);
 
         TransformUtils::scaleTranslation(operationalConfiguration, 1000);
         TransformUtils::scaleTranslation(operationalVelocity, 1000);
@@ -27,6 +28,7 @@ ConfigState UrMessageDecoder::analyzeTCPSegment(unsigned char* packet)
         state.jointVelocity = RowVector6d(jointVelocity);
         state.operationalConfiguration = RowVector6d(operationalConfiguration);
         state.operationalVelocity = RowVector6d(operationalVelocity);
+        state.operationalForce = RowVector6d(operationalForce);
     }
     return state;
 }

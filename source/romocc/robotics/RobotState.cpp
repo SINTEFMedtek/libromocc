@@ -53,6 +53,7 @@ void RobotState::setState(romocc::ConfigState configState) {
     mJointVelocity = configState.jointVelocity;
     mOperationalConfiguration = configState.operationalConfiguration;
     mOperationalVelocity = configState.operationalVelocity;
+    mOperationalForce = configState.operationalForce;
     m_bMee = TransformUtils::Affine::toAffine3DFromVector6D(mOperationalConfiguration);
 
     // m_bMee = transform_to_joint(configState.jointConfiguration);
@@ -149,6 +150,14 @@ Vector6d RobotState::getOperationalVelocity() {
     mValueLock.lock();
     // ret = jacobian * mJointVelocity;
     ret = mOperationalVelocity;
+    mValueLock.unlock();
+    return ret;
+}
+
+Vector6d RobotState::getOperationalForce() {
+    Vector6d ret;
+    mValueLock.lock();
+    ret = mOperationalForce;
     mValueLock.unlock();
     return ret;
 }

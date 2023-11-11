@@ -41,6 +41,7 @@ class ROMOCC_EXPORT RobotState : public Object
         Vector6d getJointVelocity();
         Vector6d getOperationalConfig();
         Vector6d getOperationalVelocity();
+        Vector6d getOperationalForce();
         Vector6d operationalConfigToJointConfig(Transform3d transform);
         Transform3d jointConfigToOperationalConfig(Vector6d jointConfig);
 
@@ -58,6 +59,7 @@ class ROMOCC_EXPORT RobotState : public Object
         Vector6d mJointVelocity;
         Vector6d mOperationalConfiguration;
         Vector6d mOperationalVelocity;
+        Vector6d mOperationalForce;
         Transform3d m_bMee;
 
         std::mutex mValueLock;

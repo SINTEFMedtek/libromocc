@@ -117,6 +117,10 @@ class Robot(RobotBase):
         return self.get_state().get_operational_config()
 
     @property
+    def operational_force(self):
+        return self.get_state().get_operational_force()
+
+    @property
     def pose(self):
         pose = np.copy(self.get_state().get_pose())
         if self.units == "mm":

@@ -48,12 +48,16 @@ int main(int argc, char *argv[])
             while(!stop){
                 Vector6d jointConfig = robot->getCurrentState()->getJointConfig();
                 Vector6d operationalConfig = robot->getCurrentState()->getOperationalConfig();
+                Vector6d operationalVelocity = robot->getCurrentState()->getOperationalVelocity();
+                Vector6d operationalForce = robot->getCurrentState()->getOperationalForce();
                 double currentTime = robot->getCurrentState()->getTimestamp();
 
                 if(currentTime > previousTime)
                 {
                     std::cout << "Joint config: " << TransformUtils::radToDeg(jointConfig).transpose() << std::endl;
-                    std::cout << "Operational config: " << operationalConfig.transpose() << "\n" << std::endl;
+                    std::cout << "Operational config: " << operationalConfig.transpose() << std::endl;
+                    std::cout << "Operational velocity: " << operationalVelocity.transpose() << std::endl;
+                    std::cout << "Operational force: " << operationalForce.transpose() << "\n" << std::endl;
                     previousTime = robot->getCurrentState()->getTimestamp();
                 }
             }
