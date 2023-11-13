@@ -116,6 +116,17 @@ TEST_CASE("Move with wait", "[romocc][Robot]"){
     robot->move(MotionType::movep, target_b, 500, 500);
     }
 
+TEST_CASE("Move joints with wait", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "192.168.231.129", 30003);
+    robot->connect();
+
+    std::cout << robot->getCurrentState()->getOperationalConfig() << std::endl;
+    Vector6d target_a;
+    target_a << -M_PI_2, -M_PI_2, M_PI_2, -M_PI_2, -M_PI_2, 0.;
+    robot->move(MotionType::movej, target_a, 500, 500, 0, 0, true);
+}
+
 TEST_CASE("Add update subscription", "[romocc][Robot]"){
     auto robot = Robot::New();
     robot->configure(Manipulator(ManipulatorType::UR5), "192.168.231.129", 30003);
