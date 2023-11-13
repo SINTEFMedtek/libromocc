@@ -16,6 +16,7 @@ if(ROMOCC_BUILD_URSIMULATOR)
 endif()
 
 if(ROMOCC_BUILD_PYTHON_BINDINGS)
+    find_package(PythonInterp 3 REQUIRED)
     find_package(PythonLibs 3 REQUIRED)
 endif()
 

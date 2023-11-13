@@ -13,6 +13,7 @@ struct ROMOCC_EXPORT ConfigState
     Eigen::RowVectorXd jointVelocity;
     Eigen::RowVectorXd operationalConfiguration;
     Eigen::RowVectorXd operationalVelocity;
+    Eigen::RowVectorXd operationalForce;
     double timestamp = 0;
 };
 
