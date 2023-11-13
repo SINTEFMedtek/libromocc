@@ -62,16 +62,27 @@ void Robot::move(MotionType type, Target target, double acc, double vel, double 
     mCommunicationInterface->move(type, target, acc, vel, t, rad);
     if(wait)
     {
-        auto remainingDistance = TransformUtils::norm(mCurrentState->get_bMee(), target);
-
-        const double distanceThreshold = 0.005;
+        double distanceThreshold = 0.005;
         const int timeoutInSeconds = 10; // Set your desired timeout in seconds
         const auto startTime = std::chrono::steady_clock::now();
 
+        double remainingDistance;
+        if(type == MotionType::movej){
+            auto targetj = target.matrix().reshaped(6,1);
+            remainingDistance = TransformUtils::norm(mCurrentState->getJointConfig(), targetj);
+        } else {
+            distanceThreshold = 0.015;
+            remainingDistance = TransformUtils::norm(mCurrentState->get_bMee(), target);
+        };
+
         while(remainingDistance > distanceThreshold || isnan(remainingDistance))
         {
-            remainingDistance = TransformUtils::norm(mCurrentState->get_bMee(), target);
-
+            if(type == MotionType::movej){
+                auto targetj = target.matrix().reshaped(6,1);
+                remainingDistance = TransformUtils::norm(mCurrentState->getJointConfig(), targetj);
+            } else {
+                remainingDistance = TransformUtils::norm(mCurrentState->get_bMee(), target);
+            };
             const auto currentTime = std::chrono::steady_clock::now();
             const auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
             if (elapsedTime > timeoutInSeconds)
