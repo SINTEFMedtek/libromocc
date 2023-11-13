@@ -17,12 +17,10 @@ library_path = os.path.join(build_folder, 'lib')
 if platform.system() == "Linux":
     libraries = glob.glob(os.path.join(library_path, "*.so"))
     package_data = {"pyromocc": ['*.so', *libraries]}
-    platform_name = "none"
 elif platform.system() == "Windows":
     libraries = glob.glob(os.path.join(library_path, "*.lib"))
     dlls = glob.glob(os.path.join(bin_path, "*.dll"))
     pyds = glob.glob(os.path.join(library_path, "*.pyd"))
-    platform_name = f"win_{platform.machine()}"
     package_data = {"pyromocc": [*libraries, *dlls, *pyds]}
 else:
     raise NotImplementedError(f"Platform {platform.system()} currently not supported")
