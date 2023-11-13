@@ -93,6 +93,12 @@ void Robot::move(MotionType type, Target target, double acc, double vel, double 
     }
 }
 
+template <>
+void Robot::move<double*>(MotionType type, double* target, double acc, double vel, double t, double rad, bool wait)
+{
+    Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> targetVector(target, 6);
+    move(type, targetVector, acc, vel, t, rad, wait);
+}
 
 
 } // namespace romocc
