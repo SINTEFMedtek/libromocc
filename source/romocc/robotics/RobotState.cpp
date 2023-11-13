@@ -52,13 +52,14 @@ void RobotState::setState(romocc::ConfigState configState) {
     mTimestamp = configState.timestamp;
     mJointConfiguration = configState.jointConfiguration;
     mJointVelocity = configState.jointVelocity;
+    mOperationalForce = configState.operationalForce;
 
     if(mManipulator.manipulator == UR5e || mManipulator.manipulator == UR10e || mManipulator.manipulator == UR3e){
         mOperationalConfiguration = configState.operationalConfiguration;
         mOperationalVelocity = configState.operationalVelocity;
         m_bMee = TransformUtils::Affine::toAffine3DFromVector6D(mOperationalConfiguration);
     } else{
-        // mOperationalVelocity = getJacobian() * mJointVelocity;
+        mOperationalVelocity = getJacobian() * mJointVelocity;
         m_bMee = transform_to_joint(configState.jointConfiguration);
         mOperationalConfiguration = TransformUtils::Affine::toVector6D(m_bMee);
     }
@@ -78,13 +79,9 @@ Transform3d RobotState::transform_to_joint(RowVector6d jointConfig, int jointNr)
 
 Matrix6d RobotState::getJacobian(int jointNr) {
     KDL::JntArray input_q(mKDLChain.getNrOfJoints());
-    Vector6d jointConfig = getJointConfig();
-
-    for (unsigned int i = 0; i < mKDLChain.getNrOfJoints(); i++) { input_q(i) = jointConfig[i]; }
-
+    for (unsigned int i = 0; i < mKDLChain.getNrOfJoints(); i++) { input_q(i) = mJointConfiguration[i]; }
     KDL::Jacobian output_jac(mKDLChain.getNrOfJoints());
     mJacSolver->JntToJac(input_q, output_jac, jointNr);
-
     return output_jac.data;
 }
 
@@ -152,6 +149,14 @@ Vector6d RobotState::getOperationalVelocity() {
     Vector6d ret;
     mValueLock.lock();
     ret = mOperationalVelocity;
+    mValueLock.unlock();
+    return ret;
+}
+
+Vector6d RobotState::getOperationalForce() {
+    Vector6d ret;
+    mValueLock.lock();
+    ret = mOperationalForce;
     mValueLock.unlock();
     return ret;
 }
