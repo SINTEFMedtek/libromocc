@@ -59,6 +59,7 @@ class ROMOCC_EXPORT RobotState : public Object
         Vector6d mOperationalConfiguration;
         Vector6d mOperationalVelocity;
         Transform3d m_bMee;
+        Manipulator mManipulator;
 
         std::mutex mValueLock;
 

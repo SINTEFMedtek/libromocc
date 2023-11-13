@@ -24,6 +24,7 @@ void RobotState::unpack(uint8_t *buffer) {
 void RobotState::setManipulator(romocc::Manipulator manipulator) {
     this->setKDLchain(manipulator);
     this->setDecoder(manipulator);
+    mManipulator = manipulator;
 }
 
 
@@ -145,9 +146,7 @@ double RobotState::getTimestamp() {
 
 Vector6d RobotState::getOperationalVelocity() {
     Vector6d ret;
-    Matrix6d jacobian = getJacobian();
     mValueLock.lock();
-    // ret = jacobian * mJointVelocity;
     ret = mOperationalVelocity;
     mValueLock.unlock();
     return ret;
