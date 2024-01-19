@@ -34,9 +34,14 @@ class CustomInstallCommand(install):
         # copy the .pyd and .dll files to site-packages
         module_dir = self.install_lib
 
+        for deps in [*libraries]:
+            shutil.copy(deps, os.path.join(module_dir, "pyromocc"))
+
+
         if platform.system() == "Windows":
-            for deps in [*dlls, *pyds, *libraries]:
+            for deps in [*dlls, *pyds]:
                 shutil.copy(deps, os.path.join(module_dir, "pyromocc"))
+
 
 
 class BinaryDistribution(Distribution):
@@ -62,6 +67,7 @@ setup(name=package_name,
           'Programming Language :: Python :: 3.9',
       ],
       python_requires='>=3.7',
+      package_dir={'pyromocc': 'pyromocc'},
       package_data=package_data,
       cmdclass={'install': CustomInstallCommand},
       distclass=BinaryDistribution)
