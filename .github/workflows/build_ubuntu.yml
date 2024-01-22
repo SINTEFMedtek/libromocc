@@ -14,9 +14,18 @@ jobs:
   build:
     runs-on: ubuntu-20.04
 
+    strategy:
+      matrix:
+        python-version: [ '3.8', '3.9', '3.10', '3.11' ]
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
@@ -29,10 +38,10 @@ jobs:
             libpython3-dev \
             python3-pip \
             python3-setuptools
-          sudo pip install --upgrade pip
-          sudo pip install patchelf
-          sudo pip install wheel
-          sudo pip install auditwheel
+          pip install --upgrade pip
+          pip install patchelf
+          pip install wheel
+          pip install auditwheel
 
       - name: Configure CMake
         run: |
@@ -44,11 +53,6 @@ jobs:
 
       - name: Build libromocc
         run: cmake --build build --config ${{env.BUILD_TYPE}} -j 4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
 
       - name: Build pyromocc python wheel
         run: cmake --build build --config ${{env.BUILD_TYPE}} --target create_python_wheel
