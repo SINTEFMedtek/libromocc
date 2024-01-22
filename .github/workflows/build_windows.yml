@@ -18,17 +18,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Configure CMake
-        run: |
-          cmake ${{github.workspace}} -B ${{github.workspace}}/build `
-            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} `
-            -DROMOCC_BUILD_TESTS=ON `
-            -DROMOCC_BUILD_EXAMPLES=ON `
-            -DROMOCC_BUILD_PYTHON_BINDINGS=ON `
-
-      - name: Build libromocc
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
-
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -38,6 +27,18 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install wheel
+
+      - name: Configure CMake
+        run: |
+          cmake ${{github.workspace}} -B ${{github.workspace}}/build `
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} `
+            -DROMOCC_BUILD_TESTS=OFF `
+            -DROMOCC_BUILD_EXAMPLES=OFF `
+            -DROMOCC_BUILD_PYTHON_BINDINGS=ON `
+            -DPYTHON_EXECUTABLE=$(which python)
+
+      - name: Build libromocc
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
 
       - name: Build pyromocc python wheel
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target create_python_wheel
