@@ -37,6 +37,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip3 install --upgrade pip
+          pip3 install wheel
 
       - name: Build pyromocc python wheel
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target create_python_wheel
