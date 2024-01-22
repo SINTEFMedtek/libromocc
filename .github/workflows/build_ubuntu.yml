@@ -51,10 +51,17 @@ jobs:
       - name: Build pyromocc python wheel
         run: cmake --build build --config ${{env.BUILD_TYPE}} --target create_python_wheel
 
+      - name: Determine platform
+        id: determine_platform
+        run: echo "::set-output name=platform::$(python -c 'from wheel.pep425tags import get_abbr_impl, get_impl_ver, get_abi_tag; print(f"manylinux_{get_abbr_impl()}{get_impl_ver()}_x86_64")')"
+
+      - name: Auditwheel repair
+        run: |
+          auditwheel repair ${{github.workspace}}/build/pyromocc/dist/pyromocc-*.whl --plat ${{ steps.determine_platform.outputs.platform }} -w ${{github.workspace}}/build/pyromocc/dist/wheelhouse
 
       - name: Upload Python wheel
         uses: actions/upload-artifact@v3
         with:
           name: Python wheel
-          path: ${{github.workspace}}/build/pyromocc/dist/pyromocc-*.whl
+          path: ${{github.workspace}}/build/pyromocc/dist/wheelhouse/pyromocc-*.whl
           if-no-files-found: error
