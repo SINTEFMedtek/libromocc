@@ -30,7 +30,6 @@ jobs:
             python3-pip \
             python3-setuptools
           sudo pip3 install --upgrade pip
-          sudo pip3 install wheel
           sudo pip3 install auditwheel
 
       - name: Configure CMake
@@ -54,7 +53,8 @@ jobs:
 
       - name: Determine platform
         id: determine_platform
-        run: echo "::set-output name=platform::$(python -c 'from wheel.pep425tags import get_abbr_impl, get_impl_ver, get_abi_tag; print(f"manylinux_{get_abbr_impl()}{get_impl_ver()}_x86_64")')"
+        run: |
+          echo ::set-output name=platform::$(python3 -c "import distutils.util; print(distutils.util.get_platform().replace('-', '_').replace('.', '_'))")
 
       - name: Auditwheel repair
         run: |
