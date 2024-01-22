@@ -30,6 +30,7 @@ jobs:
             python3-pip \
             python3-setuptools
           sudo pip3 install --upgrade pip
+          sudo pip3 install patchelf
           sudo pip3 install auditwheel
 
       - name: Configure CMake
