@@ -3,7 +3,9 @@ import glob
 import platform
 import shutil
 
-from setuptools.command.install import install
+from os import popen
+from setuptools.command.install import install as _install
+from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 from setuptools.dist import Distribution
 from setuptools import setup, find_packages
 
@@ -26,24 +28,48 @@ else:
     raise NotImplementedError(f"Platform {platform.system()} currently not supported")
 
 
-class CustomInstallCommand(install):
-    def run(self):
-        # run the original install command
-        install.run(self)
+class bdist_wheel(_bdist_wheel):
 
-        # copy the .pyd and .dll files to site-packages
-        module_dir = self.install_lib
-        pyromocc_dir = os.path.join(module_dir, "pyromocc")
-
-        if not os.path.exists(pyromocc_dir):
-            os.makedirs(pyromocc_dir)
-
-        for deps in [*libraries]:
-            shutil.copy(deps, pyromocc_dir)
-
+    def finalize_options(self):
+        _bdist_wheel.finalize_options(self)
         if platform.system() == "Windows":
-            for deps in [*dlls, *pyds]:
+            self.root_is_pure = True
+        else:
+            self.root_is_pure = False
+
+    def get_tag(self):
+        _, _, plat = _bdist_wheel.get_tag(self)
+        if platform.system() == "Linux":
+            glibc_major, glibc_minor = popen("ldd --version | head -1").read().split()[-1].split(".")
+
+            if glibc_major == "2" and glibc_minor == "17":
+                plat = "manylinux_2_17_x86_64.manylinux2014_x86_64"
+            else:  # For manylinux2014 and above, no alias is required
+                plat = f"manylinux_{glibc_major}_{glibc_minor}_x86_64"
+
+        return _bdist_wheel.get_tag(self)[:2] + (plat,)
+
+
+class install(_install):
+    def finalize_options(self):
+        _install.finalize_options(self)
+
+        if platform.system() == "Linux":
+            self.install_libbase = self.install_platlib
+            self.install_lib = self.install_platlib
+        else:
+            module_dir = self.install_lib
+            pyromocc_dir = os.path.join(module_dir, "pyromocc")
+
+            if not os.path.exists(pyromocc_dir):
+                os.makedirs(pyromocc_dir)
+
+            for deps in [*libraries]:
                 shutil.copy(deps, pyromocc_dir)
+
+            if platform.system() == "Windows":
+                for deps in [*dlls, *pyds]:
+                    shutil.copy(deps, pyromocc_dir)
 
 
 class BinaryDistribution(Distribution):
@@ -57,19 +83,17 @@ setup(name=package_name,
       author="Andreas Oestvik",
       packages=find_packages(exclude=['examples']),
       install_requires=['numpy'],
-      setup_requires=['wheel'],
+      setup_requires=['wheel', 'packaging'],
       extras_require={'examples': ["matplotlib"]},
       include_package_data=True,
       classifiers=[
           'Operating System :: POSIX :: Linux',
           'Operating System :: Microsoft :: Windows',
           'Programming Language :: C++',
-          'Programming Language :: Python :: 3.7',
-          'Programming Language :: Python :: 3.8',
           'Programming Language :: Python :: 3.9',
       ],
-      python_requires='>=3.7',
+      python_requires='>=3.9',
       package_dir={'pyromocc': 'pyromocc'},
       package_data=package_data,
-      cmdclass={'install': CustomInstallCommand},
+      cmdclass={'install': install, 'bdist_wheel': bdist_wheel},
       distclass=BinaryDistribution)
