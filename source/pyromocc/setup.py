@@ -83,6 +83,7 @@ setup(name=package_name,
       author="Andreas Oestvik",
       packages=find_packages(exclude=['examples']),
       install_requires=['wheel', 'numpy'],
+      setup_requires=['wheel'],
       extras_require={'examples': ["matplotlib"]},
       include_package_data=True,
       classifiers=[
