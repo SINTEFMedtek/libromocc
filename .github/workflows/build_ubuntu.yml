@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install dependencies
         run: |
@@ -29,10 +29,10 @@ jobs:
             libpython3-dev \
             python3-pip \
             python3-setuptools
-          sudo pip3 install --upgrade pip
-          sudo pip3 install patchelf
-          sudo pip3 install wheel
-          sudo pip3 install auditwheel
+          sudo pip install --upgrade pip
+          sudo pip install patchelf
+          sudo pip install wheel
+          sudo pip install auditwheel
 
       - name: Configure CMake
         run: |
@@ -46,7 +46,7 @@ jobs:
         run: cmake --build build --config ${{env.BUILD_TYPE}} -j 4
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8'
 

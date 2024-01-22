@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Configure CMake
         run: |
@@ -30,14 +30,14 @@ jobs:
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
 
       - name: Install dependencies
         run: |
-          pip3 install --upgrade pip
-          pip3 install wheel
+          pip install --upgrade pip
+          pip install wheel
 
       - name: Build pyromocc python wheel
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target create_python_wheel
