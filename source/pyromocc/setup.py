@@ -16,7 +16,7 @@ library_path = os.path.join(build_folder, 'lib')
 
 if platform.system() == "Linux":
     libraries = glob.glob(os.path.join(library_path, "*.so"))
-    package_data = {"pyromocc": ["*.so", *libraries]}
+    package_data = {"pyromocc/pyromocc": [*libraries], "pyromocc": ["*.so"]}
 elif platform.system() == "Windows":
     libraries = glob.glob(os.path.join(library_path, "*.lib"))
     dlls = glob.glob(os.path.join(bin_path, "*.dll"))
