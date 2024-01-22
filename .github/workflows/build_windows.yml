@@ -35,7 +35,6 @@ jobs:
             -DROMOCC_BUILD_TESTS=OFF `
             -DROMOCC_BUILD_EXAMPLES=OFF `
             -DROMOCC_BUILD_PYTHON_BINDINGS=ON `
-            -DPYTHON_EXECUTABLE=$(which python)
 
       - name: Build libromocc
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
