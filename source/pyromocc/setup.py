@@ -16,7 +16,7 @@ library_path = os.path.join(build_folder, 'lib')
 
 if platform.system() == "Linux":
     libraries = glob.glob(os.path.join(library_path, "*.so"))
-    package_data = {"pyromocc": ['*.so', *libraries]}
+    package_data = {"pyromocc": ["*.so", *libraries]}
 elif platform.system() == "Windows":
     libraries = glob.glob(os.path.join(library_path, "*.lib"))
     dlls = glob.glob(os.path.join(bin_path, "*.dll"))
@@ -33,15 +33,17 @@ class CustomInstallCommand(install):
 
         # copy the .pyd and .dll files to site-packages
         module_dir = self.install_lib
+        pyromocc_dir = os.path.join(module_dir, "pyromocc")
+
+        if not os.path.exists(pyromocc_dir):
+            os.makedirs(pyromocc_dir)
 
         for deps in [*libraries]:
-            shutil.copy(deps, os.path.join(module_dir, "pyromocc"))
-
+            shutil.copy(deps, pyromocc_dir)
 
         if platform.system() == "Windows":
             for deps in [*dlls, *pyds]:
-                shutil.copy(deps, os.path.join(module_dir, "pyromocc"))
-
+                shutil.copy(deps, pyromocc_dir)
 
 
 class BinaryDistribution(Distribution):
