@@ -5,12 +5,12 @@ import shutil
 
 from os import popen
 from setuptools.command.install import install as _install
-from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 from setuptools.dist import Distribution
 from setuptools import setup, find_packages
 
 package_name = "pyromocc"
 version = "0.0.6"
+cmdclass = {}
 
 build_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 bin_path = os.path.join(build_folder, 'bin')
@@ -28,26 +28,33 @@ else:
     raise NotImplementedError(f"Platform {platform.system()} currently not supported")
 
 
-class bdist_wheel(_bdist_wheel):
+try:
+    from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 
-    def finalize_options(self):
-        _bdist_wheel.finalize_options(self)
-        if platform.system() == "Windows":
-            self.root_is_pure = True
-        else:
-            self.root_is_pure = False
+    class bdist_wheel(_bdist_wheel):
 
-    def get_tag(self):
-        _, _, plat = _bdist_wheel.get_tag(self)
-        if platform.system() == "Linux":
-            glibc_major, glibc_minor = popen("ldd --version | head -1").read().split()[-1].split(".")
+        def finalize_options(self):
+            _bdist_wheel.finalize_options(self)
+            if platform.system() == "Windows":
+                self.root_is_pure = False
 
-            if glibc_major == "2" and glibc_minor == "17":
-                plat = "manylinux_2_17_x86_64.manylinux2014_x86_64"
-            else:  # For manylinux2014 and above, no alias is required
-                plat = f"manylinux_{glibc_major}_{glibc_minor}_x86_64"
+        def get_tag(self):
+            _, _, plat = _bdist_wheel.get_tag(self)
+            if platform.system() == "Linux":
+                glibc_major, glibc_minor = popen("ldd --version | head -1").read().split()[-1].split(".")
 
-        return _bdist_wheel.get_tag(self)[:2] + (plat,)
+                if glibc_major == "2" and glibc_minor == "17":
+                    plat = "manylinux_2_17_x86_64.manylinux2014_x86_64"
+                else:  # For manylinux2014 and above, no alias is required
+                    plat = f"manylinux_{glibc_major}_{glibc_minor}_x86_64"
+
+            return _bdist_wheel.get_tag(self)[:2] + (plat,)
+
+    cmdclass['bdist_wheel'] = bdist_wheel
+except ImportError as error:
+    print("Error importing dependencies:")
+    print(error)
+    bdist_wheel = None
 
 
 class install(_install):
@@ -71,6 +78,8 @@ class install(_install):
                 for deps in [*dlls, *pyds]:
                     shutil.copy(deps, pyromocc_dir)
 
+
+cmdclass['install'] = install
 
 class BinaryDistribution(Distribution):
     """Distribution which always forces a binary package with platform name"""
@@ -97,5 +106,5 @@ setup(name=package_name,
       python_requires='>=3.8',
       package_dir={'pyromocc': 'pyromocc'},
       package_data=package_data,
-      cmdclass={'install': install, 'bdist_wheel': bdist_wheel},
+      cmdclass=cmdclass,
       distclass=BinaryDistribution)
