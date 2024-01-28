@@ -2,7 +2,8 @@
 # and external (downloaded and built automatically)
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-    list(APPEND SYSTEM_LIBRARIES pthread)
+    find_package(Threads REQUIRED)
+    list(APPEND SYSTEM_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 ## External depedencies
