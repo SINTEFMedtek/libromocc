@@ -47,7 +47,7 @@ jobs:
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target create_python_wheel
 
       - name: Upload Python wheel
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: Python wheel
           path: ${{github.workspace}}/build/pyromocc/dist/pyromocc-*.whl
