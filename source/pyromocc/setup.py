@@ -9,7 +9,7 @@ from setuptools.dist import Distribution
 from setuptools import setup, find_packages
 
 package_name = "pyromocc"
-version = "0.0.6"
+version = "0.0.7"
 cmdclass = {}
 
 build_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -80,6 +80,7 @@ class install(_install):
 
 
 cmdclass['install'] = install
+
 
 class BinaryDistribution(Distribution):
     """Distribution which always forces a binary package with platform name"""

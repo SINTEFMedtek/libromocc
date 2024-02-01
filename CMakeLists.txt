@@ -5,7 +5,7 @@ project(romocc)
 # Current version
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 0)
-set (VERSION_PATCH 5)
+set (VERSION_PATCH 7)
 set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 include(cmake/Macros.cmake)
