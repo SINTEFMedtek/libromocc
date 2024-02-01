@@ -68,7 +68,7 @@ jobs:
           auditwheel repair ${{github.workspace}}/build/pyromocc/dist/pyromocc-*.whl --plat ${{ steps.determine_platform.outputs.platform }} -w ${{github.workspace}}/build/pyromocc/dist/wheelhouse
 
       - name: Upload Python wheel
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Python wheel
           path: ${{github.workspace}}/build/pyromocc/dist/wheelhouse/pyromocc-*.whl
