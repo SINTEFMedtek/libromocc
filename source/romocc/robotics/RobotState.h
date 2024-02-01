@@ -1,9 +1,13 @@
 #ifndef ROBOTSTATE_H
 #define ROBOTSTATE_H
+#define _USE_MATH_DEFINES
 
 #include <mutex>
+#include <math.h>
+
 #include "romocc/core/Object.h"
 #include "romocc/utilities/MathUtils.h"
+#include "romocc/communication/MessageDecoder.h"
 
 namespace romocc
 {
@@ -37,6 +41,7 @@ class ROMOCC_EXPORT RobotState : public Object
         Vector6d getJointVelocity();
         Vector6d getOperationalConfig();
         Vector6d getOperationalVelocity();
+        Vector6d getOperationalForce();
         Vector6d operationalConfigToJointConfig(Transform3d transform);
         Transform3d jointConfigToOperationalConfig(Vector6d jointConfig);
 
@@ -44,16 +49,19 @@ class ROMOCC_EXPORT RobotState : public Object
         std::shared_ptr<IKSolver> getIKSolver();
 
     private:
-        SharedPointer<MessageDecoder> mDecoder;
+        std::shared_ptr<MessageDecoder> mDecoder;
         void setKDLchain(Manipulator manipulator);
         void setDecoder(Manipulator manipulator);
-        void setState(RowVector6d q, RowVector6d q_vel, double timestamp);
+        void setState(romocc::ConfigState configState);
 
         double mTimestamp;
         Vector6d mJointConfiguration;
         Vector6d mJointVelocity;
         Vector6d mOperationalConfiguration;
+        Vector6d mOperationalVelocity;
+        Vector6d mOperationalForce;
         Transform3d m_bMee;
+        Manipulator mManipulator;
 
         std::mutex mValueLock;
 

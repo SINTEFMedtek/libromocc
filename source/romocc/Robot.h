@@ -46,11 +46,11 @@ class ROMOCC_EXPORT Robot : public Object
     private:
         void waitForMove();
 
-        SharedPointer<CommunicationInterface> mCommunicationInterface;
+        std::shared_ptr<CommunicationInterface> mCommunicationInterface;
         void startSubscription(std::function<void()> updateSignal);
 
-        SharedPointer<RobotCoordinateSystem> mCoordinateSystem;
-        SharedPointer<RobotState> mCurrentState;
+        std::shared_ptr<RobotCoordinateSystem> mCoordinateSystem;
+        std::shared_ptr<RobotState> mCurrentState;
         MotionQueue mMotionQueue;
         std::unique_ptr<std::thread> mThread;
         bool mActiveSubscription = false;
@@ -60,15 +60,45 @@ template <class Target>
 void Robot::move(MotionType type, Target target, double acc, double vel, double t, double rad, bool wait)
 {
     mCommunicationInterface->move(type, target, acc, vel, t, rad);
-    if(wait == true)
+    if(wait)
     {
-        auto remainingDistance = TransformUtils::norm(mCurrentState->get_bMee(), target);
-        while(remainingDistance > 0.005 || isnan(remainingDistance)){
+        double distanceThreshold = 0.005;
+        const int timeoutInSeconds = 10; // Set your desired timeout in seconds
+        const auto startTime = std::chrono::steady_clock::now();
+
+        double remainingDistance;
+        if(type == MotionType::movej){
+            auto targetj = target.matrix().reshaped(6,1);
+            remainingDistance = TransformUtils::norm(mCurrentState->getJointConfig(), targetj);
+        } else {
+            distanceThreshold = 0.015;
             remainingDistance = TransformUtils::norm(mCurrentState->get_bMee(), target);
+        };
+
+        while(remainingDistance > distanceThreshold || isnan(remainingDistance))
+        {
+            if(type == MotionType::movej){
+                auto targetj = target.matrix().reshaped(6,1);
+                remainingDistance = TransformUtils::norm(mCurrentState->getJointConfig(), targetj);
+            } else {
+                remainingDistance = TransformUtils::norm(mCurrentState->get_bMee(), target);
+            };
+            const auto currentTime = std::chrono::steady_clock::now();
+            const auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+            if (elapsedTime > timeoutInSeconds)
+            {
+                break;
+            }
         }
     }
 }
 
+template <>
+void Robot::move<double*>(MotionType type, double* target, double acc, double vel, double t, double rad, bool wait)
+{
+    Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> targetVector(target, 6);
+    move(type, targetVector, acc, vel, t, rad, wait);
+}
 
 
 } // namespace romocc

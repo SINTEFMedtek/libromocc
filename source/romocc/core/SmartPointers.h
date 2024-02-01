@@ -10,9 +10,9 @@
 
 #define ROMOCC_OBJECT(className)                                  \
     public:                                                     \
-        typedef SharedPointer<className> pointer;               \
-        static SharedPointer<className> New() {                       \
-            SharedPointer<className> smartPtr(new className());   \
+        typedef std::shared_ptr<className> pointer;               \
+        static std::shared_ptr<className> New() {                       \
+            std::shared_ptr<className> smartPtr(new className());   \
             smartPtr->setPtr(smartPtr);                              \
                                                                 \
             return smartPtr;                                    \
@@ -27,43 +27,6 @@
         void setPtr(className::pointer ptr) {                   \
             mPtr = ptr;                                         \
         }                                                       \
-
-
-
-#ifdef WIN32
-
-namespace romocc {
-
-template<class T>
-class SharedPointer : public std::shared_ptr<T> {
-    using std::shared_ptr<T>::shared_ptr; // inherit constructor
-
-};
-
-}; // end namespace echobot
-
-// Custom hashing functions for the smart pointers so that they can be used in unordered_map etc.
-namespace std {
-template <class U>
-class hash<romocc::SharedPointer<U> >{
-    public:
-        size_t operator()(const romocc::SharedPointer<U> &object) const {
-            return (std::size_t)object.get();
-        }
-};
-
-} // end namespace std
-
-#else
-
-namespace romocc {
-
-    template<class T>
-    using SharedPointer = std::shared_ptr<T>;
-
-}
-
-#endif
 
 
 #endif //ROMOCC_SMARTPOINTERS_H

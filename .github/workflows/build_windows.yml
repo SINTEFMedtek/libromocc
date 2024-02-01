@@ -1,0 +1,54 @@
+name: Build Windows
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: windows-2019
+
+    strategy:
+      matrix:
+        python-version: [ '3.8', '3.9', '3.10', '3.11' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install wheel
+
+      - name: Configure CMake
+        run: |
+          cmake ${{github.workspace}} -B ${{github.workspace}}/build `
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} `
+            -DROMOCC_BUILD_TESTS=OFF `
+            -DROMOCC_BUILD_EXAMPLES=OFF `
+            -DROMOCC_BUILD_PYTHON_BINDINGS=ON `
+
+      - name: Build libromocc
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
+
+      - name: Build pyromocc python wheel
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target create_python_wheel
+
+      - name: Upload Python wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: Python wheel
+          path: ${{github.workspace}}/build/pyromocc/dist/pyromocc-*.whl
+          if-no-files-found: error

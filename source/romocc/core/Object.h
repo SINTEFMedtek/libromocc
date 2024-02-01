@@ -12,7 +12,7 @@ namespace romocc{
 
 class Object {
     public:
-        typedef SharedPointer<Object> pointer;
+        typedef std::shared_ptr<Object> pointer;
         virtual ~Object() {};
 
     protected:

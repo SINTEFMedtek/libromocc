@@ -11,14 +11,38 @@ namespace romocc
 {
 
 // Supported manipulators
-typedef enum {UR5, UR10, UR10e} ManipulatorType;
+typedef enum {UR3, UR3e, UR5, UR5e, UR10, UR10e} ManipulatorType;
 struct ROMOCC_EXPORT Manipulator{
     ManipulatorType manipulator;
     std::string sw_version;
 
+    ManipulatorType manipulatorTypeFromString(const std::string& manipulator) {
+        if (manipulator == "UR3") {
+            return UR3;
+        } else if (manipulator == "UR3e"){
+            return UR3e;
+        } else if (manipulator == "UR5") {
+            return UR5;
+        } else if (manipulator == "UR5e") {
+            return UR5e;
+        } else if (manipulator == "UR10") {
+            return UR10;
+        } else if (manipulator == "UR10e") {
+            return UR10e;
+        } else {
+            throw std::runtime_error("Invalid manipulator type string");
+        }
+    }
+
     Manipulator(ManipulatorType manipulator = UR5, std::string sw_version = "3.0"){
         this->manipulator = manipulator;
-        this->sw_version = sw_version;};
+        this->sw_version = sw_version;
+    }
+
+    Manipulator(const std::string& manipulator, std::string sw_version = "3.0"){
+        this->manipulator = manipulatorTypeFromString(manipulator);
+        this->sw_version = sw_version;
+    }
 };
 
 // Robot motion
@@ -39,6 +63,14 @@ typedef KDL::ChainIkSolverPos_LMA IKSolver;
 typedef KDL::ChainIkSolverVel_pinv IKVelSolver;
 typedef KDL::ChainJntToJacSolver JacobianSolver;
 
+// Struct packaging
+#ifdef __GNUC__
+#define PACK( __Declaration__ ) __Declaration__ __attribute__((__packed__))
+#endif
+
+#ifdef _MSC_VER
+#define PACK( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop))
+#endif
 
 }
 

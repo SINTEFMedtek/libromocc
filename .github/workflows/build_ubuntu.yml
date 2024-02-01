@@ -1,0 +1,75 @@
+name: Build Ubuntu
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ ubuntu-22.04, ubuntu-20.04 ]
+        python-version: [ '3.8', '3.9', '3.10', '3.11' ]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            libeigen3-dev \
+            python3 \
+            libpython3-dev \
+            python3-pip \
+            python3-setuptools
+          pip install --upgrade pip
+          pip install patchelf
+          pip install wheel
+          pip install auditwheel
+
+      - name: Configure CMake
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -DROMOCC_BUILD_TESTS=ON \
+            -DROMOCC_BUILD_EXAMPLES=ON \
+            -DROMOCC_BUILD_PYTHON_BINDINGS=ON \
+
+      - name: Build libromocc
+        run: cmake --build build --config ${{env.BUILD_TYPE}} -j 4
+
+      - name: Build pyromocc python wheel
+        run: cmake --build build --config ${{env.BUILD_TYPE}} --target create_python_wheel
+
+      - name: Determine platform
+        id: determine_platform
+        run: |
+          echo platform=$(python3 -c "import distutils.util; print(distutils.util.get_platform().replace('-', '_').replace('.', '_'))") >> $GITHUB_OUTPUT
+
+      - name: Auditwheel repair
+        run: |
+          auditwheel repair ${{github.workspace}}/build/pyromocc/dist/pyromocc-*.whl --plat ${{ steps.determine_platform.outputs.platform }} -w ${{github.workspace}}/build/pyromocc/dist/wheelhouse
+
+      - name: Upload Python wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: Python wheel
+          path: ${{github.workspace}}/build/pyromocc/dist/wheelhouse/pyromocc-*.whl
+          if-no-files-found: error

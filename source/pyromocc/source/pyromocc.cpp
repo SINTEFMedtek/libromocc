@@ -2,6 +2,8 @@
 // Created by androst on 31.03.20.
 //
 
+#include <iostream>
+
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 #include <pybind11/stl.h>
@@ -26,17 +28,19 @@ PYBIND11_MODULE(pyromocc, m) {
         .def("get_state", &Robot::getCurrentState)
         .def("stop_move", &Robot::stopMove);
 
-    robot.def("movej", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double vel){
-            self.move(romocc::MotionType::movej, target, acc, vel);
+    robot.def("movej", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double vel,
+            double time = 0, double blendRad = 0, bool wait=false){
+            self.move(romocc::MotionType::movej, target, acc, vel, time, blendRad, wait);
     });
 
-    robot.def("movep", [](Robot& self, Eigen::Ref<const Eigen::MatrixXd> pose, double acc, double vel){
+    robot.def("movep", [](Robot& self, Eigen::Ref<const Eigen::MatrixXd> pose, double acc, double vel,
+            double time = 0, double blendRad = 0, bool wait=false){
         if(pose.rows() == 4 && pose.cols() == 4){
             Eigen::Affine3d transform;
             transform.matrix() = pose;
-            self.move(romocc::MotionType::movep, transform, acc, vel);
+            self.move(romocc::MotionType::movep, transform, acc, vel, time, blendRad, wait);
         } else{
-            self.move(romocc::MotionType::movep, pose.transpose(), acc, vel);
+            self.move(romocc::MotionType::movep, pose.transpose(), acc, vel, time, blendRad, wait);
         }
     });
 
@@ -58,6 +62,9 @@ PYBIND11_MODULE(pyromocc, m) {
     pybind11::class_<RobotState, std::shared_ptr<RobotState>> robotState(m, "RobotState");
     robotState.def("get_joint_config", &RobotState::getJointConfig);
     robotState.def("get_joint_velocity", &RobotState::getJointVelocity);
+    robotState.def("get_operational_config", &RobotState::getOperationalConfig);
+    robotState.def("get_operational_velocity", &RobotState::getOperationalVelocity);
+    robotState.def("get_operational_force", &RobotState::getOperationalForce);
     robotState.def("joint_to_pose", [](RobotState& self, Eigen::Ref<const Eigen::RowVectorXd> joint_config){
         return self.jointConfigToOperationalConfig(joint_config).matrix();
     });
@@ -87,8 +94,12 @@ PYBIND11_MODULE(pyromocc, m) {
             .def_readwrite("sw_version", &Manipulator::sw_version);
 
     py::enum_<ManipulatorType>(m, "ManipulatorType")
+        .value("UR3", ManipulatorType::UR3)
+        .value("UR3e", ManipulatorType::UR3e)
         .value("UR5", ManipulatorType::UR5)
-        .value("UR10", ManipulatorType::UR10);
+        .value("UR5e", ManipulatorType::UR5e)
+        .value("UR10", ManipulatorType::UR10)
+        .value("UR10e", ManipulatorType::UR10e);
 
     py::enum_<MotionType>(m, "MotionType")
         .value("movej", MotionType::movej)
@@ -129,15 +140,17 @@ PYBIND11_MODULE(pyromocc, m) {
 
     py::class_<CalibrationMatrices> calibration_matrices(m, "CalibrationMatrices");
     calibration_matrices.def_property_readonly("pose_x", [](CalibrationMatrices& self){
-        return self.prMb.matrix();
+        return self.X.matrix();
     });
     calibration_matrices.def_property_readonly("pose_y", [](CalibrationMatrices& self){
-        return self.eeMt.matrix();
+        return self.Y.matrix();
     });
 
     py::class_<CalibrationError> calibration_error(m, "CalibrationError");
     calibration_error.def_readonly("translation_error", &CalibrationError::translationError);
     calibration_error.def_readonly("rotation_error", &CalibrationError::rotationError);
+    calibration_error.def_readonly("translation_std", &CalibrationError::transStd);
+    calibration_error.def_readonly("rotation_std", &CalibrationError::rotStd);
 
     m.def("load_calibration_file", [](std::string filepath){
         auto cal_affine = romocc::load_calibration_file(filepath);
@@ -147,7 +160,7 @@ PYBIND11_MODULE(pyromocc, m) {
     m.def("save_calibration_file", [](std::string filepath, Eigen::Ref<const Eigen::MatrixXd> pose){
         Eigen::Affine3d transform;
         transform.matrix() = pose;
-        save_calibration_file(filepath, transform);
+        romocc::save_calibration_file(filepath, transform);
     });
 
     py::class_<CalibrationMethods> calibration_methods(m, "CalibrationMethods");
@@ -168,6 +181,45 @@ PYBIND11_MODULE(pyromocc, m) {
             poses_b_affine.push_back(transform);
         }
         return CalibrationMethods::Shah(poses_a_affine, poses_b_affine);;
+    });
+
+    calibration_methods.def("calibration_li", [](std::vector<Eigen::Ref<const Eigen::MatrixXd>> poses_a,
+                                                   std::vector<Eigen::Ref<const Eigen::MatrixXd>> poses_b){
+        std::vector<Eigen::Affine3d> poses_a_affine;
+        std::vector<Eigen::Affine3d> poses_b_affine;
+
+        for(auto const& pose: poses_a) {
+            Eigen::Affine3d transform;
+            transform.matrix() = pose;
+            poses_a_affine.push_back(transform);
+        }
+
+        for(auto const& pose: poses_b) {
+            Eigen::Affine3d transform;
+            transform.matrix() = pose;
+            poses_b_affine.push_back(transform);
+        }
+        return CalibrationMethods::Li(poses_a_affine, poses_b_affine);;
+    });
+
+
+    calibration_methods.def("calibration_park", [](std::vector<Eigen::Ref<const Eigen::MatrixXd>> poses_a,
+                                                 std::vector<Eigen::Ref<const Eigen::MatrixXd>> poses_b){
+        std::vector<Eigen::Affine3d> poses_a_affine;
+        std::vector<Eigen::Affine3d> poses_b_affine;
+
+        for(auto const& pose: poses_a) {
+            Eigen::Affine3d transform;
+            transform.matrix() = pose;
+            poses_a_affine.push_back(transform);
+        }
+
+        for(auto const& pose: poses_b) {
+            Eigen::Affine3d transform;
+            transform.matrix() = pose;
+            poses_b_affine.push_back(transform);
+        }
+        return CalibrationMethods::Park(poses_a_affine, poses_b_affine);
     });
 
     calibration_methods.def("estimate_calibration_error", [](Eigen::Ref<const Eigen::MatrixXd> pose_x,

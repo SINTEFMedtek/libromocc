@@ -38,8 +38,8 @@ class ROMOCC_EXPORT CommunicationInterface : public Object
         void stopMove(MotionType typeOfStop, double acc);
 
 private:
-        SharedPointer<Client> mClient;
-        SharedPointer<MessageEncoder> mEncoder;
+        std::shared_ptr<Client> mClient;
+        std::shared_ptr<MessageEncoder> mEncoder;
         RobotState::pointer mCurrentState;
 
         std::string mHost;

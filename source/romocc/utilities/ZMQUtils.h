@@ -7,12 +7,14 @@
 
 #include <zmq.h>
 #include <assert.h>
+
 #include "romocc/core/Object.h"
+#include "romocc/core/PortableEndian.h"
 
 namespace romocc
 {
 
-class ZMQUtils {
+class ROMOCC_EXPORT ZMQUtils {
 
     public:
         static void*& getContext()

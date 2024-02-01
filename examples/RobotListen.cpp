@@ -1,45 +1,64 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <cxxopts.hpp>
 
 #include "romocc/Robot.h"
+#include "romocc/utilities/MathUtils.h"
 
 using namespace romocc;
 
+void printUsage(const char* programName) {
+    std::cout << "Usage: " << programName << " --ip <IP address> --manipulator <Manipulator type> --sw_version <version>\n";
+}
+
 int main(int argc, char *argv[])
 {
-    auto print_message = []()
+    cxxopts::Options options("Robot listener", "Example of listening to robot states");
+
+    options.add_options()
+            ("ip", "IP address", cxxopts::value<std::string>()->default_value("192.168.231.131"))
+            ("manipulator", "Manipulator type", cxxopts::value<std::string>()->default_value("UR5"))
+            ("sw_version", "Software version", cxxopts::value<std::string>()->default_value("3.15"))
+            ("h,help", "Print usage");
+
+    auto result = options.parse(argc, argv);
+
+    if (result.count("help")) {
+        std::cout << options.help() << std::endl;
+        return 0;
+    }
+
+    std::string ip = result["ip"].as<std::string>();
+    std::string manipulator = result["manipulator"].as<std::string>();
+    std::string sw_version = result["sw_version"].as<std::string>();
+
+    std::cout << "Connecting to " << manipulator << " -- IP: " << ip << " -- SW: " << sw_version << std::endl;
+    auto robot = Robot::New();
+    robot->configure(Manipulator(manipulator, sw_version), ip, 30003);
+
+    if(robot->connect())
     {
-        std::cout << "State updated" << "\n";
-    };
-
-    auto ur5 = Robot::New();
-    ur5->configure(Manipulator(), "192.168.153.131", 30003);
-
-    if(ur5->connect())
-    {
-        ur5->addUpdateSubscription(print_message);
-
-        auto initialJointConfig = ur5->getCurrentState()->getJointConfig();
+        auto initialJointConfig = robot->getCurrentState()->getJointConfig();
         std::cout << initialJointConfig.transpose() << std::endl;
 
         double previousTime = 0;
         bool stop = false;
         std::thread processing_thread([&](){
             while(!stop){
-                Vector6d jointConfig = ur5->getCurrentState()->getJointConfig();
-                double currentTime = ur5->getCurrentState()->getTimestamp();
-                Transform3d m_bM1 = ur5->getCurrentState()->getTransformToJoint(1);
-                Transform3d m_bM2 = ur5->getCurrentState()->getTransformToJoint(2);
-                Transform3d m_bM3 = ur5->getCurrentState()->getTransformToJoint(3);
-                Transform3d m_bM4 = ur5->getCurrentState()->getTransformToJoint(4);
-                Transform3d m_bM5 = ur5->getCurrentState()->getTransformToJoint(5);
-                Transform3d m_bM6 = ur5->getCurrentState()->getTransformToJoint(6);
+                Vector6d jointConfig = robot->getCurrentState()->getJointConfig();
+                Vector6d operationalConfig = robot->getCurrentState()->getOperationalConfig();
+                Vector6d operationalVelocity = robot->getCurrentState()->getOperationalVelocity();
+                Vector6d operationalForce = robot->getCurrentState()->getOperationalForce();
+                double currentTime = robot->getCurrentState()->getTimestamp();
 
                 if(currentTime > previousTime)
                 {
-                    std::cout << jointConfig.transpose() << std::endl;
-                    previousTime = ur5->getCurrentState()->getTimestamp();
+                    std::cout << "Joint config: " << TransformUtils::radToDeg(jointConfig).transpose() << std::endl;
+                    std::cout << "Operational config: " << operationalConfig.transpose() << std::endl;
+                    std::cout << "Operational velocity: " << operationalVelocity.transpose() << std::endl;
+                    std::cout << "Operational force: " << operationalForce.transpose() << "\n" << std::endl;
+                    previousTime = robot->getCurrentState()->getTimestamp();
                 }
             }
         });
@@ -48,6 +67,5 @@ int main(int argc, char *argv[])
         stop = true;
         processing_thread.join();
     }
-
 
 }
