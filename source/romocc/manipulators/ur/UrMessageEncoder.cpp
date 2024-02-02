@@ -123,7 +123,7 @@ bool UrMessageEncoder::compareVersions(std::string version_0, std::string versio
     if(major_0 > major_1)
         return true;
     else{
-        if(minor_0 > minor_1)
+        if(major_0 == major_1 & minor_0 > minor_1)
             return true;
     }
     return false;
