@@ -42,14 +42,26 @@ print(robot.operational_config)
 ```
 
 ### Setup and build ###
+For building libromocc, you need to have CMake installed. 
 
 ```bash
 git clone https://github.com/SINTEFMedtek/libromocc.git
 cd libromocc
 mkdir build
 cd build
+```
+
+#### Windows ####
+```bash
+cmake .. -G "Visual Studio 16 2019" -A x64 # Change generator string to reflect your VS version
+cmake --build . --config Release -j 4
+```
+
+#### Ubuntu ####
+
+```bash
 cmake ..
-make -j8
+make -j 4
 ```
 
 ### Usage ###
