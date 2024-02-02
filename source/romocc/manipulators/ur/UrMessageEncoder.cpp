@@ -1,6 +1,5 @@
 #include "UrMessageEncoder.h"
 #include <stdio.h>
-#include <string.h>
 #include <iostream>
 
 namespace romocc
@@ -9,18 +8,21 @@ namespace romocc
 std::string UrMessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowVectorXd targetConfiguration, double acc,
                                       double vel, double t, double rad)
 {
-    acc = acc/1000; // mm -> m
-    vel = vel/1000;
-    rad = rad/1000;
-
     if(typeOfMovement==MotionType::movej)
         return movej(targetConfiguration,acc,vel,t,rad);
     else if(typeOfMovement==MotionType::movep){
+        acc = acc/1000; // mm -> m
+        vel = vel/1000;
+        rad = rad/1000;
+
         targetConfiguration(Eigen::seq(0, 2)) = targetConfiguration(Eigen::seq(0, 2))/1000;
         return movep(targetConfiguration,acc,vel,t,rad);
     }
-    else if(typeOfMovement==MotionType::speedl)
+    else if(typeOfMovement==MotionType::speedl){
+        acc = acc/1000; // mm -> m
+        targetConfiguration = targetConfiguration/1000; // mm -> m
         return speedl(targetConfiguration,acc,t);
+    }
     else if(typeOfMovement == MotionType::speedj)
         return speedj(targetConfiguration,acc,t);
     else if(typeOfMovement == MotionType::stopj)
