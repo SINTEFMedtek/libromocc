@@ -24,16 +24,16 @@ PYBIND11_MODULE(pyromocc, m) {
     pybind11::class_<Robot> robot(m, "RobotBase");
     robot.def(py::init<>())
         .def("configure", &Robot::configure)
-        .def("connect", &Robot::connect, "Connects to the robot.")
         .def("get_state", &Robot::getCurrentState)
-        .def("stop_move", &Robot::stopMove);
+        .def("stop_move", &Robot::stopMove)
+        .def("_connect", &Robot::connect, "Connects to the robot.");
 
-    robot.def("movej", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double vel,
+    robot.def("_movej", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double vel,
             double time = 0, double blendRad = 0, bool wait=false){
             self.move(romocc::MotionType::movej, target, acc, vel, time, blendRad, wait);
     });
 
-    robot.def("movep", [](Robot& self, Eigen::Ref<const Eigen::MatrixXd> pose, double acc, double vel,
+    robot.def("_movep", [](Robot& self, Eigen::Ref<const Eigen::MatrixXd> pose, double acc, double vel,
             double time = 0, double blendRad = 0, bool wait=false){
         if(pose.rows() == 4 && pose.cols() == 4){
             Eigen::Affine3d transform;
@@ -44,16 +44,16 @@ PYBIND11_MODULE(pyromocc, m) {
         }
     });
 
-    robot.def("speedj", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double time=5){
+    robot.def("_speedj", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc=500, double time=0.5){
         self.move(romocc::MotionType::speedj, target, acc, 0, time);
     });
-    robot.def("speedl", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double time=5){
+    robot.def("_speedl", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc=500, double time=0.5){
         self.move(romocc::MotionType::speedl, target, acc, 0, time);
     });
-    robot.def("stopj", [](Robot& self, double acc){
+    robot.def("_stopj", [](Robot& self, double acc){
         self.stopMove(romocc::MotionType::stopj, acc);
     });
-    robot.def("stopl", [](Robot& self, double acc){
+    robot.def("_stopl", [](Robot& self, double acc){
         self.stopMove(romocc::MotionType::stopl, acc);
     });
 
