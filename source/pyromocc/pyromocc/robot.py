@@ -122,9 +122,9 @@ class Robot(RobotBase):
         vec: np.ndarray, sequence (list, tuple)
             Translate with the relative vector (x, y, z)
         acceleration: float
-            Acceleration to velocity value
+            Acceleration to velocity value (mm/s^2)
         velocity: float
-            Velocity of motion
+            Velocity of motion (mm/s)
         wait: bool
             Wait for the motion to finish before returning
         """
@@ -182,7 +182,7 @@ class Robot(RobotBase):
         Parameters
         ----------
         velocity: np.ndarray, Sequence
-            Linear velocity (mm/s)
+            Linear velocity (x, y, z, rx, ry, rz) [mm/s, rad/s]
         acceleration: float
             Linear acceleration (mm/s^2)
         time: float
