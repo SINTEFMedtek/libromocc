@@ -5,6 +5,8 @@ from unittest import TestCase
 
 from pyromocc import Robot
 
+np.set_printoptions(precision=2, suppress=True)
+
 
 class TestRobot(TestCase):
     def setUp(self) -> None:
@@ -33,6 +35,10 @@ class TestRobot(TestCase):
         target_speed = [10, 0, 0, 0, 0, 0]
         self.robot.speedl(target_speed, 100, 3)
 
+    def test_robot_speedl_rx(self):
+        target_speed = [0, 0, 0, -np.pi/4, 0, 0]
+        self.robot.speedl(target_speed, 100, 3)
+
     def test_robot_speedj(self):
         target_speed_joints = [-np.pi/2, 0, 0, 0, 0, 0]
         self.robot.speedj(target_speed_joints, np.pi, time=1)
@@ -50,3 +56,27 @@ class TestRobot(TestCase):
         self.robot.speedj(target_speed_joints, np.pi, time=1)
         time.sleep(2)
         self.robot.stopj()
+
+    def test_robot_movep_exceed_limit(self):
+        target_pose_aa = [1000, 0, 0, 0, 0, 0]
+        self.robot.operational_config_limit = (1000, 1000, 1000, 1000, 1000, 1000)
+        with self.assertRaises(ValueError):
+            self.robot.movep(target_pose_aa, 100, 100, wait=True)
+
+    def test_robot_speedj_exceed_limit(self):
+        target_speed_joints = [np.pi/2, 0, 0, 0, 0, 0]
+        self.robot.joint_velocity_limit = np.pi/4
+        with self.assertRaises(ValueError):
+            self.robot.speedj(target_speed_joints, np.pi, time=1)
+
+    def test_robot_speedl_exceed_limit(self):
+        target_speed = [0, 0, 150, 2*np.pi, 0, 0]
+        self.robot.operational_velocity_limit = (100, np.pi)
+        with self.assertRaises(ValueError):
+            self.robot.speedl(target_speed, 500, 5)
+
+    def test_loop_stopj(self):
+        for i in range(125):
+            self.robot.stopj()
+            time.sleep(1/125.0)
+
