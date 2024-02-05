@@ -20,7 +20,7 @@ std::string UrMessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowV
     }
     else if(typeOfMovement==MotionType::speedl){
         acc = acc/1000; // mm -> m
-        targetConfiguration = targetConfiguration/1000; // mm -> m
+        targetConfiguration.head(3) /= 1000; // mm -> m
         return speedl(targetConfiguration,acc,t);
     }
     else if(typeOfMovement == MotionType::speedj)
