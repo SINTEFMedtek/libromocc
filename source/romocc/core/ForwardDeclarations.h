@@ -46,7 +46,7 @@ struct ROMOCC_EXPORT Manipulator{
 };
 
 // Robot motion
-typedef enum {movej,movep,speedj,speedl,stopj,stopl} MotionType;
+typedef enum {movej,movep,speedj,speedl,servoj,servoc,stopj,stopl} MotionType;
 typedef std::vector<struct RobotMotion> MotionQueue;
 
 // Eigen robot typedefs
