@@ -75,6 +75,27 @@ class TestRobot(TestCase):
         with self.assertRaises(ValueError):
             self.robot.speedl(target_speed, 500, 5)
 
+    def test_robot_servoj(self):
+        target_q = [-np.pi/2, -np.pi/2, -np.pi/2, -np.pi/2, np.pi/2, 0]
+        self.robot.servoj(target_q, 500, 250, 0.5, 0.1, 300.)
+
+    def test_robot_current_time(self):
+        print(self.robot.current_time())
+
+    def test_robot_wait(self):
+        self.robot.wait(0.5, 1/125.)
+
+    def test_robot_servoj_control_loop(self):
+        target_q = [-1.6007, -1.7271, -2.2030, -0.8080, 1.5951, -0.0310]
+        self.robot.movej(target_q, 0.5, 0.5, 0, 0, True)
+
+        for _ in range(250):
+            current_time = self.robot.current_time()
+            self.robot.servoj(target_q, 0.0, 0.0, 1/125.0, 0.1, 300.)
+            target_q[0] += 0.001
+            target_q[1] += 0.001
+            self.robot.wait(current_time, 1/125.0)
+
     def test_loop_stopj(self):
         for i in range(125):
             self.robot.stopj()
