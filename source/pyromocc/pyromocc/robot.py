@@ -258,7 +258,7 @@ class Robot(RobotBase):
 
     @property
     def operational_velocity(self):
-        return self.get_state().get_operational_config()
+        return self.get_state().get_operational_velocity()
 
     @property
     def operational_force(self):
