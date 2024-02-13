@@ -215,6 +215,13 @@ class Robot(RobotBase):
         self._verify_limits(acceleration, velocity, is_joint=True)
         self._speedj(velocity, acceleration, time)
 
+    def servoj(self, joint_config, acceleration, velocity, time, lookahead_time, gain):
+        self._verify_limits(acceleration, velocity, is_joint=True)
+        self._servoj(joint_config, acceleration, velocity, time, lookahead_time, gain)
+
+    def servoc(self, pose, acceleration, velocity, radius):
+        raise NotImplemented
+
     def stopl(self, acceleration=500):
         """
         Stops the robot with linear motion and given acceleration.
@@ -417,8 +424,18 @@ class Robot(RobotBase):
         else:
             if np.any(np.abs(acceleration) > self.operational_acceleration_limit):
                 raise ValueError("Operational acceleration exceeds the limit.")
-            if np.any(np.abs(velocity) > self.operational_velocity_limit):
-                raise ValueError("Operational velocity exceeds the limit.")
+
+            if isinstance(velocity, (list, tuple)):
+                if len(velocity) == 6:
+                    if np.any(np.abs(velocity) > self.operational_velocity_limit):
+                        raise ValueError("Operational velocity exceeds the limit.")
+                elif len(velocity) == 2:
+                    if (np.any(np.abs(velocity[0]) > self.operational_velocity_limit[:3]) or
+                            np.any(np.abs(velocity[1]) > self.operational_velocity_limit[3:])):
+                        raise ValueError("Operational velocity exceeds the limit.")
+            else:
+                if np.any(np.abs(velocity) > self.operational_velocity_limit[:3]):
+                    raise ValueError("Operational velocity exceeds the limit")
 
     def _has_valid_state(self):
         """ Checks if robot is in a valid state by evaluating the joint configuration."""
