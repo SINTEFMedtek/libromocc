@@ -31,7 +31,11 @@ class ROMOCC_EXPORT Robot : public Object
         void addUpdateSubscription(std::function<void()> updateFunction);
 
         template <class Target>
-        void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0, bool wait=false);
+        void move(MotionType type, Target target, double acc, double vel, double t=0, double rad=0,  bool wait=false);
+
+        template <class Target>
+        void move(MotionType type, Target target, double acc, double vel, double t, double lookahead_time, double gain);
+
         void stopMove(MotionType type, double acc);
         void sendProgram(std::string program);
 
@@ -104,6 +108,11 @@ void Robot::move<double*>(MotionType type, double* target, double acc, double ve
     move(type, targetVector, acc, vel, t, rad, wait);
 }
 
+template <class Target>
+void Robot::move(MotionType type, Target target, double acc, double vel, double t, double lookahead_time, double gain)
+{
+    mCommunicationInterface->move(type, target, acc, vel, t, lookahead_time, gain);
+}
 
 } // namespace romocc
 
