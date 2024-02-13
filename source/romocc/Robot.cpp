@@ -105,10 +105,55 @@ void Robot::sendProgram(std::string program)
     mCommunicationInterface->sendMessage(program);
 }
 
+std::chrono::steady_clock::time_point Robot::currentTime()
+{
+    return std::chrono::steady_clock::now();
+}
+
 void Robot::addUpdateSubscription(std::function<void()> updateSignal)
 {
     mActiveSubscription = true;
     mThread = std::make_unique<std::thread>(std::bind(&Robot::startSubscription, this, updateSignal));
+}
+
+void Robot::wait(const std::chrono::steady_clock::time_point &t_cycle_start, double dt)
+{
+    auto t_app_stop = std::chrono::steady_clock::now();
+    auto t_app_duration = std::chrono::duration<double>(t_app_stop - t_cycle_start);
+    if (t_app_duration.count() < dt)
+    {
+        sleep(dt - t_app_duration.count());
+    }
+}
+
+void Robot::sleep(double seconds)
+{
+    static double estimate = 5e-3;
+    static double mean = 5e-3;
+    static double m2 = 0;
+    static int64_t count = 1;
+
+    while (seconds > estimate)
+    {
+        auto start = std::chrono::high_resolution_clock::now();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        auto end = std::chrono::high_resolution_clock::now();
+
+        double observed = std::chrono::duration<double>(end - start).count();
+        seconds -= observed;
+
+        ++count;
+        double delta = observed - mean;
+        mean += delta / static_cast<double>(count);
+        m2 += delta * (observed - mean);
+        double stddev = sqrt(m2 / (static_cast<double>(count - 1)));
+        estimate = mean + stddev;
+    }
+
+    // Lock
+    auto start = std::chrono::high_resolution_clock::now();
+    while (std::chrono::duration<double>((std::chrono::high_resolution_clock::now() - start)).count() < seconds)
+        ;
 }
 
 void Robot::startSubscription(std::function<void()> updateSignal)

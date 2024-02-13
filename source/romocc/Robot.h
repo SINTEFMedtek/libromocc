@@ -40,6 +40,10 @@ class ROMOCC_EXPORT Robot : public Object
 
         RobotCoordinateSystem::pointer getCoordinateSystem(){ return mCoordinateSystem;};
 
+        std::chrono::steady_clock::time_point currentTime();
+        void wait(const std::chrono::steady_clock::time_point &t_cycle_start, double dt = 1/125.0);
+        static void sleep(double seconds);
+
         Robot();
         ~Robot();
 
