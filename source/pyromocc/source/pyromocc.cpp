@@ -1,12 +1,9 @@
-//
-// Created by androst on 31.03.20.
-//
-
 #include <iostream>
 
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 #include <pybind11/stl.h>
+#include <pybind11/chrono.h>
 
 #include "romocc/Robot.h"
 #include "romocc/utilities/MathUtils.h"
@@ -47,15 +44,32 @@ PYBIND11_MODULE(pyromocc, m) {
     robot.def("_speedj", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc=M_PI_4, double time=0.5){
         self.move(romocc::MotionType::speedj, target, acc, 0, time);
     });
+
     robot.def("_speedl", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc=500, double time=0.5){
         self.move(romocc::MotionType::speedl, target, acc, 0, time);
     });
+
+    robot.def("_servoj", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc=500, double vel=500, double time=1/125., double lookahead_time=0.1, double gain=300){
+        self.move(romocc::MotionType::servoj, target, acc, vel, time, lookahead_time, gain);
+    });
+
+    robot.def("_servoc", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc=500, double vel=500, double rad=10){
+        self.move(romocc::MotionType::servoc, target, acc, vel, rad);
+    });
+
     robot.def("_stopj", [](Robot& self, double acc=M_PI_2){
         self.stopMove(romocc::MotionType::stopj, acc);
     });
+
     robot.def("_stopl", [](Robot& self, double acc=500){
         self.stopMove(romocc::MotionType::stopl, acc);
     });
+
+    robot.def("wait", [](Robot& self, const std::chrono::steady_clock::time_point &t_cycle_start, double dt=1/125.){
+        self.wait(t_cycle_start, dt);
+    });
+
+    robot.def("current_time", &Robot::currentTime);
 
     robot.def("_send_program", &Robot::sendProgram);
 
@@ -106,6 +120,8 @@ PYBIND11_MODULE(pyromocc, m) {
         .value("movep", MotionType::movep)
         .value("speedj", MotionType::speedj)
         .value("speedl", MotionType::speedl)
+        .value("servoj", MotionType::servoj)
+        .value("servoc", MotionType::servoc)
         .value("stopj", MotionType::stopj)
         .value("stopl", MotionType::stopl);
 
