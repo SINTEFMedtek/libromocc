@@ -13,6 +13,7 @@ class ROMOCC_EXPORT MessageEncoder : public Object
 {
     public:
         virtual std::string moveCommand(MotionType type, Eigen::RowVectorXd jointConfig, double acc, double vel, double t, double rad) = 0;
+        virtual std::string moveCommand(MotionType type, Eigen::RowVectorXd jointConfig, double acc, double vel, double t, double lookahead_time, double gain) = 0;
         virtual std::string moveCommand(MotionType type, Eigen::Affine3d pose, double acc, double vel, double t, double rad) = 0;
         virtual std::string moveCommand(MotionType type, double target[], double acc, double vel, double t, double rad) = 0;
         virtual std::string stopCommand(MotionType type, double acc) = 0;

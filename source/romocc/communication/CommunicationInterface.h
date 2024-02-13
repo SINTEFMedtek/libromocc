@@ -35,6 +35,10 @@ class ROMOCC_EXPORT CommunicationInterface : public Object
 
         template <class TargetConfiguration>
         void move(MotionType typeOfMotion, TargetConfiguration target, double acc, double vel, double t, double rad);
+
+        template <class TargetConfiguration>
+        void move(MotionType typeOfMotion, TargetConfiguration target, double acc, double vel, double t, double lookahead_time, double gain);
+
         void stopMove(MotionType typeOfStop, double acc);
 
 private:
@@ -57,6 +61,13 @@ void CommunicationInterface::move(MotionType typeOfMotion, TargetConfiguration t
 {
     sendMessage(mEncoder->moveCommand(typeOfMotion, target, acc, vel, t, rad));
 };
+
+template <class TargetConfiguration>
+void CommunicationInterface::move(MotionType typeOfMotion, TargetConfiguration target, double acc, double vel, double t, double lookahead_time, double gain)
+{
+    sendMessage(mEncoder->moveCommand(typeOfMotion, target, acc, vel, t, lookahead_time, gain));
+};
+
 
 }
 
