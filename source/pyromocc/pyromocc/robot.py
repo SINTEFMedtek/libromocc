@@ -219,6 +219,10 @@ class Robot(RobotBase):
         self._verify_limits(acceleration, velocity, is_joint=True)
         self._servoj(joint_config, acceleration, velocity, time, lookahead_time, gain)
 
+    def servol(self, pose, time):
+        # TODO: Check limits
+        self._servol(pose, time)
+
     def servoc(self, pose, acceleration, velocity, radius):
         raise NotImplemented
 

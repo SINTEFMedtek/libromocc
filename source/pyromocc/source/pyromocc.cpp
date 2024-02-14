@@ -53,6 +53,10 @@ PYBIND11_MODULE(pyromocc, m) {
         self.move(romocc::MotionType::servoj, target, acc, vel, time, lookahead_time, gain);
     });
 
+    robot.def("_servol", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double time=1/125.){
+        self.move(romocc::MotionType::servol, target, 0, 0, time);
+    });
+
     robot.def("_servoc", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc=500, double vel=500, double rad=10){
         self.move(romocc::MotionType::servoc, target, acc, vel, rad);
     });
@@ -122,6 +126,7 @@ PYBIND11_MODULE(pyromocc, m) {
         .value("speedj", MotionType::speedj)
         .value("speedl", MotionType::speedl)
         .value("servoj", MotionType::servoj)
+        .value("servol", MotionType::servol)
         .value("servoc", MotionType::servoc)
         .value("stopj", MotionType::stopj)
         .value("stopl", MotionType::stopl);
