@@ -89,6 +89,10 @@ class TestRobot(TestCase):
         target_q = [-np.pi/2, -np.pi/2, -np.pi/2, -np.pi/2, np.pi/2, 0]
         self.robot.servoj(target_q, 500, 250, 0.5, 0.1, 300.)
 
+    def test_robot_servol(self):
+        target_oc = [-120.11, -431.76, 200, 0.00, -3.00, 0.00]
+        self.robot.servol(target_oc, 5)
+
     def test_robot_current_time(self):
         print(self.robot.current_time())
 
