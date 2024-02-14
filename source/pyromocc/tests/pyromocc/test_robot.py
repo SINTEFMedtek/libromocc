@@ -19,6 +19,16 @@ class TestRobot(TestCase):
     def test_operational_config(self):
         assert self.robot.operational_config is not None
 
+    def test_robot_get_timestamp_update_loop(self):
+        timestamps = [self.robot.timestamp]
+        for _ in range(100000):
+            current_timestamp = self.robot.timestamp
+            if current_timestamp != timestamps[-1]:
+                timestamps.append(current_timestamp)
+        sample_time = np.average(np.diff(timestamps))
+        sample_rate = 1/sample_time
+        print(len(timestamps), sample_time, sample_rate)
+
     def test_robot_movej(self):
         target_q = [-np.pi/2, -np.pi/2, -np.pi/2, -np.pi/2, np.pi/2, 0]
         self.robot.movej(target_q, np.pi/4, np.pi/4, wait=True)
