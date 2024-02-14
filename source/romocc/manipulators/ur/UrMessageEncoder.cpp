@@ -6,7 +6,7 @@ namespace romocc
 {
 
 std::string UrMessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowVectorXd targetConfiguration, double acc,
-                                      double vel, double t, double rad)
+                                          double vel, double t, double rad)
 {
     if(typeOfMovement==MotionType::movej)
         return movej(targetConfiguration,acc,vel,t,rad);
@@ -27,6 +27,10 @@ std::string UrMessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowV
         return speedj(targetConfiguration,acc,t);
     else if(typeOfMovement==MotionType::servoc)
         return servoc(targetConfiguration, acc, vel, rad);
+    else if(typeOfMovement==MotionType::servol){
+        targetConfiguration.head(3) /= 1000; // mm -> m
+        return servol(targetConfiguration, t);
+    }
     else if(typeOfMovement == MotionType::stopj)
         return stopj(acc);
     else if(typeOfMovement == MotionType::stopl)
@@ -107,6 +111,11 @@ std::string UrMessageEncoder::servoj(Eigen::RowVectorXd jp, double a, double v, 
     if(mNewSWVersion)
         return format("servoj([%f,%f,%f,%f,%f,%f],a=%f,v=%f,t=%f,lookahead_time=%f,gain=%f)", jp(0), jp(1), jp(2), jp(3), jp(4), jp(5), a, v, t, lookahead_time, gain);
     return format("servoj([%f,%f,%f,%f,%f,%f],a=%f,v=%f,t=%f)", jp(0), jp(1), jp(2), jp(3), jp(4), jp(5), a, v, t);
+}
+
+std::string UrMessageEncoder::servol(Eigen::RowVectorXd oc, double t)
+{
+    return format("servol(p[%f,%f,%f,%f,%f,%f],%f)", oc(0), oc(1), oc(2), oc(3), oc(4), oc(5), t);
 }
 
 std::string UrMessageEncoder::servoc(Eigen::RowVectorXd oc, double a, double v, double r)

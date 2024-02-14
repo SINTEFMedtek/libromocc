@@ -38,6 +38,7 @@ class ROMOCC_EXPORT UrMessageEncoder : public MessageEncoder
         std::string speedl(Eigen::RowVectorXd operationalVelocity, double a, double t);
 
         std::string servoj(Eigen::RowVectorXd jointPosition, double a, double v, double t, double lookahead_time, double gain);
+        std::string servol(Eigen::RowVectorXd operationalConfig, double t);
         std::string servoc(Eigen::RowVectorXd operationalConfig, double a, double v, double r);
 
         std::string stopj(double a);

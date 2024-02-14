@@ -165,6 +165,15 @@ TEST_CASE("Move servoj", "[romocc][Robot]"){
     robot->move(MotionType::servoj, target_q, 500., 500., 1, 0.1, 300.);
 }
 
+TEST_CASE("Move servol", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5e), "localhost", 30003);
+    robot->connect();
+
+    Vector6d target_oc = {-120.11, -431.76, 100, 0.00, -3.00, 0.00};
+    robot->move(MotionType::servol, target_oc, 0., 0., 5, 0.0, false);
+}
+
 TEST_CASE("Move servoc", "[romocc][Robot]"){
     Robot::pointer robot = Robot::New();
     robot->configure(Manipulator(ManipulatorType::UR5), "localhost", 30003);
