@@ -433,7 +433,10 @@ class Robot(RobotBase):
             if np.any(np.abs(acceleration) > self.operational_acceleration_limit):
                 raise ValueError("Operational acceleration exceeds the limit.")
 
-            if isinstance(velocity, (list, tuple)):
+            if isinstance(velocity, float):
+                if np.any(np.abs(velocity) > self.operational_velocity_limit[:3]):
+                    raise ValueError("Operational velocity exceeds the limit.")
+            else:
                 if len(velocity) == 6:
                     if np.any(np.abs(velocity) > self.operational_velocity_limit):
                         raise ValueError("Operational velocity exceeds the limit.")
@@ -441,9 +444,6 @@ class Robot(RobotBase):
                     if (np.any(np.abs(velocity[0]) > self.operational_velocity_limit[:3]) or
                             np.any(np.abs(velocity[1]) > self.operational_velocity_limit[3:])):
                         raise ValueError("Operational velocity exceeds the limit.")
-            else:
-                if np.any(np.abs(velocity) > self.operational_velocity_limit[:3]):
-                    raise ValueError("Operational velocity exceeds the limit")
 
     def _has_valid_state(self):
         """ Checks if robot is in a valid state by evaluating the joint configuration."""
