@@ -79,6 +79,7 @@ PYBIND11_MODULE(pyromocc, m) {
     robotState.def("get_operational_config", &RobotState::getOperationalConfig);
     robotState.def("get_operational_velocity", &RobotState::getOperationalVelocity);
     robotState.def("get_operational_force", &RobotState::getOperationalForce);
+    robotState.def("get_timestamp", &RobotState::getTimestamp);
     robotState.def("joint_to_pose", [](RobotState& self, Eigen::Ref<const Eigen::RowVectorXd> joint_config){
         return self.jointConfigToOperationalConfig(joint_config).matrix();
     });

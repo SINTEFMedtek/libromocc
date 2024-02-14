@@ -265,6 +265,10 @@ class Robot(RobotBase):
         return self.get_state().get_operational_force()
 
     @property
+    def timestamp(self):
+        return self.get_state().get_timestamp()
+
+    @property
     def pose(self):
         pose = np.copy(self.get_state().get_pose())
         return pose
