@@ -83,7 +83,7 @@ class Robot(RobotBase):
         self.is_connected = self._connect()
 
         t0 = time.time()
-        while not self._has_valid_state() or time.time()-t0 > 5.0:
+        while not self._has_valid_state() and time.time()-t0 < 5.0:
             time.sleep(0.1)
             self.is_connected = self._has_valid_state()
 
