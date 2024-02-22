@@ -44,7 +44,7 @@ class ROMOCC_EXPORT UrMessageDecoder : public MessageDecoder
                 double generalised_tool_forces_[UrMessageDecoder::NUMBER_OF_JOINTS];
                 double target_tool_coordinates_[UrMessageDecoder::NUMBER_OF_JOINTS];
                 double target_tool_speed_[UrMessageDecoder::NUMBER_OF_JOINTS];
-                int64_t digital_pins_;
+                int64_t all_pins_;
                 double motor_temperatures_[UrMessageDecoder::NUMBER_OF_JOINTS];
                 double controller_timer_;
                 double test_value_;
@@ -61,6 +61,7 @@ class ROMOCC_EXPORT UrMessageDecoder : public MessageDecoder
                 double masterboard_robot_voltage_;
                 double masterboard_robot_current_;
                 double actual_joint_voltages_[UrMessageDecoder::NUMBER_OF_JOINTS];
+                int64_t all_pouts_;
         });
 };
 

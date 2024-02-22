@@ -42,6 +42,13 @@ class ROMOCC_EXPORT RobotState : public Object
         Vector6d getOperationalConfig();
         Vector6d getOperationalVelocity();
         Vector6d getOperationalForce();
+        int getDigitalOutputs();
+        int getDigitalInputs();
+        int getConfigurableOutputs();
+        int getConfigurableInputs();
+        int getToolOutputs();
+        int getToolInputs();
+        int getSafetyMode();
         Vector6d operationalConfigToJointConfig(Transform3d transform);
         Transform3d jointConfigToOperationalConfig(Vector6d jointConfig);
 
@@ -60,6 +67,13 @@ class ROMOCC_EXPORT RobotState : public Object
         Vector6d mOperationalConfiguration;
         Vector6d mOperationalVelocity;
         Vector6d mOperationalForce;
+        int mDigitalOutputs;
+        int mDigitalInputs;
+        int mConfigurableOutputs;
+        int mConfigurableInputs;
+        int mToolOutputs;
+        int mToolInputs;
+        int mSafetyMode;
         Transform3d m_bMee;
         Manipulator mManipulator;
 

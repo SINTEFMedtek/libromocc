@@ -53,6 +53,13 @@ void RobotState::setState(romocc::ConfigState configState) {
     mJointConfiguration = configState.jointConfiguration;
     mJointVelocity = configState.jointVelocity;
     mOperationalForce = configState.operationalForce;
+    mDigitalOutputs = configState.digitalOutputs;
+    mDigitalInputs = configState.digitalInputs;
+    mConfigurableOutputs = configState.configurableOutput;
+    mConfigurableInputs = configState.configurableInputs;
+    mToolOutputs = configState.toolOutputs;
+    mToolInputs = configState.toolInputs;
+    mSafetyMode = configState.safetyMode;
 
     if(mManipulator.manipulator == UR5e || mManipulator.manipulator == UR10e || mManipulator.manipulator == UR3e){
         mOperationalConfiguration = configState.operationalConfiguration;
@@ -125,6 +132,62 @@ Vector6d RobotState::getOperationalConfig() {
     Vector6d ret;
     mValueLock.lock();
     ret = mOperationalConfiguration;
+    mValueLock.unlock();
+    return ret;
+}
+
+int RobotState::getDigitalOutputs() {
+    int ret;
+    mValueLock.lock();
+    ret = mDigitalOutputs;
+    mValueLock.unlock();
+    return ret;
+}
+
+int RobotState::getConfigurableOutputs() {
+    int ret;
+    mValueLock.lock();
+    ret = mConfigurableOutputs;
+    mValueLock.unlock();
+    return ret;
+}
+
+int RobotState::getDigitalInputs() {
+    int ret;
+    mValueLock.lock();
+    ret = mDigitalInputs;
+    mValueLock.unlock();
+    return ret;
+}
+
+int RobotState::getConfigurableInputs() {
+    int ret;
+    mValueLock.lock();
+    ret = mConfigurableInputs;
+    mValueLock.unlock();
+    return ret;
+}
+
+int RobotState::getToolOutputs() {
+    int ret;
+    mValueLock.lock();
+    ret = mToolOutputs;
+    mValueLock.unlock();
+    return ret;
+}
+
+int RobotState::getToolInputs() {
+    int ret;
+    mValueLock.lock();
+    ret = mToolInputs;
+    mValueLock.unlock();
+    return ret;
+}
+
+int RobotState::getSafetyMode() {
+    int ret;
+    mValueLock.lock();
+    ret = mSafetyMode;
     mValueLock.unlock();
     return ret;
 }

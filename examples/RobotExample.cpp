@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
 
     options.add_options()
             ("ip", "IP address", cxxopts::value<std::string>()->default_value("192.168.231.131"))
+            ("port", "Dashboard port", cxxopts::value<int>()->default_value("300003"))
             ("manipulator", "Manipulator type", cxxopts::value<std::string>()->default_value("UR5"))
             ("sw_version", "Software version", cxxopts::value<std::string>()->default_value("3.15"))
             ("h,help", "Print usage");
@@ -33,12 +34,13 @@ int main(int argc, char *argv[])
     }
 
     std::string ip = result["ip"].as<std::string>();
+    int port = result["port"].as<int>();
     std::string manipulator = result["manipulator"].as<std::string>();
     std::string sw_version = result["sw_version"].as<std::string>();
 
-    std::cout << "Connecting to " << manipulator << " -- IP: " << ip << " -- SW: " << sw_version << std::endl;
+    std::cout << "Connecting to " << manipulator << " -- IP: " << ip << ":" << port << "  --SW: " << sw_version << std::endl;
     auto robot = Robot::New();
-    robot->configure(Manipulator(manipulator, sw_version), ip, 30003);
+    robot->configure(Manipulator(manipulator, sw_version), ip, port);
 
     if(robot->connect())
     {
@@ -51,13 +53,22 @@ int main(int argc, char *argv[])
             while(!stop){
                 Vector6d jointConfig = robot->getCurrentState()->getJointConfig();
                 Vector6d operationalConfig = robot->getCurrentState()->getOperationalConfig();
+                int digitalOutputs = robot->getCurrentState()->getDigitalOutputs();
+                int configurableOutputs = robot->getCurrentState()->getConfigurableOutputs();
+                int toolOutputs = robot->getCurrentState()->getToolOutputs();
 
+                int safetyMode = robot->getCurrentState()->getSafetyMode();
+                
                 double currentTime = robot->getCurrentState()->getTimestamp();
 
                 if(currentTime > previousTime)
                 {
                     std::cout << "Joint config: " << TransformUtils::radToDeg(jointConfig).transpose() << std::endl;
-                    std::cout << "Operational config: " << operationalConfig.transpose() << "\n" << std::endl;
+                    std::cout << "Operational config: " << operationalConfig.transpose() << std::endl;
+                    std::cout << "Digital outputs: " << digitalOutputs << std::endl;
+                    std::cout << "Configurable outputs: " << configurableOutputs << std::endl;
+                    std::cout << "Tool outputs: " << toolOutputs << std::endl;
+                    std::cout << "Safety mode: " << safetyMode << "\n" << std::endl;
                     previousTime = robot->getCurrentState()->getTimestamp();
                 }
             }
