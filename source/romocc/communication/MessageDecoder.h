@@ -3,7 +3,6 @@
 
 #include "romocc/core/Object.h"
 #include "romocc/core/ForwardDeclarations.h"
-#include <bitset>
 
 namespace romocc
 {
