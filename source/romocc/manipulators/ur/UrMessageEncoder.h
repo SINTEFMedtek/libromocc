@@ -22,19 +22,24 @@ class ROMOCC_EXPORT UrMessageEncoder : public MessageEncoder
         virtual std::string moveCommand(MotionType type, Eigen::RowVectorXd targetConfiguration, double acc, double vel, double t, double rad);
         virtual std::string moveCommand(MotionType type, Eigen::Affine3d targetPose, double acc, double vel, double t, double rad);
         virtual std::string moveCommand(MotionType type, double targetConfig[6], double acc, double vel, double t, double rad);
+        virtual std::string moveCommand(MotionType type, Eigen::RowVectorXd targetConfiguration, double acc, double vel, double t, double lookahead_time, double gain);
 
         virtual std::string stopCommand(MotionType typeOfStop, double acc);
         virtual std::string shutdownCommand();
 
         void setSoftwareVersion(std::string version);
 
-private:
+    private:
         std::string movej(Eigen::RowVectorXd jointConfig, double a, double v, double t, double r);
         std::string movep(Eigen::RowVectorXd operationalConfig, double a, double v, double t, double r);
         std::string movep(double operationalConfig[6], double a, double v, double t, double r);
 
         std::string speedj(Eigen::RowVectorXd jointVelocity, double a, double t);
         std::string speedl(Eigen::RowVectorXd operationalVelocity, double a, double t);
+
+        std::string servoj(Eigen::RowVectorXd jointPosition, double a, double v, double t, double lookahead_time, double gain);
+        std::string servol(Eigen::RowVectorXd operationalConfig, double t);
+        std::string servoc(Eigen::RowVectorXd operationalConfig, double a, double v, double r);
 
         std::string stopj(double a);
         std::string stopl(double a);

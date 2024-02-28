@@ -1,30 +1,51 @@
 #include "UrMessageEncoder.h"
 #include <stdio.h>
-#include <string.h>
 #include <iostream>
 
 namespace romocc
 {
 
 std::string UrMessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowVectorXd targetConfiguration, double acc,
-                                      double vel, double t, double rad)
+                                          double vel, double t, double rad)
 {
-    acc = acc/1000; // mm -> m
-    vel = vel/1000;
-    rad = rad/1000;
-
     if(typeOfMovement==MotionType::movej)
         return movej(targetConfiguration,acc,vel,t,rad);
     else if(typeOfMovement==MotionType::movep){
+        acc = acc/1000; // mm -> m
+        vel = vel/1000;
+        rad = rad/1000;
+
         targetConfiguration(Eigen::seq(0, 2)) = targetConfiguration(Eigen::seq(0, 2))/1000;
         return movep(targetConfiguration,acc,vel,t,rad);
     }
-    else if(typeOfMovement==MotionType::speedl)
+    else if(typeOfMovement==MotionType::speedl){
+        acc = acc/1000; // mm -> m
+        targetConfiguration.head(3) /= 1000; // mm -> m
         return speedl(targetConfiguration,acc,t);
+    }
     else if(typeOfMovement == MotionType::speedj)
         return speedj(targetConfiguration,acc,t);
+    else if(typeOfMovement==MotionType::servoc)
+        return servoc(targetConfiguration, acc, vel, rad);
+    else if(typeOfMovement==MotionType::servol){
+        targetConfiguration.head(3) /= 1000; // mm -> m
+        return servol(targetConfiguration, t);
+    }
     else if(typeOfMovement == MotionType::stopj)
         return stopj(acc);
+    else if(typeOfMovement == MotionType::stopl)
+        return stopl(acc);
+    else
+        return std::string("Invalid motion type");
+}
+
+std::string UrMessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::RowVectorXd targetConfiguration, double acc,
+                                          double vel, double t, double lookahead_time, double gain)
+{
+    if(typeOfMovement==MotionType::servoj)
+        return servoj(targetConfiguration,acc,vel,t,lookahead_time,gain);
+    else
+        return std::string("Invalid motion type");
 }
 
 std::string UrMessageEncoder::moveCommand(MotionType typeOfMovement, Eigen::Affine3d pose, double acc, double vel, double t, double radius)
@@ -47,6 +68,8 @@ std::string UrMessageEncoder::stopCommand(MotionType typeOfStop, double acc)
         return stopj(acc);
     else if(typeOfStop==MotionType::stopl)
         return stopl(acc);
+    else
+        return std::string("Invalid stop type");
 }
 
 std::string UrMessageEncoder::shutdownCommand()
@@ -81,6 +104,23 @@ std::string UrMessageEncoder::speedl(Eigen::RowVectorXd ov, double a, double t)
     if(mNewSWVersion)
         return format("speedl([%f,%f,%f,%f,%f,%f],a=%f,t=%f)", ov(0), ov(1), ov(2), ov(3), ov(4), ov(5), a, t);
     return format("speedl([%f,%f,%f,%f,%f,%f],a=%f,t_min=%f)", ov(0), ov(1), ov(2), ov(3), ov(4), ov(5), a, t);
+}
+
+std::string UrMessageEncoder::servoj(Eigen::RowVectorXd jp, double a, double v, double t, double lookahead_time, double gain)
+{
+    if(mNewSWVersion)
+        return format("servoj([%f,%f,%f,%f,%f,%f],a=%f,v=%f,t=%f,lookahead_time=%f,gain=%f)", jp(0), jp(1), jp(2), jp(3), jp(4), jp(5), a, v, t, lookahead_time, gain);
+    return format("servoj([%f,%f,%f,%f,%f,%f],a=%f,v=%f,t=%f)", jp(0), jp(1), jp(2), jp(3), jp(4), jp(5), a, v, t);
+}
+
+std::string UrMessageEncoder::servol(Eigen::RowVectorXd oc, double t)
+{
+    return format("servol(p[%f,%f,%f,%f,%f,%f],%f)", oc(0), oc(1), oc(2), oc(3), oc(4), oc(5), t);
+}
+
+std::string UrMessageEncoder::servoc(Eigen::RowVectorXd oc, double a, double v, double r)
+{
+    return format("servoc([%f,%f,%f,%f,%f,%f],a=%f,v=%f,r=%f)", oc(0), oc(1), oc(2), oc(3), oc(4), oc(5), a, v, r);
 }
 
 std::string UrMessageEncoder::stopl(double a)
@@ -121,7 +161,7 @@ bool UrMessageEncoder::compareVersions(std::string version_0, std::string versio
     if(major_0 > major_1)
         return true;
     else{
-        if(minor_0 > minor_1)
+        if(major_0 == major_1 & minor_0 > minor_1)
             return true;
     }
     return false;

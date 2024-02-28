@@ -1,7 +1,10 @@
-from .pyromocc import *
-from typing import Union
-
+import time
+import warnings
 import numpy as np
+
+from typing import Sequence, Union
+
+from .pyromocc import *
 
 
 class Robot(RobotBase):
@@ -13,25 +16,50 @@ class Robot(RobotBase):
         The robot IP address.
     port: int
         Port used for communicating.
-    manipulator: str, {'UR5', 'UR10'}
-        Manipulator type. Currently supports UR5 and UR10 from universal robotics. Defaults to 'UR5'.
+    manipulator: str, {'UR3', 'UR5', 'UR10', 'UR3e', 'UR5e', 'UR10e'}
+        Manipulator type. Currently, supports UR3, UR5, and UR10 from universal robotics. Defaults to 'UR5'.
     sw_version: str
         Controller software version. Format 'major.minor'. Defaults to "5.3".
 
     Attributes
     ----------
     pose : ndarray
-        Returns the instant 4x4 homogeneous matrix from base to end-effector
+        Returns the instant 4x4 homogeneous matrix from base to end-effector. The pose is in mm.
     pose_aa : list
-        A list of 6 values representing the axis-angle representation and translation of the end-effector wrt base
+        A list of 6 values representing the axis-angle representation and translation of the flange wrt base. The pose
+        is in mm.
+    joint_config : ndarray
+        Returns the instant joint configuration of the robot.
+    joint_velocity : ndarray
+        Returns the instant joint velocity of the robot.
+    operational_config : ndarray
+        Returns the instant operational configuration of the robot.
+    operational_velocity : ndarray
+        Returns the instant operational velocity of the robot.
+    operational_force : ndarray
+        Returns the instant operational force of the robot.
+
+
+    Methods
+    -------
+    connect()
+        Triggers robot connection process. Checks and confirms connection validity within a 5-second loop.
+        Raises a warning if the robot is not connected after 5 seconds. Returns connection status.
+    move_to_pose(pose, acceleration, velocity, wait=False, pose_units="mm")
+        Move to the specified pose. Pose is a 4x4 homogeneous transform.
+    translate(vec, acceleration, velocity, wait=False)
+        Translate the end-effector by the specified vector (x, y, z).
+    movep(pose, acceleration, velocity, time=0, blend_radius=0, wait=False)
+        Move the robot to the specified pose.
+
     """
 
-    def __init__(self, ip: str, port: int = 30003, manipulator: str = None, units="mm", sw_version="3.15"):
+    def __init__(self, ip: str, port: int = 30003, manipulator: str = None, sw_version="3.15"):
         RobotBase.__init__(self)
         self.ip = ip
         self.port = port
         self.sw_version = sw_version
-        self.units = units  # default unit is mm (millimetre)
+        self.is_connected = False
 
         if manipulator is None:
             manipulator = "UR5"
@@ -41,22 +69,30 @@ class Robot(RobotBase):
         self.manipulator = Manipulator(manipulator_type, self.sw_version)
         self.configure(self.manipulator, self.ip, self.port)
 
-    @staticmethod
-    def _string_to_manipulator_type(manipulator):
-        if manipulator == 'UR3':
-            return ManipulatorType.UR3
-        elif manipulator == 'UR3e':
-            return ManipulatorType.UR3e
-        elif manipulator == 'UR5':
-            return ManipulatorType.UR5
-        elif manipulator == 'UR5e':
-            return ManipulatorType.UR5e
-        elif manipulator == 'UR10':
-            return ManipulatorType.UR10
-        elif manipulator == 'UR10e':
-            return ManipulatorType.UR10e
+        self._operational_acceleration_limit = 2500  # 2500 mm/s^2
+        self._operational_velocity_limit = [250, 250, 250, np.pi, np.pi, np.pi]  # 250 mm/s, 1 rad/s
 
-    def move_to_pose(self, pose, acceleration, velocity, wait=False):
+        self._joint_acceleration_limit = 4*np.pi  # 4*pi rad/s^2
+        self._joint_velocity_limit = [np.pi, np.pi, np.pi, np.pi, np.pi, np.pi]  # 1 rad/s
+
+    def connect(self):
+        """ Triggers robot connection process. Checks and confirms connection validity within a 5-second loop.
+        Raises a warning if the robot is not connected after 5 seconds. Returns connection status.
+        """
+
+        self.is_connected = self._connect()
+
+        t0 = time.time()
+        while not self._has_valid_state() and time.time()-t0 < 5.0:
+            time.sleep(0.1)
+            self.is_connected = self._has_valid_state()
+
+        if not self.is_connected:
+            warnings.warn("Robot not connected. Please check the IP and port.")
+
+        return self.is_connected
+
+    def move_to_pose(self, pose, acceleration, velocity, wait=False, pose_units="mm"):
         """
         Parameters
         ----------
@@ -68,18 +104,20 @@ class Robot(RobotBase):
             Velocity of motion
         wait: bool
             Wait for the motion to finish before returning
+        pose_units: str
+            Units of the pose, 'mm' or 'm'. Default is 'mm'.
         """
 
-        if self.units == "mm":
+        if pose_units == "mm":
             self.movep(pose, acceleration, velocity, 0, 0, wait)
-        elif self.units == "m":
+        elif pose_units == "m":
             # scale to mm before calling movep
             pose[:3, 3] *= 1000
             acceleration *= 1000
             velocity *= 1000
             self.movep(pose, acceleration, velocity, 0, 0, wait)
         else:
-            raise NotImplemented("Unit {} not supported.".format(self.units))
+            raise NotImplemented("Unit {} not supported.".format(pose_units))
 
     def translate(self, vec, acceleration, velocity, wait=False):
         """
@@ -87,18 +125,128 @@ class Robot(RobotBase):
 
         Parameters
         ----------
-        vec: ndarray, sequence (list, tuple)
+        vec: np.ndarray, sequence (list, tuple)
             Translate with the relative vector (x, y, z)
         acceleration: float
-            Acceleration to velocity value
+            Acceleration to velocity value (mm/s^2)
         velocity: float
-            Velocity of motion
+            Velocity of motion (mm/s)
         wait: bool
             Wait for the motion to finish before returning
         """
         pose = self.pose
         pose[:3, 3] += vec
         self.movep(pose, acceleration, velocity, 0, 0, wait)
+
+    def movep(self, pose, acceleration, velocity, time=0, blend_radius=0, wait=False):
+        """
+        Move the robot to the specified pose.
+
+        Parameters
+        ----------
+        pose: np.ndarray, Sequence
+            Move to the specified pose. Pose is a 4x4 homogeneous transform or a Sequence of 6 values representing the
+            axis-angle representation and translation of the flange wrt base.
+        acceleration: float
+            Acceleration to velocity value
+        velocity: float
+            Velocity of motion (unit: mm/s)
+        time: float
+            Time to complete the motion. If 0, the robot will move with the specified velocity and acceleration.
+        blend_radius: float
+            Blend radius for the motion.
+        wait: bool
+            Wait for the motion to finish before returning.
+        """
+        self._verify_limits(acceleration, velocity, is_joint=False)
+        self._movep(pose, acceleration, velocity, time, blend_radius, wait)
+
+    def movej(self, joint_config, acceleration, velocity, time=0, blend_radius=0, wait=False):
+        """
+        Move the robot to the specified joint configuration.
+
+        Parameters
+        ----------
+        joint_config: np.ndarray, Sequence
+            Move to the specified joint configuration.
+        acceleration: float
+            Acceleration to velocity value (rad/s^2)
+        velocity: float
+            Velocity of motion (rad/s)
+        time: float
+            Time to complete the motion. If 0, the robot will move with the specified velocity and acceleration.
+        blend_radius: float
+            Blend radius for the motion.
+        wait: bool
+            Wait for the motion to finish before returning.
+        """
+        self._verify_limits(acceleration, velocity, is_joint=True)
+        self._movej(joint_config, acceleration, velocity, time, blend_radius, wait)
+
+    def speedl(self, velocity, acceleration, time=0.5):
+        """
+        Set the linear speed of the robot.
+
+        Parameters
+        ----------
+        velocity: np.ndarray, Sequence
+            Linear velocity (x, y, z, rx, ry, rz) [mm/s, rad/s]
+        acceleration: float
+            Linear acceleration (mm/s^2)
+        time: float
+            Time to keep motion regardless of the velocity is reached.
+        """
+        self._verify_limits(acceleration, velocity, is_joint=False)
+        self._speedl(velocity, acceleration, time)
+
+    def speedj(self, velocity, acceleration, time=0.5):
+        """
+        Set the joint speed of the robot.
+
+        Parameters
+        ----------
+        velocity: np.ndarray, Sequence
+            Joint velocity (rad/s)
+        acceleration: float
+            Joint acceleration (rad/s^2)
+        time: float
+            Time to keep motion regardless of the velocity is reached.
+        """
+        self._verify_limits(acceleration, velocity, is_joint=True)
+        self._speedj(velocity, acceleration, time)
+
+    def servoj(self, joint_config, acceleration, velocity, time, lookahead_time, gain):
+        self._verify_limits(acceleration, velocity, is_joint=True)
+        self._servoj(joint_config, acceleration, velocity, time, lookahead_time, gain)
+
+    def servol(self, pose, time):
+        # TODO: Check limits
+        self._servol(pose, time)
+
+    def servoc(self, pose, acceleration, velocity, radius):
+        raise NotImplemented
+
+    def stopl(self, acceleration=500):
+        """
+        Stops the robot with linear motion and given acceleration.
+
+        Parameters
+        ----------
+        acceleration: float
+            Linear acceleration (mm/s^2)
+        """
+        self._stopl(acceleration)
+
+    def stopj(self, acceleration=np.pi/4):
+        """
+        Stops the robot with joint motion and given joint acceleration.
+
+        Parameters
+        ----------
+        acceleration: float
+            Joint acceleration (rad/s^2)
+        """
+        self._stopj(acceleration)
 
     @property
     def joint_config(self):
@@ -114,22 +262,30 @@ class Robot(RobotBase):
 
     @property
     def operational_velocity(self):
-        return self.get_state().get_operational_config()
+        return self.get_state().get_operational_velocity()
 
     @property
     def operational_force(self):
         return self.get_state().get_operational_force()
 
     @property
+    def timestamp(self):
+        return self.get_state().get_timestamp()
+
+    @property
     def pose(self):
         pose = np.copy(self.get_state().get_pose())
-        if self.units == "mm":
+        return pose
+
+    def get_pose(self, pose_units="mm"):
+        pose = np.copy(self.get_state().get_pose())
+        if pose_units == "mm":
             return pose
-        elif self.units == "m":
+        elif pose_units == "m":
             pose[:3, 3] /= 1000
             return pose
         else:
-            raise NotImplemented("Unit {} not supported.".format(self.units))
+            raise NotImplemented("Unit {} not supported.".format(pose_units))
 
     @property
     def pose_aa(self):
@@ -208,16 +364,105 @@ class Robot(RobotBase):
         return joint_config
 
     def jacobian(self):
+        """ Returns the Jacobian matrix of the robot."""
         return self.get_state().get_jacobian()
 
     def inverse_jacobian(self):
+        """Returns the inverse Jacobian matrix of the robot."""
         return self.get_state().get_inverse_jacobian()
 
     def send_program(self, program: Union[str, bytes]):
-        """
-        Sends program to the robot in URScript format.
-        """
+        """ Sends program to the robot in URScript format. """
         program.strip()
         if not isinstance(program, bytes):
             program = program.encode()
         self._send_program(program)
+
+    @property
+    def operational_acceleration_limit(self):
+        return self._operational_acceleration_limit
+
+    @operational_acceleration_limit.setter
+    def operational_acceleration_limit(self, value):
+        self._operational_acceleration_limit = value
+
+    @property
+    def operational_velocity_limit(self):
+        return self._operational_velocity_limit
+
+    @operational_velocity_limit.setter
+    def operational_velocity_limit(self, value: Sequence[float]):
+        if isinstance(value, float):
+            raise ValueError("Operational velocity limit must be a list of 2 or 6 values.")
+        elif isinstance(value, (list, tuple)):
+            if len(value) == 6:
+                self._operational_velocity_limit = value
+            elif len(value) == 2:
+                self._operational_velocity_limit = [value[0]]*3 + [value[1]]*3
+            else:
+                raise ValueError("Operational velocity limit must be a list of 6 values.")
+
+    @property
+    def joint_acceleration_limit(self):
+        return self._joint_acceleration_limit
+
+    @joint_acceleration_limit.setter
+    def joint_acceleration_limit(self, value: float):
+        self._joint_acceleration_limit = value
+
+    @property
+    def joint_velocity_limit(self):
+        return self._joint_velocity_limit
+
+    @joint_velocity_limit.setter
+    def joint_velocity_limit(self, value: Union[float, list]):
+        if isinstance(value, float):
+            self._joint_velocity_limit = [value]*6
+        elif isinstance(value, list):
+            if len(value) != 6:
+                raise ValueError("Joint velocity limit must be a list of 6 values.")
+            self._joint_velocity_limit = value
+
+    def _verify_limits(self, acceleration, velocity, is_joint=True):
+        if is_joint:
+            if np.any(np.abs(acceleration) > self.joint_acceleration_limit):
+                raise ValueError("Joint acceleration exceeds the limit.")
+            if np.any(np.abs(velocity) > self.joint_velocity_limit):
+                raise ValueError("Joint velocity exceeds the limit.")
+        else:
+            if np.any(np.abs(acceleration) > self.operational_acceleration_limit):
+                raise ValueError("Operational acceleration exceeds the limit.")
+
+            if isinstance(velocity, (float, int)):
+                if np.any(np.abs(velocity) > self.operational_velocity_limit[:3]):
+                    raise ValueError("Operational velocity exceeds the limit.")
+            else:
+                if len(velocity) == 6:
+                    if np.any(np.abs(velocity) > self.operational_velocity_limit):
+                        raise ValueError("Operational velocity exceeds the limit.")
+                elif len(velocity) == 2:
+                    if (np.any(np.abs(velocity[0]) > self.operational_velocity_limit[:3]) or
+                            np.any(np.abs(velocity[1]) > self.operational_velocity_limit[3:])):
+                        raise ValueError("Operational velocity exceeds the limit.")
+
+    def _has_valid_state(self):
+        """ Checks if robot is in a valid state by evaluating the joint configuration."""
+        joint_config = self.joint_config
+        return not np.any(np.abs(joint_config) > 2*np.pi)
+
+    @staticmethod
+    def _string_to_manipulator_type(manipulator):
+        """ Converts user provided manipulator type string to enumerated type. """
+
+        if manipulator == 'UR3':
+            return ManipulatorType.UR3
+        elif manipulator == 'UR3e':
+            return ManipulatorType.UR3e
+        elif manipulator == 'UR5':
+            return ManipulatorType.UR5
+        elif manipulator == 'UR5e':
+            return ManipulatorType.UR5e
+        elif manipulator == 'UR10':
+            return ManipulatorType.UR10
+        elif manipulator == 'UR10e':
+            return ManipulatorType.UR10e

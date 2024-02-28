@@ -51,10 +51,10 @@ TEST_CASE("Initialize robot and test kinematics", "[romocc][Robot]") {
 
 TEST_CASE("Initialize robot and listen for new states", "[romocc][Robot]") {
     Robot::pointer robot = Robot::New();
-    robot->configure(Manipulator(ManipulatorType::UR10), "192.168.153.131", 30003);
+    robot->configure(Manipulator(ManipulatorType::UR5), "localhost", 30003);
     robot->connect();
 
-    for(int i = 0; i<100; i++)
+    for(int i = 0; i<1000; i++)
     {
         std::cout << robot->getCurrentState()->getJointConfig().transpose() << std::endl;
     }
@@ -138,7 +138,7 @@ TEST_CASE("Add update subscription", "[romocc][Robot]"){
     };
 
     robot->addUpdateSubscription(print_message);
-    }
+}
 
 TEST_CASE("Transform to all joints", "[romocc][Robot]"){
     auto robot = Robot::New();
@@ -153,5 +153,55 @@ TEST_CASE("Transform to all joints", "[romocc][Robot]"){
     Transform3d m_bM6 = robot->getCurrentState()->getTransformToJoint(6);
 
     std::cout << m_bM2.matrix() << std::endl;
+}
+
+TEST_CASE("Move servoj", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "localhost", 30003);
+    robot->connect();
+
+    std::cout << robot->getCurrentState()->getOperationalConfig() << std::endl;
+    Vector6d target_q = {-1.6007, -1.7271, -2.2030, -0.8080, 1.5951, -0.0310};
+    robot->move(MotionType::servoj, target_q, 500., 500., 1, 0.1, 300.);
+}
+
+TEST_CASE("Move servol", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5e), "localhost", 30003);
+    robot->connect();
+
+    Vector6d target_oc = {-120.11, -431.76, 100, 0.00, -3.00, 0.00};
+    robot->move(MotionType::servol, target_oc, 0., 0., 5, 0.0, false);
+}
+
+TEST_CASE("Move servoc", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "localhost", 30003);
+    robot->connect();
+
+    Vector6d target_oc = {-87.783, 574.295, 516.137, 3.035, -0.813, -0.};
+    robot->move(MotionType::servoc, target_oc, 500., 500., 10);
+}
+
+TEST_CASE("Move servoj with wait", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "localhost", 30003);
+    robot->connect();
+
+    std::cout << robot->getCurrentState()->getOperationalConfig() << std::endl;
+    Vector6d target_q = {-1.6007, -1.7271, -2.2030, -0.8080, 1.5951, -0.0310};
+
+    robot->move(MotionType::movej, target_q, 500, 500, 1, 0, true);
+
+    // 125 Hz control loop for 2 seconds
+    for (unsigned int i=0; i<250; i++)
+    {
+        auto t_start = robot->currentTime();
+        robot->move(MotionType::servoj, target_q, 0., 0., 1/125.0, 0.1, 300.);
+        target_q[0] += 0.001;
+        target_q[1] += 0.001;
+        robot->wait(t_start);
     }
 }
+
+}   // namespace romocc

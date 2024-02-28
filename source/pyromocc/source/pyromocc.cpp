@@ -1,12 +1,9 @@
-//
-// Created by androst on 31.03.20.
-//
-
 #include <iostream>
 
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 #include <pybind11/stl.h>
+#include <pybind11/chrono.h>
 
 #include "romocc/Robot.h"
 #include "romocc/utilities/MathUtils.h"
@@ -24,16 +21,16 @@ PYBIND11_MODULE(pyromocc, m) {
     pybind11::class_<Robot> robot(m, "RobotBase");
     robot.def(py::init<>())
         .def("configure", &Robot::configure)
-        .def("connect", &Robot::connect, "Connects to the robot.")
         .def("get_state", &Robot::getCurrentState)
-        .def("stop_move", &Robot::stopMove);
+        .def("stop_move", &Robot::stopMove)
+        .def("_connect", &Robot::connect, "Connects to the robot.");
 
-    robot.def("movej", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double vel,
+    robot.def("_movej", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double vel,
             double time = 0, double blendRad = 0, bool wait=false){
             self.move(romocc::MotionType::movej, target, acc, vel, time, blendRad, wait);
     });
 
-    robot.def("movep", [](Robot& self, Eigen::Ref<const Eigen::MatrixXd> pose, double acc, double vel,
+    robot.def("_movep", [](Robot& self, Eigen::Ref<const Eigen::MatrixXd> pose, double acc, double vel,
             double time = 0, double blendRad = 0, bool wait=false){
         if(pose.rows() == 4 && pose.cols() == 4){
             Eigen::Affine3d transform;
@@ -44,18 +41,39 @@ PYBIND11_MODULE(pyromocc, m) {
         }
     });
 
-    robot.def("speedj", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double time=5){
+    robot.def("_speedj", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc=M_PI_4, double time=0.5){
         self.move(romocc::MotionType::speedj, target, acc, 0, time);
     });
-    robot.def("speedl", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double time=5){
+
+    robot.def("_speedl", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc=500, double time=0.5){
         self.move(romocc::MotionType::speedl, target, acc, 0, time);
     });
-    robot.def("stopj", [](Robot& self, double acc){
+
+    robot.def("_servoj", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc=500, double vel=500, double time=1/125., double lookahead_time=0.1, double gain=300){
+        self.move(romocc::MotionType::servoj, target, acc, vel, time, lookahead_time, gain);
+    });
+
+    robot.def("_servol", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double time=1/125.){
+        self.move(romocc::MotionType::servol, target, 0, 0, time);
+    });
+
+    robot.def("_servoc", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc=500, double vel=500, double rad=10){
+        self.move(romocc::MotionType::servoc, target, acc, vel, rad);
+    });
+
+    robot.def("_stopj", [](Robot& self, double acc=M_PI_2){
         self.stopMove(romocc::MotionType::stopj, acc);
     });
-    robot.def("stopl", [](Robot& self, double acc){
+
+    robot.def("_stopl", [](Robot& self, double acc=500){
         self.stopMove(romocc::MotionType::stopl, acc);
     });
+
+    robot.def("wait", [](Robot& self, const std::chrono::steady_clock::time_point &t_cycle_start, double dt=1/125.){
+        self.wait(t_cycle_start, dt);
+    });
+
+    robot.def("current_time", &Robot::currentTime);
 
     robot.def("_send_program", &Robot::sendProgram);
 
@@ -72,6 +90,7 @@ PYBIND11_MODULE(pyromocc, m) {
     robotState.def("get_tool_outputs", &RobotState::getToolOutputs);
     robotState.def("get_tool_inputs", &RobotState::getToolInputs);
     robotState.def("get_safety_mode", &RobotState::getSafetyMode);
+    robotState.def("get_timestamp", &RobotState::getTimestamp);
     robotState.def("joint_to_pose", [](RobotState& self, Eigen::Ref<const Eigen::RowVectorXd> joint_config){
         return self.jointConfigToOperationalConfig(joint_config).matrix();
     });
@@ -113,6 +132,9 @@ PYBIND11_MODULE(pyromocc, m) {
         .value("movep", MotionType::movep)
         .value("speedj", MotionType::speedj)
         .value("speedl", MotionType::speedl)
+        .value("servoj", MotionType::servoj)
+        .value("servol", MotionType::servol)
+        .value("servoc", MotionType::servoc)
         .value("stopj", MotionType::stopj)
         .value("stopl", MotionType::stopl);
 
