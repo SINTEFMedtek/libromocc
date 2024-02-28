@@ -64,6 +64,53 @@ cmake ..
 make -j 4
 ```
 
+### Setup and build (Windows) ###
+
+These instructions assume you have Visual Studio and CMake GUI available on your computer. 
+```bash
+git clone https://github.com/SINTEFMedtek/libromocc.git
+cd libromocc
+mkdir build
+cd build
+cmake-gui.exe ..
+```
+Update the paths to the source code and the build directory as needed:
+- Source: ```<path_to>/libromocc/source```
+- Build: ```<path_to>/libromocc/build```
+
+Click Configure and select the Visual Studio version you would like to use to compile the libraries.
+
+Update the configuration as needed e.g., build tests, examples, Python bindings, etc. Remember to click Configure to update the configuration, and update the paths of the different variables as needed (see **Building the Python bindings** underneath).
+
+When ready, click Generate to create the Visual Studio solution files. Once done click on Open Project.
+
+On Visual Studio, change the solution configuration to Release and build the solution (Build > Build solution).
+
+Once compiled, using again CMake GUI, check that the installation path is correct i.e., modify ```CMAKE_INSTALL_PREFIX``` as needed.
+
+Open the project on Visual Studio again, and compile ```ALL_BUILD``` and the ```INSTALL``` solutions. Notice that to compile the ```INSTALL``` solution, you should be running Visual Studio as admin.
+
+Add the library to the ```PATH``` environment variable by adding the path to the bin folder in the installation directory e.g., ```%CMAKE_INSTALL_PREFIX%/romocc/libromocc/bin```
+
+#### Building the Python bindings ####
+When configuring the project using CMake, check the option ```ROMOCC_BUILD_PYTHON_BINDINGS```, and click Configure to update the configuration of the project.
+
+Update the paths to the Python interpreter and debugger as needed. Build the project as described above.
+
+The python wheels can be found in: ```%CMAKE_INSTALL_PREFIX%/romocc/pyromocc```
+
+#### Using cmake from the terminal ####
+Take a look at https://gnuwin32.sourceforge.net/packages/make.htm to generate the Visual Studio solution files.
+```bash
+git clone https://github.com/SINTEFMedtek/libromocc.git
+cd libromocc
+mkdir build
+cd build
+cmake ..
+# Open the project on Visual Studio
+Start-Process .\ALL_BUILD.vcxproj
+```
+
 ### Usage ###
 
 If you use libromocc in your research and would like to cite the library, we suggest you cite the following conference paper:
@@ -77,9 +124,9 @@ If you use libromocc in your research and would like to cite the library, we sug
 }
 ```
 
-DISCLAIMER: libromocc is researchware and is provided "as-is". The contributors makes no other warranties, express or 
+DISCLAIMER: libromocc is researchware and is provided "as-is". The contributors make no other warranties, express or 
 implied, and hereby disclaims all implied warranties for use and further development. The code is free to download and 
-use under a BSD-2 license. See included licence for more information.
+use under a BSD-2 licence. See included licence for more information.
 
 The code base is currently undergoing large changes, thus there is no guarantee that internal interfaces will be stable.
 
