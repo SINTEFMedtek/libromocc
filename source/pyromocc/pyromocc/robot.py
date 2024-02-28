@@ -433,7 +433,7 @@ class Robot(RobotBase):
             if np.any(np.abs(acceleration) > self.operational_acceleration_limit):
                 raise ValueError("Operational acceleration exceeds the limit.")
 
-            if isinstance(velocity, float):
+            if isinstance(velocity, (float, int)):
                 if np.any(np.abs(velocity) > self.operational_velocity_limit[:3]):
                     raise ValueError("Operational velocity exceeds the limit.")
             else:
