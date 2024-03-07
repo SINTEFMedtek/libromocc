@@ -28,6 +28,8 @@ class ROMOCC_EXPORT Robot : public Object
         void shutdown();
 
         RobotState::pointer getCurrentState() const;
+        connectionConfiguration getCommuncationConfiguration() const;
+
         void addUpdateSubscription(std::function<void()> updateFunction);
 
         template <class Target>

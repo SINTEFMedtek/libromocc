@@ -246,4 +246,9 @@ Transform3d RobotState::jointConfigToOperationalConfig(romocc::Vector6d jointCon
     return transform_to_joint(jointConfig);
 }
 
+Manipulator RobotState::getManipulator()
+{
+    return mManipulator;
+}
+
 }

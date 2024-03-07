@@ -23,7 +23,34 @@ PYBIND11_MODULE(pyromocc, m) {
         .def("configure", &Robot::configure)
         .def("get_state", &Robot::getCurrentState)
         .def("stop_move", &Robot::stopMove)
-        .def("_connect", &Robot::connect, "Connects to the robot.");
+        .def("_connect", &Robot::connect, "Connects to the robot.")
+        .def("get_comms_config", &Robot::getCommuncationConfiguration)
+        .def(py::pickle(
+            /* Get object state */
+            [](Robot &r) {
+                Manipulator manipulator = r.getCurrentState()->getManipulator();
+                connectionConfiguration commsConfig = r.getCommuncationConfiguration();
+                if (r.isConnected())
+                    r.disconnect();
+                return py::make_tuple(manipulator.manipulator, manipulator.sw_version, commsConfig.host, commsConfig.port);
+            },
+
+            /* Create a new object and restore the state */
+            [](py::tuple pickled_state) {
+                if (pickled_state.size() != 4)
+                    throw std::runtime_error("Invalid state");
+
+                Manipulator manipulator = { pickled_state[0].cast<ManipulatorType>(), pickled_state[1].cast<std::string>() };
+                /* Create a new instance of Robot */
+                std::unique_ptr<Robot> r = std::unique_ptr<Robot>(new Robot());
+                r->configure(manipulator, pickled_state[2].cast<std::string>(), pickled_state[3].cast<int>());
+                if (!r->connect()) {
+                    throw std::runtime_error("Failed to unpickle, cannot connect to robot");
+                }
+
+                return r;
+            }
+        ));
 
     robot.def("_movej", [](Robot& self, Eigen::Ref<const Eigen::RowVectorXd> target, double acc, double vel,
             double time = 0, double blendRad = 0, bool wait=false){

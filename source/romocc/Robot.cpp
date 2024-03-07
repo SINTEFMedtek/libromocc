@@ -55,6 +55,11 @@ RobotState::pointer Robot::getCurrentState() const
     return mCurrentState;
 }
 
+connectionConfiguration Robot::getCommuncationConfiguration() const
+{
+    return mCommunicationInterface->getConnectionConfig();
+}
+
 void Robot::runMotionQueue(MotionQueue queue)
 {
     mMotionQueue = std::move(queue);
