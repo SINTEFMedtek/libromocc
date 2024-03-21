@@ -100,6 +100,11 @@ void CommunicationInterface::setManipulator(romocc::Manipulator manipulator)
     mCurrentState->setManipulator(manipulator);
 }
 
+connectionConfiguration CommunicationInterface::getConnectionConfig()
+{
+    return connectionConfiguration{ mHost, mPort };
+}
+
 RobotState::pointer CommunicationInterface::getRobotState()
 {
     return mCurrentState;

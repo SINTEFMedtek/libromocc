@@ -13,6 +13,11 @@
 
 namespace romocc
 {
+struct connectionConfiguration
+{
+    std::string host;
+    int port;
+};
 
 class ROMOCC_EXPORT CommunicationInterface : public Object
 {
@@ -24,6 +29,7 @@ class ROMOCC_EXPORT CommunicationInterface : public Object
 
         void configConnection(std::string host, int port);
         void setManipulator(Manipulator manipulator);
+        connectionConfiguration getConnectionConfig();
 
         RobotState::pointer getRobotState();
 
