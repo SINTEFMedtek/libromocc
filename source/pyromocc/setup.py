@@ -9,7 +9,7 @@ from setuptools.dist import Distribution
 from setuptools import setup, find_packages
 
 package_name = "pyromocc"
-version = "0.0.7"
+version = "0.0.8"
 cmdclass = {}
 
 build_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
