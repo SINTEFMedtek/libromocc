@@ -55,7 +55,7 @@ RobotState::pointer Robot::getCurrentState() const
     return mCurrentState;
 }
 
-connectionConfiguration Robot::getCommuncationConfiguration() const
+connectionConfiguration Robot::getCommunicationConfiguration() const
 {
     return mCommunicationInterface->getConnectionConfig();
 }

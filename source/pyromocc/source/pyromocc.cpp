@@ -24,12 +24,12 @@ PYBIND11_MODULE(pyromocc, m) {
         .def("get_state", &Robot::getCurrentState)
         .def("stop_move", &Robot::stopMove)
         .def("_connect", &Robot::connect, "Connects to the robot.")
-        .def("get_comms_config", &Robot::getCommuncationConfiguration)
+        .def("get_communication_config", &Robot::getCommunicationConfiguration)
         .def(py::pickle(
             /* Get object state */
             [](Robot &r) {
                 Manipulator manipulator = r.getCurrentState()->getManipulator();
-                connectionConfiguration commsConfig = r.getCommuncationConfiguration();
+                connectionConfiguration commsConfig = r.getCommunicationConfiguration();
                 if (r.isConnected())
                     r.disconnect();
                 return py::make_tuple(manipulator.manipulator, manipulator.sw_version, commsConfig.host, commsConfig.port);
