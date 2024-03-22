@@ -24,6 +24,8 @@ PYBIND11_MODULE(pyromocc, m) {
         .def("get_state", &Robot::getCurrentState)
         .def("stop_move", &Robot::stopMove)
         .def("_connect", &Robot::connect, "Connects to the robot.")
+        .def("_disconnect", &Robot::disconnect, "Disconnects from the robot.")
+        .def("_is_connected", &Robot::isConnected, "Check if there is communication with the robot")
         .def("get_comms_config", &Robot::getCommuncationConfiguration)
         .def(py::pickle(
             /* Get object state */

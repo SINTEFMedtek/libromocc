@@ -54,7 +54,7 @@ class Robot(RobotBase):
 
     """
 
-    def __init__(self, ip: str, port: int = 30003, manipulator: str = None, sw_version="3.15"):
+    def __init__(self, ip: str, port: int = 30003, manipulator: str = None, sw_version="3.15", auto_connect: bool = False):
         RobotBase.__init__(self)
         self.ip = ip
         self.port = port
@@ -74,6 +74,9 @@ class Robot(RobotBase):
 
         self._joint_acceleration_limit = 4*np.pi  # 4*pi rad/s^2
         self._joint_velocity_limit = [np.pi, np.pi, np.pi, np.pi, np.pi, np.pi]  # 1 rad/s
+        
+        if auto_connect:
+            self.connect()
 
     def connect(self):
         """ Triggers robot connection process. Checks and confirms connection validity within a 5-second loop.
@@ -466,3 +469,15 @@ class Robot(RobotBase):
             return ManipulatorType.UR10
         elif manipulator == 'UR10e':
             return ManipulatorType.UR10e
+    
+    def __reduce__(self):
+        if self._is_connected():
+            self._disconnect()
+        return (self.__class__, (self.ip, self.port, self.manipulator.manipulator.name, self.sw_version, True))
+    
+    # def __setstate__(self, new_state):
+    #     assert len(new_state[-1]) == 4, "Invalid state length"
+    #     robot_class, (ip, port, manipulator_name, sw_version) = new_state
+    #     robot = robot_class(ip, port, manipulator_name, sw_version)
+    #     robot.connect()
+    #     return robot
