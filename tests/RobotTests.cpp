@@ -281,4 +281,14 @@ TEST_CASE("Set tool voltage", "[romocc][Robot]"){
     robot->wait(robot->currentTime(), 0.1);
 }
 
+TEST_CASE("Enable / disable freedrive", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "localhost", 30003);
+    robot->connect();
+
+    robot->enableFreedriveMode();
+    robot->wait(robot->currentTime(), 2);
+    robot->disableFreedriveMode();
+}
+
 }   // namespace romocc
