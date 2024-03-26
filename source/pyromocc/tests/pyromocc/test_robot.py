@@ -126,3 +126,92 @@ class TestRobot(TestCase):
             self.robot.stopj()
             time.sleep(1/125.0)
 
+    def test_robot_io_properties(self):
+        for _ in range(250):
+            current_time = self.robot.current_time()
+            print(f"Digital inputs: {self.robot.io.digital_inputs}")
+            print(f"Digital outputs: {self.robot.io.digital_outputs}")
+            print(f"Configurable inputs: {self.robot.io.configurable_inputs}")
+            print(f"Configurable outputs: {self.robot.io.configurable_outputs}")
+            print(f"Tool inputs: {self.robot.io.tool_inputs}")
+            print(f"Tool outputs: {self.robot.io.tool_outputs}")
+            self.robot.wait(current_time, 1/125.0)
+
+    def test_robot_set_configurable_outputs(self):
+        for i in range(8):
+            self.robot.set_configurable_output(i, True)
+            time.sleep(0.05)
+
+        assert all(self.robot.io.configurable_outputs == [True, True, True, True, True, True, True, True])
+
+        for i in reversed(range(8)):
+            self.robot.set_configurable_output(i, False)
+            time.sleep(0.05)
+
+        assert all(self.robot.io.configurable_outputs == [False, False, False, False, False, False, False, False])
+
+    def test_robot_io_configurable_outputs(self):
+        self.robot.io.configurable_outputs = [False, False, False, False, False, False, False, False]
+        assert all(self.robot.io.configurable_outputs == [False, False, False, False, False, False, False, False])
+
+        self.robot.io.configurable_outputs = [False, True, False, False, True, False, False, False]
+        assert all(self.robot.io.configurable_outputs == [False, True, False, False, True, False, False, False])
+
+        self.robot.io.configurable_outputs = [True, True, True, True, True, True, True, True]
+        assert all(self.robot.io.configurable_outputs == [True, True, True, True, True, True, True, True])
+
+        self.robot.io.configurable_outputs = [False, False, False, False, False, False, False, False]
+        assert all(self.robot.io.configurable_outputs == [False, False, False, False, False, False, False, False])
+
+
+    def test_robot_set_digital_outputs(self):
+        for i in range(8):
+            self.robot.set_digital_output(i, True)
+            time.sleep(0.05)
+
+        assert all(self.robot.io.digital_outputs == [True, True, True, True, True, True, True, True])
+
+        for i in reversed(range(8)):
+            self.robot.set_digital_output(i, False)
+            time.sleep(0.05)
+
+        assert all(self.robot.io.digital_outputs == [False, False, False, False, False, False, False, False])
+
+    def test_robot_io_digital_outputs(self):
+        self.robot.io.digital_outputs = [False, False, False, False, False, False, False, False]
+        assert all(self.robot.io.digital_outputs == [False, False, False, False, False, False, False, False])
+
+        self.robot.io.digital_outputs = [False, True, False, False, True, False, False, False]
+        assert all(self.robot.io.digital_outputs == [False, True, False, False, True, False, False, False])
+
+        self.robot.io.digital_outputs = [True, True, True, True, True, True, True, True]
+        assert all(self.robot.io.digital_outputs == [True, True, True, True, True, True, True, True])
+
+        self.robot.io.digital_outputs = [False, False, False, False, False, False, False, False]
+        assert all(self.robot.io.digital_outputs == [False, False, False, False, False, False, False, False])
+
+    def test_robot_set_tool_outputs(self):
+        for i in range(2):
+            self.robot.set_tool_output(i, True)
+            time.sleep(0.05)
+
+        assert all(self.robot.io.tool_outputs == [True, True])
+
+        for i in reversed(range(2)):
+            self.robot.set_tool_output(i, False)
+            time.sleep(0.05)
+
+        assert all(self.robot.io.tool_outputs == [False, False])
+
+    def test_robot_io_tool_outputs(self):
+        self.robot.io.tool_outputs = [False, False]
+        assert all(self.robot.io.tool_outputs == [False, False])
+
+        self.robot.io.tool_outputs = [False, True]
+        assert all(self.robot.io.tool_outputs == [False, True])
+
+        self.robot.io.tool_outputs = [True, True]
+        assert all(self.robot.io.tool_outputs == [True, True])
+
+        self.robot.io.tool_outputs = [False, False]
+        assert all(self.robot.io.tool_outputs == [False, False])
