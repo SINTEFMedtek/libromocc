@@ -25,6 +25,11 @@ PYBIND11_MODULE(pyromocc, m) {
         .def("stop_move", &Robot::stopMove)
         .def("_connect", &Robot::connect, "Connects to the robot.")
         .def("get_communication_config", &Robot::getCommunicationConfiguration)
+        .def("set_configurable_output", &Robot::setConfigurableOutput)
+        .def("set_digital_output", &Robot::setDigitalOutput)
+        .def("set_analog_output", &Robot::setAnalogOutput)
+        .def("set_tool_voltage", &Robot::setToolVoltage)
+        .def("set_tool_output", &Robot::setToolOutput)
         .def(py::pickle(
             /* Get object state */
             [](Robot &r) {
