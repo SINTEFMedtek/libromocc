@@ -75,6 +75,8 @@ class Robot(RobotBase):
         self._joint_acceleration_limit = 4*np.pi  # 4*pi rad/s^2
         self._joint_velocity_limit = [np.pi, np.pi, np.pi, np.pi, np.pi, np.pi]  # 1 rad/s
 
+        self.io = self.IO(self)
+
     def connect(self):
         """ Triggers robot connection process. Checks and confirms connection validity within a 5-second loop.
         Raises a warning if the robot is not connected after 5 seconds. Returns connection status.
@@ -466,3 +468,63 @@ class Robot(RobotBase):
             return ManipulatorType.UR10
         elif manipulator == 'UR10e':
             return ManipulatorType.UR10e
+
+    class IO(object):
+        def __init__(self, robot):
+            self.robot = robot
+
+        @property
+        def digital_inputs(self):
+            return self._unpack_bits(self.robot.get_state().get_digital_inputs())
+
+        @digital_inputs.setter
+        def digital_inputs(self, value):
+            for idx, val in enumerate(value):
+                self.robot.set_digital_input(idx, val)
+
+        @property
+        def digital_outputs(self):
+            return self._unpack_bits(self.robot.get_state().get_digital_outputs())
+
+        @digital_outputs.setter
+        def digital_outputs(self, value):
+            for idx, val in enumerate(value):
+                if self.digital_outputs[idx] != val:
+                    self.robot.set_digital_output(idx, val)
+                    while self.digital_outputs[idx] != val:
+                        pass
+        @property
+        def configurable_inputs(self):
+            return self._unpack_bits(self.robot.get_state().get_configurable_inputs())
+
+        @property
+        def configurable_outputs(self):
+            return self._unpack_bits(self.robot.get_state().get_configurable_outputs())
+
+        @configurable_outputs.setter
+        def configurable_outputs(self, value):
+            for idx, val in enumerate(value):
+                if self.configurable_outputs[idx] != val:
+                    self.robot.set_configurable_output(idx, val)
+                    while self.configurable_outputs[idx] != val:
+                        pass
+
+        @property
+        def tool_inputs(self):
+            return self._unpack_bits(self.robot.get_state().get_tool_inputs())[:2]
+
+        @property
+        def tool_outputs(self):
+            return self._unpack_bits(self.robot.get_state().get_tool_outputs())[:2]
+
+        @tool_outputs.setter
+        def tool_outputs(self, value):
+            for idx, val in enumerate(value):
+                if self.tool_outputs[idx] != val:
+                    self.robot.set_tool_output(idx, val)
+                    while self.tool_outputs[idx] != val:
+                        pass
+
+        @staticmethod
+        def _unpack_bits(value: int):
+            return np.unpackbits(np.array(value, dtype=np.uint8), axis=0, bitorder='little').astype(bool)
