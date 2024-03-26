@@ -126,6 +126,11 @@ class TestRobot(TestCase):
             self.robot.stopj()
             time.sleep(1/125.0)
 
+    def test_enable_disable_freedrive_mode(self):
+        self.robot.set_freedrive_mode(True)
+        time.sleep(1)
+        self.robot.set_freedrive_mode(False)
+
     def test_robot_io_properties(self):
         for _ in range(250):
             current_time = self.robot.current_time()
@@ -162,7 +167,6 @@ class TestRobot(TestCase):
 
         self.robot.io.configurable_outputs = [False, False, False, False, False, False, False, False]
         assert all(self.robot.io.configurable_outputs == [False, False, False, False, False, False, False, False])
-
 
     def test_robot_set_digital_outputs(self):
         for i in range(8):
