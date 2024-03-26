@@ -110,6 +110,17 @@ class TestRobot(TestCase):
             target_q[1] += 0.001
             self.robot.wait(current_time, 1/125.0)
 
+    def test_robot_servol_control_loop(self):
+        target_q = [-1.6007, -1.7271, -2.2030, -0.8080, 1.5951, -0.0310]
+        self.robot.movej(target_q, 0.5, 0.5, 0, 0, True)
+
+        target_p = self.robot.operational_config
+        for _ in range(250):
+            current_time = self.robot.current_time()
+            self.robot.servol(target_p, time=0.1)
+            target_p[2] += 1.0
+            self.robot.wait(current_time, 1/125.0)
+
     def test_loop_stopj(self):
         for i in range(125):
             self.robot.stopj()
