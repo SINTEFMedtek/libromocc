@@ -43,6 +43,11 @@ class ROMOCC_EXPORT Robot : public Object
 
         void runMotionQueue(MotionQueue queue);
         void stopRunMotionQueue();
+        void setConfigurableOutput(int pin, bool value);
+        void setDigitalOutput(int pin, bool value);
+        void setAnalogOutput(int pin, double value);
+        void setToolVoltage(int voltage);
+        void setToolOutput(int pin, bool value);
 
         RobotCoordinateSystem::pointer getCoordinateSystem(){ return mCoordinateSystem;};
 

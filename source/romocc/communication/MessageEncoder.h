@@ -18,6 +18,11 @@ class ROMOCC_EXPORT MessageEncoder : public Object
         virtual std::string moveCommand(MotionType type, double target[], double acc, double vel, double t, double rad) = 0;
         virtual std::string stopCommand(MotionType type, double acc) = 0;
         virtual std::string shutdownCommand() = 0;
+        virtual std::string setConfigurableOutput(int pin, bool value) = 0;
+        virtual std::string setDigitalOutput(int pin, bool value) = 0;
+        virtual std::string setAnalogOutput(int pin, double value) = 0;
+        virtual std::string setToolVoltage(int voltage) = 0;
+        virtual std::string setToolOutput(int pin, bool value) = 0;
 
     protected:
         std::string format(const std::string& format, ...);

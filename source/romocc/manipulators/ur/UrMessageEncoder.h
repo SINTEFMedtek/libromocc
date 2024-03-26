@@ -47,6 +47,12 @@ class ROMOCC_EXPORT UrMessageEncoder : public MessageEncoder
         std::string textmsg(std::string msg);
         std::string sleep(double time);
 
+        std::string setConfigurableOutput(int pin, bool value);
+        std::string setDigitalOutput(int pin, bool value);
+        std::string setAnalogOutput(int pin, double value);
+        std::string setToolOutput(int pin, bool value);
+        std::string setToolVoltage(int voltage);
+
         std::string powerdown();
 
         std::string mURSoftwareVersion = "3.0";

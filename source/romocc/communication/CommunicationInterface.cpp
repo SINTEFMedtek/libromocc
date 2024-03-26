@@ -115,5 +115,29 @@ void CommunicationInterface::stopMove(MotionType typeOfStop, double acc)
     sendMessage(mEncoder->stopCommand(typeOfStop, acc));
 }
 
+void CommunicationInterface::setConfigurableOutput(int pin, bool value)
+{
+    sendMessage(mEncoder->setConfigurableOutput(pin, value));
+}
+
+void CommunicationInterface::setDigitalOutput(int pin, bool value)
+{
+    sendMessage(mEncoder->setDigitalOutput(pin, value));
+}
+
+void CommunicationInterface::setAnalogOutput(int pin, double value)
+{
+    sendMessage(mEncoder->setAnalogOutput(pin, value));
+}
+
+void CommunicationInterface::setToolVoltage(int voltage)
+{
+    sendMessage(mEncoder->setToolVoltage(voltage));
+}
+
+void CommunicationInterface::setToolOutput(int pin, bool value)
+{
+    sendMessage(mEncoder->setToolOutput(pin, value));
+}
 
 }

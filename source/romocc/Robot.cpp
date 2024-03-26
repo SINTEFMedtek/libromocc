@@ -60,6 +60,31 @@ connectionConfiguration Robot::getCommunicationConfiguration() const
     return mCommunicationInterface->getConnectionConfig();
 }
 
+void Robot::setConfigurableOutput(int pin, bool value)
+{
+    mCommunicationInterface->setConfigurableOutput(pin, value);
+}
+
+void Robot::setDigitalOutput(int pin, bool value)
+{
+    mCommunicationInterface->setDigitalOutput(pin, value);
+}
+
+void Robot::setAnalogOutput(int pin, double value)
+{
+    mCommunicationInterface->setAnalogOutput(pin, value);
+}
+
+void Robot::setToolOutput(int pin, bool value)
+{
+    mCommunicationInterface->setToolOutput(pin, value);
+}
+
+void Robot::setToolVoltage(int voltage)
+{
+    mCommunicationInterface->setToolVoltage(voltage);
+}
+
 void Robot::runMotionQueue(MotionQueue queue)
 {
     mMotionQueue = std::move(queue);

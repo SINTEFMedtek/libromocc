@@ -133,6 +133,31 @@ std::string UrMessageEncoder::stopj(double a)
     return format("stopj(%f)", a);
 }
 
+std::string UrMessageEncoder::setConfigurableOutput(int pin, bool value)
+{
+    return format("set_configurable_digital_out(%d,%s)", pin, value ? "True" : "False");
+}
+
+std::string UrMessageEncoder::setDigitalOutput(int pin, bool value)
+{
+    return format("set_digital_out(%d,%s)", pin, value ? "True" : "False");
+}
+
+std::string UrMessageEncoder::setToolOutput(int pin, bool value)
+{
+    return format("set_tool_digital_out(%d,%s)", pin, value ? "True" : "False");
+}
+
+std::string UrMessageEncoder::setToolVoltage(int voltage)
+{
+    return format("set_tool_voltage(%d)", voltage);
+}
+
+std::string UrMessageEncoder::setAnalogOutput(int pin, double value)
+{
+    return format("set_analog_out(%d,%f)", pin, value);
+}
+
 std::string UrMessageEncoder::powerdown()
 {
     return std::string("powerdown()");

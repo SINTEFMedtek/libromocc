@@ -47,6 +47,12 @@ class ROMOCC_EXPORT CommunicationInterface : public Object
 
         void stopMove(MotionType typeOfStop, double acc);
 
+        void setConfigurableOutput(int pin, bool value);
+        void setDigitalOutput(int pin, bool value);
+        void setAnalogOutput(int pin, double value);
+        void setToolVoltage(int voltage);
+        void setToolOutput(int pin, bool value);
+
 private:
         std::shared_ptr<Client> mClient;
         std::shared_ptr<MessageEncoder> mEncoder;
