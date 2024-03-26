@@ -53,7 +53,10 @@ class ROMOCC_EXPORT CommunicationInterface : public Object
         void setToolVoltage(int voltage);
         void setToolOutput(int pin, bool value);
 
-private:
+        void enableFreedriveMode();
+        void disableFreedriveMode();
+
+    private:
         std::shared_ptr<Client> mClient;
         std::shared_ptr<MessageEncoder> mEncoder;
         RobotState::pointer mCurrentState;

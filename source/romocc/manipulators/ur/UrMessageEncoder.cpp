@@ -158,6 +158,16 @@ std::string UrMessageEncoder::setAnalogOutput(int pin, double value)
     return format("set_analog_out(%d,%f)", pin, value);
 }
 
+std::string UrMessageEncoder::enableFreedriveMode()
+{
+    return std::string("freedrive_mode()");
+}
+
+std::string UrMessageEncoder::disableFreedriveMode()
+{
+    return std::string("end_freedrive_mode()");
+}
+
 std::string UrMessageEncoder::powerdown()
 {
     return std::string("powerdown()");

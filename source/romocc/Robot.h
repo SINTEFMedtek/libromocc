@@ -49,6 +49,9 @@ class ROMOCC_EXPORT Robot : public Object
         void setToolVoltage(int voltage);
         void setToolOutput(int pin, bool value);
 
+        void enableFreedriveMode();
+        void disableFreedriveMode();
+
         RobotCoordinateSystem::pointer getCoordinateSystem(){ return mCoordinateSystem;};
 
         std::chrono::steady_clock::time_point currentTime();

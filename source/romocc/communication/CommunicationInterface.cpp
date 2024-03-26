@@ -140,4 +140,14 @@ void CommunicationInterface::setToolOutput(int pin, bool value)
     sendMessage(mEncoder->setToolOutput(pin, value));
 }
 
+void CommunicationInterface::enableFreedriveMode()
+{
+    sendMessage(mEncoder->enableFreedriveMode());
+}
+
+void CommunicationInterface::disableFreedriveMode()
+{
+    sendMessage(mEncoder->disableFreedriveMode());
+}
+
 }

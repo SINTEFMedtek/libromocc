@@ -53,6 +53,9 @@ class ROMOCC_EXPORT UrMessageEncoder : public MessageEncoder
         std::string setToolOutput(int pin, bool value);
         std::string setToolVoltage(int voltage);
 
+        std::string enableFreedriveMode();
+        std::string disableFreedriveMode();
+
         std::string powerdown();
 
         std::string mURSoftwareVersion = "3.0";

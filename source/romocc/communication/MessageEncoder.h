@@ -24,6 +24,9 @@ class ROMOCC_EXPORT MessageEncoder : public Object
         virtual std::string setToolVoltage(int voltage) = 0;
         virtual std::string setToolOutput(int pin, bool value) = 0;
 
+        virtual std::string enableFreedriveMode() = 0;
+        virtual std::string disableFreedriveMode() = 0;
+
     protected:
         std::string format(const std::string& format, ...);
 };

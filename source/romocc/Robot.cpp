@@ -85,6 +85,16 @@ void Robot::setToolVoltage(int voltage)
     mCommunicationInterface->setToolVoltage(voltage);
 }
 
+void Robot::enableFreedriveMode()
+{
+    mCommunicationInterface->enableFreedriveMode();
+}
+
+void Robot::disableFreedriveMode()
+{
+    mCommunicationInterface->disableFreedriveMode();
+}
+
 void Robot::runMotionQueue(MotionQueue queue)
 {
     mMotionQueue = std::move(queue);
