@@ -30,6 +30,8 @@ PYBIND11_MODULE(pyromocc, m) {
         .def("set_analog_output", &Robot::setAnalogOutput)
         .def("set_tool_voltage", &Robot::setToolVoltage)
         .def("set_tool_output", &Robot::setToolOutput)
+        .def("enable_freedrive_mode", &Robot::enableFreedriveMode)
+        .def("disable_freedrive_mode", &Robot::disableFreedriveMode)
         .def(py::pickle(
             /* Get object state */
             [](Robot &r) {

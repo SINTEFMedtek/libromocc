@@ -425,6 +425,12 @@ class Robot(RobotBase):
                 raise ValueError("Joint velocity limit must be a list of 6 values.")
             self._joint_velocity_limit = value
 
+    def set_freedrive_mode(self, enable: bool):
+        if enable:
+            self.enable_freedrive_mode()
+        else:
+            self.disable_freedrive_mode()
+
     def _verify_limits(self, acceleration, velocity, is_joint=True):
         if is_joint:
             if np.any(np.abs(acceleration) > self.joint_acceleration_limit):
