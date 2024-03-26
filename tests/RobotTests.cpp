@@ -204,4 +204,81 @@ TEST_CASE("Move servoj with wait", "[romocc][Robot]"){
     }
 }
 
+TEST_CASE("Set configurable outputs", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "localhost", 30003);
+    robot->connect();
+
+    for (int i = 0; i < 8; i++)
+    {
+        robot->setConfigurableOutput(i, true);
+        robot->wait(robot->currentTime(), 0.1);
+        robot->setConfigurableOutput(i, false);
+        robot->wait(robot->currentTime(), 0.1);
+    }
+}
+
+TEST_CASE("Set digital outputs", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "localhost", 30003);
+    robot->connect();
+
+    for (int i = 0; i < 8; i++)
+    {
+        robot->setDigitalOutput(i, true);
+        robot->wait(robot->currentTime(), 0.1);
+        robot->setDigitalOutput(i, false);
+        robot->wait(robot->currentTime(), 0.1);
+    }
+}
+
+TEST_CASE("Set tool outputs", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "localhost", 30003);
+    robot->connect();
+
+    for (int i = 0; i < 2; i++)
+    {
+        robot->setToolOutput(i, true);
+        robot->wait(robot->currentTime(), 0.2);
+        robot->setToolOutput(i, false);
+        robot->wait(robot->currentTime(), 0.2);
+    }
+}
+
+TEST_CASE("Set analog output", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "localhost", 30003);
+    robot->connect();
+
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            robot->setAnalogOutput(i, j/9.0);
+            robot->wait(robot->currentTime(), 0.2);
+        }
+        robot->setAnalogOutput(i, 0);
+        robot->wait(robot->currentTime(), 0.2);
+    }
+}
+
+TEST_CASE("Set tool voltage", "[romocc][Robot]"){
+    Robot::pointer robot = Robot::New();
+    robot->configure(Manipulator(ManipulatorType::UR5), "localhost", 30003);
+    robot->connect();
+
+    robot->setToolVoltage(0);
+    robot->wait(robot->currentTime(), 0.1);
+
+    robot->setToolVoltage(12);
+    robot->wait(robot->currentTime(), 0.5);
+
+    robot->setToolVoltage(24);
+    robot->wait(robot->currentTime(), 0.5);
+
+    robot->setToolVoltage(0);
+    robot->wait(robot->currentTime(), 0.1);
+}
+
 }   // namespace romocc
